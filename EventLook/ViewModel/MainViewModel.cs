@@ -18,16 +18,6 @@ namespace EventLook.ViewModel
         /// </summary>
         public MainViewModel(IDataService dataService)
         {
-            ////if (IsInDesignMode)
-            ////{
-            ////    // Code runs in Blend --> create design time data.
-            ////}
-            ////else
-            ////{
-            ////    // Code runs "for real"
-            ////}
-            ///
-
             InitializeCommands();
             DataService = dataService;
             LoadData();
@@ -56,8 +46,8 @@ namespace EventLook.ViewModel
         private CollectionViewSource CVS { get; set; }
 
         #region Properties (Displayable in View)
-        private ObservableCollection<EventRecord> _events;
-        public ObservableCollection<EventRecord> Events
+        private ObservableCollection<EventItem> _events;
+        public ObservableCollection<EventItem> Events
         {
             get { return _events; }
             set
@@ -79,7 +69,7 @@ namespace EventLook.ViewModel
         {
             var events = DataService.GetEvents();
 
-            Events = new ObservableCollection<EventRecord>(events);
+            Events = new ObservableCollection<EventItem>(events);
         }
         /// <summary>
         /// This method handles a message recieved from the View which enables a reference to the

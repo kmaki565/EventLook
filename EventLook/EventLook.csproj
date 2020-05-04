@@ -71,6 +71,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Model\DataService.cs" />
+    <Compile Include="Model\EventItem.cs" />
     <Compile Include="ViewModel\CvsMessageToken.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
