@@ -1,4 +1,5 @@
 using CommonServiceLocator;
+using EventLook.Model;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Ioc;
 
@@ -24,14 +25,14 @@ namespace EventLook.ViewModel
             ////}
             ////else
             ////{
-            ////    // Create run time view services and models
-            ////    SimpleIoc.Default.Register<IDataService, DataService>();
+            // Create run time view services and models
+            SimpleIoc.Default.Register<IDataService, DataService>();
             ////}
 
             SimpleIoc.Default.Register<MainViewModel>();
         }
 
-        public MainViewModel Main
+        public MainViewModel MainVm
         {
             get
             {
@@ -41,7 +42,7 @@ namespace EventLook.ViewModel
         
         public static void Cleanup()
         {
-            // TODO Clear the ViewModels
+            ServiceLocator.Current.GetInstance<MainViewModel>().Cleanup();
         }
     }
 }

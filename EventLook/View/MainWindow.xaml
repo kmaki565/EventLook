@@ -5,9 +5,19 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EventLook"
         mc:Ignorable="d"
-        DataContext="{Binding Source={StaticResource Locator}, Path=ViewModelName}"
-        Title="MainWindow" Height="450" Width="800">
+        DataContext="{Binding Source={StaticResource Locator}, Path=MainVm, Mode=OneWay}"
+        Title="EventLook">
+    <Window.Resources>
+        <!-- This next line instantiates a CollectionViewSource with the collection of Events as its collection of objects-->
+        <CollectionViewSource Source="{Binding Events}" x:Key="X_CVS"/>
+    </Window.Resources>
     <Grid>
-        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <!-- *** The ItemsSource of the data grid is bound to the CollectionViewSource object that was instantiated above -->
+        <DataGrid ItemsSource="{Binding Source={StaticResource X_CVS}}" Margin="8" Grid.Row="1" AutoGenerateColumns="True"  IsReadOnly="True"></DataGrid>
+
     </Grid>
 </Window>
