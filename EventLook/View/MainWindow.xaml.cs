@@ -31,6 +31,8 @@ namespace EventLook
             Messenger.Default.Send(new ViewCollectionViewSourceMessageToken() { CVS = (CollectionViewSource)(this.Resources["X_CVS"]) });
 
             // Note to MVVM purists:  Not an ideal solution.  But based on the amount if time spent on this it was acceptable, especially to the client.
+
+            ContentRendered += (s, e) => { ((MainViewModel)DataContext).OnLoaded(); };
         }
     }
 }

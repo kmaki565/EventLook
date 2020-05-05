@@ -6,8 +6,10 @@
         xmlns:local="clr-namespace:EventLook"
         mc:Ignorable="d"
         DataContext="{Binding Source={StaticResource Locator}, Path=MainVm, Mode=OneWay}"
+        ResizeMode="CanResizeWithGrip"
         Title="EventLook">
     <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="conv" />
         <!-- This next line instantiates a CollectionViewSource with the collection of Events as its collection of objects-->
         <CollectionViewSource Source="{Binding Events}" x:Key="X_CVS"/>
     </Window.Resources>
@@ -15,9 +17,13 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
             <RowDefinition/>
+            <RowDefinition Height="35"/>
         </Grid.RowDefinitions>
         <!-- *** The ItemsSource of the data grid is bound to the CollectionViewSource object that was instantiated above -->
-        <DataGrid ItemsSource="{Binding Source={StaticResource X_CVS}}" Margin="8" Grid.Row="1" AutoGenerateColumns="True"  IsReadOnly="True"></DataGrid>
+        <DataGrid ItemsSource="{Binding Source={StaticResource X_CVS}}" Margin="5,5,5,0" Grid.Row="1" AutoGenerateColumns="True"  IsReadOnly="True"></DataGrid>
+        <StatusBar Grid.Row="2" Visibility="{Binding IsUpdating, Converter={StaticResource conv}}">
+            <Label Content="Loading..."/>
+        </StatusBar>
 
     </Grid>
 </Window>
