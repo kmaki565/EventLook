@@ -1,0 +1,29 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+env:
+  PROJECT_NAME: EventLook
+
+# Controls when the action will run. Triggers the workflow on every push or pull request event
+on: [push, pull_request]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: windows-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+    - uses: warrenbuckley/Setup-Nuget@v1
+    - run: nuget restore ${{ env.PROJECT_NAME }}.sln
+    - uses: warrenbuckley/Setup-MSBuild@v1
+    - run: msbuild ${{ env.PROJECT_NAME }}.sln '/p:Configuration=Release;Platform="Any CPU"'
+    # Save artifacts
+    - uses: actions/upload-artifact@v1
+      with:
+        name: ${{ env.PROJECT_NAME }}-${{ github.sha }}
+        path: ${{ env.PROJECT_NAME }}\bin\Release
