@@ -15,25 +15,14 @@ namespace EventLook.Model
     {
         public EventItem(EventRecord eventRecord)
         {
-            _event = eventRecord;
-            TimeCreated = _event.TimeCreated ?? DateTime.MinValue;
-            ProviderName = _event.ProviderName;
-            LevelDisplayName = _event.LevelDisplayName;
-            EventId = _event.Id;
-            Message = _event.FormatDescription();
+            Record = eventRecord;
+            TimeOfEvent = eventRecord.TimeCreated ?? DateTime.MinValue;
+            Message = eventRecord.FormatDescription();
         }
-        #region Properties (to display in View)
-        public DateTime TimeCreated { get; }
-        public string ProviderName { get; }
-        public string LevelDisplayName { get; }
-        public int EventId { get; }
+        #region Properties
+        public EventRecord Record { get; set; }
+        public DateTime TimeOfEvent { get; }
         public string Message { get; }
         #endregion
-
-        private EventRecord _event;
-        public EventRecord GetEventRecord()
-        {
-            return _event;
-        }
     }
 }

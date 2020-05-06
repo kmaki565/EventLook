@@ -20,7 +20,27 @@
             <RowDefinition Height="35"/>
         </Grid.RowDefinitions>
         <!-- *** The ItemsSource of the data grid is bound to the CollectionViewSource object that was instantiated above -->
-        <DataGrid ItemsSource="{Binding Source={StaticResource X_CVS}}" Margin="5,5,5,0" Grid.Row="1" AutoGenerateColumns="True"  IsReadOnly="True"></DataGrid>
+        <DataGrid ItemsSource="{Binding Source={StaticResource X_CVS}}" Margin="5,5,5,0" Grid.Row="1" AutoGenerateColumns="False" IsReadOnly="True">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Time of event" Binding="{Binding TimeOfEvent, StringFormat=u}"/>
+                <DataGridTextColumn Header="Source" Binding="{Binding Record.ProviderName}" MaxWidth="200">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="TextWrapping" Value="Wrap" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="Level" Binding="{Binding Record.LevelDisplayName}"/>
+                <DataGridTextColumn Header="Event ID" Binding="{Binding Record.EventId}"/>
+                <DataGridTextColumn Header="Message" Binding="{Binding Message}" Width="*">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="TextWrapping" Value="Wrap" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+            </DataGrid.Columns>
+        </DataGrid>
         <StatusBar Grid.Row="2" Visibility="{Binding IsUpdating, Converter={StaticResource conv}}">
             <Label Content="Loading..."/>
         </StatusBar>

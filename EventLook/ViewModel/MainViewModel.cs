@@ -2,6 +2,8 @@ using EventLook.Model;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using GalaSoft.MvvmLight.Messaging;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.Eventing.Reader;
 using System.Threading.Tasks;
@@ -21,6 +23,7 @@ namespace EventLook.ViewModel
         {
             InitializeCommands();
             DataService = dataService;
+            Events = new ObservableCollection<EventItem>();
 
             //--------------------------------------------------------------
             // This 'registers' the instance of this view model to recieve messages with this type of token.  This 
@@ -29,9 +32,10 @@ namespace EventLook.ViewModel
             // filtering
             Messenger.Default.Register<ViewCollectionViewSourceMessageToken>(this, Handle_ViewCollectionViewSourceMessageToken);
         }
-        public void OnLoaded()
+        public async void OnLoaded()
         {
-            LoadDataAsync();
+            await DataService.LoadEventsAsync("System", 3, new Progress<EventItem>(ProgressCallback));
+            IsUpdating = false;
         }
         public override void Cleanup()
         {
@@ -39,6 +43,10 @@ namespace EventLook.ViewModel
             base.Cleanup();
         }
 
+        private void ProgressCallback(EventItem loadedEvent)
+        {
+            Events.Add(loadedEvent);
+        }
         /// <summary>
         /// Gets or sets the IDownloadDataService member
         /// </summary>
@@ -64,7 +72,7 @@ namespace EventLook.ViewModel
             }
         }
 
-        private bool isUpdating;
+        private bool isUpdating = true;
         public bool IsUpdating
         {
             get
@@ -86,19 +94,7 @@ namespace EventLook.ViewModel
         {
             //TODO: 
         }
-        private async void LoadDataAsync()
-        {
-            IsUpdating = true;
-            var initialEvents = await DataService.FetchInitialEventsAsync();
-            Events = new ObservableCollection<EventItem>(initialEvents);
 
-            var restOfEvents = await DataService.FetchRestOfEventsAsync();
-            foreach (var evt in restOfEvents)
-            {
-                Events.Add(evt);
-            }
-            IsUpdating = false;
-        }
         /// <summary>
         /// This method handles a message recieved from the View which enables a reference to the
         /// instantiated CollectionViewSource to be used in the ViewModel.
