@@ -31,7 +31,7 @@
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
                 <DataGridTextColumn Header="Level" Binding="{Binding Record.LevelDisplayName}"/>
-                <DataGridTextColumn Header="Event ID" Binding="{Binding Record.EventId}"/>
+                <DataGridTextColumn Header="Event ID" Binding="{Binding Record.Id}"/>
                 <DataGridTextColumn Header="Message" Binding="{Binding Message}" Width="*">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
