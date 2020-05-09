@@ -26,16 +26,17 @@ namespace EventLook.ViewModel
             Events = new ObservableCollection<EventItem>();
 
             //--------------------------------------------------------------
-            // This 'registers' the instance of this view model to recieve messages with this type of token.  This 
-            // is used to recieve a reference from the view that the collectionViewSource has been instantiated
-            // and to recieve a reference to the CollectionViewSource which will be used in the view model for 
+            // This 'registers' the instance of this view model to receive messages with this type of token.  This 
+            // is used to receive a reference from the view that the collectionViewSource has been instantiated
+            // and to receive a reference to the CollectionViewSource which will be used in the view model for 
             // filtering
             Messenger.Default.Register<ViewCollectionViewSourceMessageToken>(this, Handle_ViewCollectionViewSourceMessageToken);
         }
         public async void OnLoaded()
         {
+            StatusText = "Loading...";
             await DataService.LoadEventsAsync("System", 3, new Progress<EventItem>(ProgressCallback));
-            IsUpdating = false;
+            StatusText = "Ready";
         }
         public override void Cleanup()
         {
@@ -72,19 +73,19 @@ namespace EventLook.ViewModel
             }
         }
 
-        private bool isUpdating = true;
-        public bool IsUpdating
+        private string statusText;
+        public string StatusText
         {
             get
             {
-                return isUpdating;
+                return statusText;
             }
             private set
             {
-                if (value == isUpdating)
+                if (value == statusText)
                     return;
 
-                isUpdating = value;
+                statusText = value;
                 RaisePropertyChanged();
             }
         }
@@ -96,7 +97,7 @@ namespace EventLook.ViewModel
         }
 
         /// <summary>
-        /// This method handles a message recieved from the View which enables a reference to the
+        /// This method handles a message received from the View which enables a reference to the
         /// instantiated CollectionViewSource to be used in the ViewModel.
         /// </summary>
         private void Handle_ViewCollectionViewSourceMessageToken(ViewCollectionViewSourceMessageToken token)
