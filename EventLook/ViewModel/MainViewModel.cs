@@ -32,11 +32,11 @@ namespace EventLook.ViewModel
             // filtering
             Messenger.Default.Register<ViewCollectionViewSourceMessageToken>(this, Handle_ViewCollectionViewSourceMessageToken);
         }
-        public async void OnLoaded()
+        public void OnLoaded()
         {
             StatusText = "Loading...";
-            await DataService.LoadEventsAsync("System", 3, new Progress<EventItem>(ProgressCallback));
-            StatusText = "Ready";
+            var progress = new Progress<ProgressInfo>(ProgressCallback); // Needs to instantiate in UI thread
+            Task.Run(() => DataService.LoadEvents("System", 3, progress));
         }
         public override void Cleanup()
         {
@@ -44,9 +44,17 @@ namespace EventLook.ViewModel
             base.Cleanup();
         }
 
-        private void ProgressCallback(EventItem loadedEvent)
+        private void ProgressCallback(ProgressInfo progressInfo)
         {
-            Events.Add(loadedEvent);
+            //TODO: AddRange
+            foreach (var evt in progressInfo.LoadedEvents)
+            {
+                Events.Add(evt);
+            }
+
+            StatusText = progressInfo.IsComplete 
+                ? $"{Events.Count} events loaded."
+                : $"Loading {Events.Count} events...";
         }
         /// <summary>
         /// Gets or sets the IDownloadDataService member

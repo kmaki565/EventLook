@@ -9,30 +9,33 @@ namespace EventLook.Model
 {
     public interface IDataService
     {
-        Task LoadEventsAsync(string eventSource, int range, IProgress<EventItem> progress);
+        void LoadEvents(string eventSource, int range, IProgress<ProgressInfo> progress);
     }
     public class DataService : IDataService
     {
-        public Task LoadEventsAsync(string eventSource, int range, IProgress<EventItem> progress)
+        public void LoadEvents(string eventSource, int range, IProgress<ProgressInfo> progress)
         {
             string sQuery = string.Format(" *[System[TimeCreated[@SystemTime > '{0}' and @SystemTime <= '{1}']]]",
-                DateTime.UtcNow.AddDays(-1 * range).ToString("s"),
+                DateTime.UtcNow.AddDays(-3 * range).ToString("s"),
                 DateTime.UtcNow.ToString("s"));
 
             var elQuery = new EventLogQuery(eventSource, PathType.LogName, sQuery);
             elQuery.ReverseDirection = true;
-            var elReader = new System.Diagnostics.Eventing.Reader.EventLogReader(elQuery);
+            var reader = new System.Diagnostics.Eventing.Reader.EventLogReader(elQuery);
 
-            return Task.Run(
-                () =>
+            var accumulatedEvents = new List<EventRecord>();
+            int count = 0;
+            for (var eventRecord = reader.ReadEvent(); eventRecord != null; eventRecord = reader.ReadEvent())
+            {
+                accumulatedEvents.Add(eventRecord);
+                ++count;
+                if (count % 100 == 0)
                 {
-                    int count = 1;
-                    for (var eventInstance = elReader.ReadEvent(); eventInstance != null; eventInstance = elReader.ReadEvent(), ++count)
-                    {
-                        //TODO: This has a performance issue
-                        progress.Report(new EventItem(eventInstance));
-                    }
-                });
+                    progress.Report(new ProgressInfo(accumulatedEvents.ConvertAll(e => new EventItem(e)), false));
+                    accumulatedEvents.Clear();
+                }
+            }
+            progress.Report(new ProgressInfo(accumulatedEvents.ConvertAll(e => new EventItem(e)), true));
         }
     }
 }
