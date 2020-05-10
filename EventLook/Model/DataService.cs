@@ -9,14 +9,14 @@ namespace EventLook.Model
 {
     public interface IDataService
     {
-        void LoadEvents(string eventSource, int range, IProgress<ProgressInfo> progress);
+        void ReadEvents(string eventSource, int range, IProgress<ProgressInfo> progress);
     }
     public class DataService : IDataService
     {
-        public void LoadEvents(string eventSource, int range, IProgress<ProgressInfo> progress)
+        public void ReadEvents(string eventSource, int range, IProgress<ProgressInfo> progress)
         {
             string sQuery = string.Format(" *[System[TimeCreated[@SystemTime > '{0}' and @SystemTime <= '{1}']]]",
-                DateTime.UtcNow.AddDays(-3 * range).ToString("s"),
+                DateTime.UtcNow.AddDays(-1 * range).ToString("s"),
                 DateTime.UtcNow.ToString("s"));
 
             var elQuery = new EventLogQuery(eventSource, PathType.LogName, sQuery);
@@ -25,6 +25,7 @@ namespace EventLook.Model
 
             var accumulatedEvents = new List<EventRecord>();
             int count = 0;
+            //TODO: Exception handling
             for (var eventRecord = reader.ReadEvent(); eventRecord != null; eventRecord = reader.ReadEvent())
             {
                 accumulatedEvents.Add(eventRecord);

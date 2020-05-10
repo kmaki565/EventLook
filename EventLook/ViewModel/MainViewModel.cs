@@ -5,7 +5,7 @@ using GalaSoft.MvvmLight.Messaging;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics.Eventing.Reader;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows.Data;
 
@@ -24,6 +24,8 @@ namespace EventLook.ViewModel
             InitializeCommands();
             DataService = dataService;
             Events = new ObservableCollection<EventItem>();
+            progress = new Progress<ProgressInfo>(ProgressCallback); // Needs to instantiate in UI thread
+            stopwatch = new Stopwatch();
 
             //--------------------------------------------------------------
             // This 'registers' the instance of this view model to receive messages with this type of token.  This 
@@ -34,9 +36,7 @@ namespace EventLook.ViewModel
         }
         public void OnLoaded()
         {
-            StatusText = "Loading...";
-            var progress = new Progress<ProgressInfo>(ProgressCallback); // Needs to instantiate in UI thread
-            Task.Run(() => DataService.LoadEvents("System", 3, progress));
+            LoadEvents();
         }
         public override void Cleanup()
         {
@@ -44,6 +44,13 @@ namespace EventLook.ViewModel
             base.Cleanup();
         }
 
+        private void LoadEvents()
+        {
+            stopwatch.Restart();
+            StatusText = "Loading...";
+            Events.Clear();
+            Task.Run(() => DataService.ReadEvents("System", 7, progress));
+        }
         private void ProgressCallback(ProgressInfo progressInfo)
         {
             //TODO: AddRange
@@ -52,9 +59,15 @@ namespace EventLook.ViewModel
                 Events.Add(evt);
             }
 
-            StatusText = progressInfo.IsComplete 
-                ? $"{Events.Count} events loaded."
-                : $"Loading {Events.Count} events...";
+            if (progressInfo.IsComplete)
+            {
+                stopwatch.Stop();
+                StatusText = $"{Events.Count} events loaded. ({stopwatch.Elapsed.TotalSeconds:F1} sec)"; // 1 digit after decimal point
+            }
+            else
+            {
+                StatusText = $"Loading {Events.Count} events...";
+            }
         }
         /// <summary>
         /// Gets or sets the IDownloadDataService member
@@ -65,6 +78,8 @@ namespace EventLook.ViewModel
         /// collection of Things and the datagrid in which each thing is displayed.
         /// </summary>
         private CollectionViewSource CVS { get; set; }
+        private Progress<ProgressInfo> progress;
+        private Stopwatch stopwatch;
 
         #region Properties (Displayable in View)
         private ObservableCollection<EventItem> _events;
