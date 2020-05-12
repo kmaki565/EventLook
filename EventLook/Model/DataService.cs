@@ -19,8 +19,10 @@ namespace EventLook.Model
                 DateTime.UtcNow.AddDays(-1 * range).ToString("s"),
                 DateTime.UtcNow.ToString("s"));
 
-            var elQuery = new EventLogQuery(eventSource, PathType.LogName, sQuery);
-            elQuery.ReverseDirection = true;
+            var elQuery = new EventLogQuery(eventSource, PathType.LogName, sQuery)
+            {
+                ReverseDirection = true
+            };
             var reader = new System.Diagnostics.Eventing.Reader.EventLogReader(elQuery);
 
             var accumulatedEvents = new List<EventRecord>();

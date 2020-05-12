@@ -15,12 +15,19 @@
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="50"/>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="25"/>
             <RowDefinition/>
             <RowDefinition Height="25"/>
         </Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" Text="Log name" Margin="10,0,0,0" />
+        <ComboBox Grid.Row="1" 
+                  ItemsSource="{Binding LogSources}" SelectedItem="{Binding SelectedLogSource}"
+                  DisplayMemberPath="Name" SelectedValuePath="Name" 
+                  HorizontalAlignment="Left" Margin="10,0,0,0" Width="200" />
+
         <!-- *** The ItemsSource of the data grid is bound to the CollectionViewSource object that was instantiated above -->
-        <DataGrid ItemsSource="{Binding Source={StaticResource X_CVS}}" Margin="5" Grid.Row="1" AutoGenerateColumns="False" IsReadOnly="True">
+        <DataGrid ItemsSource="{Binding Source={StaticResource X_CVS}}" Margin="5" Grid.Row="2" AutoGenerateColumns="False" IsReadOnly="True">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Time of event" Binding="{Binding TimeOfEvent, StringFormat=u}"/>
                 <DataGridTextColumn Header="Source" Binding="{Binding Record.ProviderName}" MaxWidth="200">
@@ -42,7 +49,7 @@
             </DataGrid.Columns>
         </DataGrid>
 
-        <StatusBar Grid.Row="2">
+        <StatusBar Grid.Row="3">
             <StatusBarItem>
                 <TextBlock Text="{Binding StatusText}" />
             </StatusBarItem>

@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Data;
 
@@ -24,6 +25,16 @@ namespace EventLook.ViewModel
             InitializeCommands();
             DataService = dataService;
             Events = new ObservableCollection<EventItem>();
+            LogSources = new ObservableCollection<LogSource>
+            {
+                //TODO: move to Model
+                new LogSource() { Name = "System" },
+                new LogSource() { Name = "Application" },
+                new LogSource() { Name = "Lenovo-Power-BaseModule/Operational" },
+                new LogSource() { Name = "Lenovo-Power-SmartStandby/Operational" },
+            };
+            SelectedLogSource = LogSources.FirstOrDefault();
+
             progress = new Progress<ProgressInfo>(ProgressCallback); // Needs to instantiate in UI thread
             stopwatch = new Stopwatch();
 
@@ -37,6 +48,7 @@ namespace EventLook.ViewModel
         public void OnLoaded()
         {
             LoadEvents();
+            isWindowLoaded = true;
         }
         public override void Cleanup()
         {
@@ -49,7 +61,7 @@ namespace EventLook.ViewModel
             stopwatch.Restart();
             StatusText = "Loading...";
             Events.Clear();
-            Task.Run(() => DataService.ReadEvents("System", 7, progress));
+            Task.Run(() => DataService.ReadEvents(selectedLogSource.Name, 7, progress));
         }
         private void ProgressCallback(ProgressInfo progressInfo)
         {
@@ -78,8 +90,9 @@ namespace EventLook.ViewModel
         /// collection of Things and the datagrid in which each thing is displayed.
         /// </summary>
         private CollectionViewSource CVS { get; set; }
-        private Progress<ProgressInfo> progress;
-        private Stopwatch stopwatch;
+        private readonly Progress<ProgressInfo> progress;
+        private readonly Stopwatch stopwatch;
+        private bool isWindowLoaded = false;
 
         #region Properties (Displayable in View)
         private ObservableCollection<EventItem> _events;
@@ -93,6 +106,19 @@ namespace EventLook.ViewModel
 
                 _events = value;
                 RaisePropertyChanged();
+            }
+        }
+
+        public ObservableCollection<LogSource> LogSources { get; set; }
+
+        private LogSource selectedLogSource;
+        public LogSource SelectedLogSource
+        {
+            get { return selectedLogSource; }
+            set 
+            { 
+                selectedLogSource = value;
+                if (isWindowLoaded) LoadEvents();
             }
         }
 
