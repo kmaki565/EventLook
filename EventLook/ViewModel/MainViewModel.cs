@@ -58,6 +58,7 @@ namespace EventLook.ViewModel
 
         private void LoadEvents()
         {
+            //TODO: Cancel previous call
             stopwatch.Restart();
             StatusText = "Loading...";
             Events.Clear();
