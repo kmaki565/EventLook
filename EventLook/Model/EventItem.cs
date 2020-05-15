@@ -17,7 +17,15 @@ namespace EventLook.Model
         {
             Record = eventRecord;
             TimeOfEvent = eventRecord.TimeCreated ?? DateTime.MinValue;
-            Message = eventRecord.FormatDescription();
+            try
+            {
+                Message = eventRecord.FormatDescription();
+            }
+            catch (Exception ex)
+            {
+                //TODO: This slows down reading logs?
+                Message = "Exception occurred while reading the description:\n" + ex.Message;
+            }
         }
         #region Properties
         public EventRecord Record { get; set; }

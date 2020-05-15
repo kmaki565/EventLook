@@ -25,14 +25,8 @@ namespace EventLook.ViewModel
             InitializeCommands();
             DataService = dataService;
             Events = new ObservableCollection<EventItem>();
-            LogSources = new ObservableCollection<LogSource>
-            {
-                //TODO: move to Model
-                new LogSource() { Name = "System" },
-                new LogSource() { Name = "Application" },
-                new LogSource() { Name = "Lenovo-Power-BaseModule/Operational" },
-                new LogSource() { Name = "Lenovo-Power-SmartStandby/Operational" },
-            };
+
+            logSourceMgr = new LogSourceMgr();
             SelectedLogSource = LogSources.FirstOrDefault();
 
             progress = new Progress<ProgressInfo>(ProgressCallback); // Needs to instantiate in UI thread
@@ -91,6 +85,7 @@ namespace EventLook.ViewModel
         /// collection of Things and the datagrid in which each thing is displayed.
         /// </summary>
         private CollectionViewSource CVS { get; set; }
+        private readonly LogSourceMgr logSourceMgr;
         private readonly Progress<ProgressInfo> progress;
         private readonly Stopwatch stopwatch;
         private bool isWindowLoaded = false;
@@ -110,7 +105,10 @@ namespace EventLook.ViewModel
             }
         }
 
-        public ObservableCollection<LogSource> LogSources { get; set; }
+        public ObservableCollection<LogSource> LogSources 
+        { 
+            get { return logSourceMgr.LogSources; }
+        }
 
         private LogSource selectedLogSource;
         public LogSource SelectedLogSource
