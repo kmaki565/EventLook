@@ -52,14 +52,18 @@ namespace EventLook.ViewModel
 
         private void LoadEvents()
         {
-            //TODO: Cancel previous call
+            if (isUpdating)
+                DataService.Cancel();
+            isUpdating = true;
             stopwatch.Restart();
             StatusText = "Loading...";
-            Events.Clear();
             Task.Run(() => DataService.ReadEvents(selectedLogSource.Name, 7, progress));
         }
         private void ProgressCallback(ProgressInfo progressInfo)
         {
+            if (progressInfo.IsFirst)
+                Events.Clear();
+
             //TODO: AddRange
             foreach (var evt in progressInfo.LoadedEvents)
             {
@@ -68,6 +72,7 @@ namespace EventLook.ViewModel
 
             if (progressInfo.IsComplete)
             {
+                isUpdating = false;
                 stopwatch.Stop();
                 StatusText = $"{Events.Count} events loaded. ({stopwatch.Elapsed.TotalSeconds:F1} sec)"; // 1 digit after decimal point
             }
@@ -89,6 +94,7 @@ namespace EventLook.ViewModel
         private readonly Progress<ProgressInfo> progress;
         private readonly Stopwatch stopwatch;
         private bool isWindowLoaded = false;
+        private bool isUpdating = false;
 
         #region Properties (Displayable in View)
         private ObservableCollection<EventItem> _events;
