@@ -12,14 +12,8 @@ using System.Windows.Data;
 
 namespace EventLook.ViewModel
 {
-    /// <summary>
-    /// This class contains properties that the main View can data bind to.
-    /// </summary>
     public class MainViewModel : ViewModelBase
     {
-        /// <summary>
-        /// Initializes a new instance of the MainViewModel class.
-        /// </summary>
         public MainViewModel(IDataService dataService)
         {
             InitializeCommands();
@@ -39,69 +33,6 @@ namespace EventLook.ViewModel
             // filtering
             Messenger.Default.Register<ViewCollectionViewSourceMessageToken>(this, Handle_ViewCollectionViewSourceMessageToken);
         }
-        public void OnLoaded()
-        {
-            Task.Run(() => LoadEvents());
-            isWindowLoaded = true;
-        }
-        public override void Cleanup()
-        {
-            Messenger.Default.Unregister<ViewCollectionViewSourceMessageToken>(this);
-            base.Cleanup();
-        }
-
-        private async Task LoadEvents()
-        {
-            if (isUpdating)
-                DataService.Cancel();
-
-            await Update(DataService.ReadEvents(selectedLogSource.Name, 7, progress));
-        }
-        private void ProgressCallback(ProgressInfo progressInfo)
-        {
-            if (progressInfo.IsFirst)
-                Events.Clear();
-
-            //TODO: AddRange
-            foreach (var evt in progressInfo.LoadedEvents)
-            {
-                Events.Add(evt);
-            }
-            loadedEventCount = Events.Count;
-            UpdateStatusText();
-        }
-        private async Task Update(Task task)
-        {
-            try
-            {
-                stopwatch.Restart();
-                loadedEventCount = 0;
-                isUpdating = true;
-                UpdateStatusText();
-                await task;
-            }
-            finally
-            {
-                isUpdating = false;
-                stopwatch.Stop();
-                UpdateStatusText();
-            }
-        }
-        private void UpdateStatusText()
-        {
-            StatusText = isUpdating ?
-                $"Loading {loadedEventCount} events..." :
-                $"{loadedEventCount} events loaded. ({stopwatch.Elapsed.TotalSeconds:F1} sec)"; // 1 digit after decimal point
-        }
-        /// <summary>
-        /// Gets or sets the IDownloadDataService member
-        /// </summary>
-        internal IDataService DataService { get; set; }
-        /// <summary>
-        /// Gets or sets the CollectionViewSource which is the proxy for the 
-        /// collection of Things and the datagrid in which each thing is displayed.
-        /// </summary>
-        private CollectionViewSource CVS { get; set; }
         private readonly LogSourceMgr logSourceMgr;
         private readonly Progress<ProgressInfo> progress;
         private readonly Stopwatch stopwatch;
@@ -109,7 +40,8 @@ namespace EventLook.ViewModel
         private bool isUpdating = false;
         private int loadedEventCount = 0;
 
-        #region Properties (Displayable in View)
+        internal IDataService DataService { get; set; }
+
         private ObservableCollection<EventItem> _events;
         public ObservableCollection<EventItem> Events
         {
@@ -159,13 +91,70 @@ namespace EventLook.ViewModel
                 RaisePropertyChanged();
             }
         }
-        #endregion
+
+        public void OnLoaded()
+        {
+            Task.Run(() => LoadEvents());
+            isWindowLoaded = true;
+        }
+        public override void Cleanup()
+        {
+            Messenger.Default.Unregister<ViewCollectionViewSourceMessageToken>(this);
+            base.Cleanup();
+        }
 
         private void InitializeCommands()
         {
             //TODO: 
         }
+        private async Task LoadEvents()
+        {
+            if (isUpdating)
+                DataService.Cancel();
 
+            await Update(DataService.ReadEvents(selectedLogSource.Name, 7, progress));
+        }
+        private void ProgressCallback(ProgressInfo progressInfo)
+        {
+            if (progressInfo.IsFirst)
+                Events.Clear();
+
+            //TODO: AddRange
+            foreach (var evt in progressInfo.LoadedEvents)
+            {
+                Events.Add(evt);
+            }
+            loadedEventCount = Events.Count;
+            UpdateStatusText();
+        }
+        private async Task Update(Task task)
+        {
+            try
+            {
+                stopwatch.Restart();
+                loadedEventCount = 0;
+                isUpdating = true;
+                UpdateStatusText();
+                await task;
+            }
+            finally
+            {
+                isUpdating = false;
+                stopwatch.Stop();
+                UpdateStatusText();
+            }
+        }
+        private void UpdateStatusText()
+        {
+            StatusText = isUpdating ?
+                $"Loading {loadedEventCount} events..." :
+                $"{loadedEventCount} events loaded. ({stopwatch.Elapsed.TotalSeconds:F1} sec)"; // 1 digit after decimal point
+        }
+        /// <summary>
+        /// Gets or sets the CollectionViewSource which is the proxy for the 
+        /// collection of Things and the datagrid in which each thing is displayed.
+        /// </summary>
+        private CollectionViewSource CVS { get; set; }
         /// <summary>
         /// This method handles a message received from the View which enables a reference to the
         /// instantiated CollectionViewSource to be used in the ViewModel.
@@ -174,6 +163,5 @@ namespace EventLook.ViewModel
         {
             CVS = token.CVS;
         }
-
     }
 }
