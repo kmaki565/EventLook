@@ -41,7 +41,7 @@ namespace EventLook.ViewModel
         }
         public void OnLoaded()
         {
-            LoadEvents();
+            Task.Run(() => LoadEvents());
             isWindowLoaded = true;
         }
         public override void Cleanup()
@@ -50,14 +50,12 @@ namespace EventLook.ViewModel
             base.Cleanup();
         }
 
-        private void LoadEvents()
+        private async Task LoadEvents()
         {
             if (isUpdating)
                 DataService.Cancel();
-            isUpdating = true;
-            stopwatch.Restart();
-            StatusText = "Loading...";
-            Task.Run(() => DataService.ReadEvents(selectedLogSource.Name, 7, progress));
+
+            await Update(DataService.ReadEvents(selectedLogSource.Name, 7, progress));
         }
         private void ProgressCallback(ProgressInfo progressInfo)
         {
@@ -69,17 +67,31 @@ namespace EventLook.ViewModel
             {
                 Events.Add(evt);
             }
-
-            if (progressInfo.IsComplete)
+            loadedEventCount = Events.Count;
+            UpdateStatusText();
+        }
+        private async Task Update(Task task)
+        {
+            try
+            {
+                stopwatch.Restart();
+                loadedEventCount = 0;
+                isUpdating = true;
+                UpdateStatusText();
+                await task;
+            }
+            finally
             {
                 isUpdating = false;
                 stopwatch.Stop();
-                StatusText = $"{Events.Count} events loaded. ({stopwatch.Elapsed.TotalSeconds:F1} sec)"; // 1 digit after decimal point
+                UpdateStatusText();
             }
-            else
-            {
-                StatusText = $"Loading {Events.Count} events...";
-            }
+        }
+        private void UpdateStatusText()
+        {
+            StatusText = isUpdating ?
+                $"Loading {loadedEventCount} events..." :
+                $"{loadedEventCount} events loaded. ({stopwatch.Elapsed.TotalSeconds:F1} sec)"; // 1 digit after decimal point
         }
         /// <summary>
         /// Gets or sets the IDownloadDataService member
@@ -95,6 +107,7 @@ namespace EventLook.ViewModel
         private readonly Stopwatch stopwatch;
         private bool isWindowLoaded = false;
         private bool isUpdating = false;
+        private int loadedEventCount = 0;
 
         #region Properties (Displayable in View)
         private ObservableCollection<EventItem> _events;
@@ -121,9 +134,12 @@ namespace EventLook.ViewModel
         {
             get { return selectedLogSource; }
             set 
-            { 
+            {
+                if (value == selectedLogSource)
+                    return;
+
                 selectedLogSource = value;
-                if (isWindowLoaded) LoadEvents();
+                if (isWindowLoaded) Task.Run(() => LoadEvents());
             }
         }
 

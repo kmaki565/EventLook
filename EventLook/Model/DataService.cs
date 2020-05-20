@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Text;
@@ -10,13 +11,14 @@ namespace EventLook.Model
 {
     public interface IDataService
     {
-        void ReadEvents(string eventSource, int range, IProgress<ProgressInfo> progress);
+        Task<int> ReadEvents(string eventSource, int range, IProgress<ProgressInfo> progress);
+        
         void Cancel();
     }
     public class DataService : IDataService
     {
         private CancellationTokenSource cts;
-        public void ReadEvents(string eventSource, int range, IProgress<ProgressInfo> progress)
+        public async Task<int> ReadEvents(string eventSource, int range, IProgress<ProgressInfo> progress)
         {
             using (cts = new CancellationTokenSource())
             {
@@ -35,26 +37,36 @@ namespace EventLook.Model
                         ReverseDirection = true
                     };
                     var reader = new System.Diagnostics.Eventing.Reader.EventLogReader(elQuery);
-
-                    for (var eventRecord = reader.ReadEvent(); eventRecord != null; eventRecord = reader.ReadEvent())
+                    var eventRecord = reader.ReadEvent();
+                    Debug.WriteLine("Start Reading");
+                    await Task.Run(() =>
                     {
-                        cts.Token.ThrowIfCancellationRequested();
-
-                        eventRecords.Add(eventRecord);
-                        ++count;
-                        if (count % 100 == 0)
+                        for (; eventRecord != null; eventRecord = reader.ReadEvent())
                         {
-                            progress.Report(new ProgressInfo(eventRecords.ConvertAll(e => new EventItem(e)), false, isFirst));
-                            isFirst = false;
-                            eventRecords.Clear();
+                            cts.Token.ThrowIfCancellationRequested();
+
+                            eventRecords.Add(eventRecord);
+                            ++count;
+                            if (count % 100 == 0)
+                            {
+                                var info = new ProgressInfo(eventRecords.ConvertAll(e => new EventItem(e)), false, isFirst);
+                                cts.Token.ThrowIfCancellationRequested();
+                                progress.Report(info);
+                                isFirst = false;
+                                eventRecords.Clear();
+                            }
                         }
-                    }
+                        var info2 = new ProgressInfo(eventRecords.ConvertAll(e => new EventItem(e)), true, isFirst);
+                        cts.Token.ThrowIfCancellationRequested();
+                        progress.Report(info2);
+                        Debug.WriteLine("End Reading");
+                    });
                 }
                 catch (OperationCanceledException)
                 {
-                    return;
+                    Debug.WriteLine("Cancelled");
                 }
-                progress.Report(new ProgressInfo(eventRecords.ConvertAll(e => new EventItem(e)), true, isFirst));
+                return count;
             }
         }
         public void Cancel()
