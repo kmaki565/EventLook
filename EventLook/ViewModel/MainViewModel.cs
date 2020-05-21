@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using System.Windows.Input;
 
 namespace EventLook.ViewModel
 {
@@ -94,8 +95,12 @@ namespace EventLook.ViewModel
 
         public void OnLoaded()
         {
-            Task.Run(() => LoadEvents());
+            Refresh();
             isWindowLoaded = true;
+        }
+        public void Refresh()
+        {
+            Task.Run(() => LoadEvents());
         }
         public override void Cleanup()
         {
@@ -103,9 +108,15 @@ namespace EventLook.ViewModel
             base.Cleanup();
         }
 
+        public ICommand RefreshCommand
+        {
+            get;
+            private set;
+        }
+
         private void InitializeCommands()
         {
-            //TODO: 
+            RefreshCommand = new RelayCommand(Refresh, null);
         }
         private async Task LoadEvents()
         {

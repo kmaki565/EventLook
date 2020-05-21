@@ -22,14 +22,20 @@
             <RowDefinition/>
             <RowDefinition Height="25"/>
         </Grid.RowDefinitions>
-        <TextBlock Grid.Row="0" Text="Log name" Margin="10,0,0,0" />
-        <ComboBox Grid.Row="1" 
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3*" />
+            <ColumnDefinition Width="10*" />
+        </Grid.ColumnDefinitions>
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="Log name" Margin="10,0,0,0" />
+        <ComboBox Grid.Row="1" Grid.Column="0"
                   ItemsSource="{Binding LogSources}" SelectedItem="{Binding SelectedLogSource}"
                   DisplayMemberPath="Name" SelectedValuePath="Name" 
-                  HorizontalAlignment="Left" Margin="10,0,0,0" Width="200" />
+                  HorizontalAlignment="Left" Margin="10,0,0,0" Width="235" />
+        <Button Grid.Row="1" Grid.Column="2" HorizontalAlignment="Left" Margin="10,0,0,0" Width="25" Height="25"
+                FontFamily="{StaticResource WingDings3}" Content="P" Command="{Binding RefreshCommand, Mode=OneWay}" />
 
         <!-- *** The ItemsSource of the data grid is bound to the CollectionViewSource object that was instantiated above -->
-        <DataGrid ItemsSource="{Binding Source={StaticResource X_CVS}}" Margin="5" Grid.Row="2" AutoGenerateColumns="False" IsReadOnly="True">
+        <DataGrid ItemsSource="{Binding Source={StaticResource X_CVS}}" Margin="5" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" AutoGenerateColumns="False" IsReadOnly="True">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Time of event" Binding="{Binding TimeOfEvent, StringFormat=u}"/>
                 <DataGridTextColumn Header="Source" Binding="{Binding Record.ProviderName}" MaxWidth="200">
@@ -51,7 +57,7 @@
             </DataGrid.Columns>
         </DataGrid>
 
-        <StatusBar Grid.Row="3">
+        <StatusBar Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2">
             <StatusBarItem>
                 <TextBlock Text="{Binding StatusText}" />
             </StatusBarItem>
