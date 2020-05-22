@@ -33,6 +33,10 @@
                   HorizontalAlignment="Left" Margin="10,0,0,0" Width="235" />
         <Button Grid.Row="1" Grid.Column="2" HorizontalAlignment="Left" Margin="10,0,0,0" Width="25" Height="25"
                 FontFamily="{StaticResource WingDings3}" Content="P" Command="{Binding RefreshCommand, Mode=OneWay}" />
+        <Button Grid.Row="1" Grid.Column="2" HorizontalAlignment="Left" Margin="40,0,0,0" Width="25" Height="25"
+                Command="{Binding CancelCommand, Mode=OneWay}" IsEnabled="{Binding IsUpdating}">
+            <Image Width="10" Height="10" Style="{DynamicResource ImageStyleForButtons}"/>
+        </Button>
 
         <!-- *** The ItemsSource of the data grid is bound to the CollectionViewSource object that was instantiated above -->
         <DataGrid ItemsSource="{Binding Source={StaticResource X_CVS}}" Margin="5" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" AutoGenerateColumns="False" IsReadOnly="True">

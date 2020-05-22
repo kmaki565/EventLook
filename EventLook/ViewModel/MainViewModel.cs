@@ -38,7 +38,6 @@ namespace EventLook.ViewModel
         private readonly Progress<ProgressInfo> progress;
         private readonly Stopwatch stopwatch;
         private bool isWindowLoaded = false;
-        private bool isUpdating = false;
         private int loadedEventCount = 0;
 
         internal IDataService DataService { get; set; }
@@ -92,6 +91,19 @@ namespace EventLook.ViewModel
                 RaisePropertyChanged();
             }
         }
+        private bool isUpdating = false;
+        public bool IsUpdating
+        {
+            get { return isUpdating; }
+            private set
+            {
+                if (value == isUpdating)
+                    return;
+
+                isUpdating = value;
+                RaisePropertyChanged();
+            }
+        }
 
         public void OnLoaded()
         {
@@ -101,6 +113,11 @@ namespace EventLook.ViewModel
         public void Refresh()
         {
             Task.Run(() => LoadEvents());
+        }
+        public void Cancel()
+        {
+            if (IsUpdating)
+                DataService.Cancel();
         }
         public override void Cleanup()
         {
@@ -113,15 +130,20 @@ namespace EventLook.ViewModel
             get;
             private set;
         }
+        public ICommand CancelCommand
+        {
+            get;
+            private set;
+        }
 
         private void InitializeCommands()
         {
             RefreshCommand = new RelayCommand(Refresh, null);
+            CancelCommand = new RelayCommand(Cancel, () => IsUpdating);
         }
         private async Task LoadEvents()
         {
-            if (isUpdating)
-                DataService.Cancel();
+            Cancel();
 
             await Update(DataService.ReadEvents(selectedLogSource.Name, 7, progress));
         }
@@ -144,20 +166,20 @@ namespace EventLook.ViewModel
             {
                 stopwatch.Restart();
                 loadedEventCount = 0;
-                isUpdating = true;
+                IsUpdating = true;
                 UpdateStatusText();
                 await task;
             }
             finally
             {
-                isUpdating = false;
+                IsUpdating = false;
                 stopwatch.Stop();
                 UpdateStatusText();
             }
         }
         private void UpdateStatusText()
         {
-            StatusText = isUpdating ?
+            StatusText = IsUpdating ?
                 $"Loading {loadedEventCount} events..." :
                 $"{loadedEventCount} events loaded. ({stopwatch.Elapsed.TotalSeconds:F1} sec)"; // 1 digit after decimal point
         }

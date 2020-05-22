@@ -9,5 +9,16 @@
     <Application.Resources>
         <vm:ViewModelLocator x:Key="Locator" d:IsDataSource="True" xmlns:vm="clr-namespace:EventLook.ViewModel" />
         <FontFamily x:Key="WingDings3">./Font/WINGDNG3.TTF#Wingdings 3</FontFamily>
+        <!-- This is the style used to display enabled or disabled button images for removing filters-->
+        <Style x:Key="ImageStyleForButtons" TargetType="{x:Type Image}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}}" Value="True">
+                    <Setter Property="Source" Value="/EventLook;component/Asset/1385_Disable_16x16_72.png"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType={x:Type Button}, Mode=FindAncestor}}" Value="False">
+                    <Setter Property="Source" Value="/EventLook;component/Asset/1385_Disable_16x16_72_disabled.png"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
     </Application.Resources>
 </Application>
