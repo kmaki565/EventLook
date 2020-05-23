@@ -26,14 +26,14 @@
             <ColumnDefinition Width="3*" />
             <ColumnDefinition Width="10*" />
         </Grid.ColumnDefinitions>
-        <TextBlock Grid.Row="0" Grid.Column="0" Text="Log name" Margin="10,0,0,0" />
-        <ComboBox Grid.Row="1" Grid.Column="0"
+
+        <ComboBox Grid.Row="0" Grid.Column="0"
                   ItemsSource="{Binding LogSources}" SelectedItem="{Binding SelectedLogSource}"
                   DisplayMemberPath="Name" SelectedValuePath="Name" 
                   HorizontalAlignment="Left" Margin="10,0,0,0" Width="235" />
-        <Button Grid.Row="1" Grid.Column="2" HorizontalAlignment="Left" Margin="10,0,0,0" Width="25" Height="25"
+        <Button Grid.Row="0" Grid.Column="2" HorizontalAlignment="Left" Margin="10,0,0,0" Width="25" Height="25"
                 FontFamily="{StaticResource WingDings3}" Content="P" Command="{Binding RefreshCommand, Mode=OneWay}" />
-        <Button Grid.Row="1" Grid.Column="2" HorizontalAlignment="Left" Margin="40,0,0,0" Width="25" Height="25"
+        <Button Grid.Row="0" Grid.Column="2" HorizontalAlignment="Left" Margin="40,0,0,0" Width="25" Height="25"
                 Command="{Binding CancelCommand, Mode=OneWay}" IsEnabled="{Binding IsUpdating}">
             <Image Width="10" Height="10" Style="{DynamicResource ImageStyleForButtons}"/>
         </Button>
@@ -41,6 +41,10 @@
         <!-- *** The ItemsSource of the data grid is bound to the CollectionViewSource object that was instantiated above -->
         <DataGrid ItemsSource="{Binding Source={StaticResource X_CVS}}" Margin="5" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" AutoGenerateColumns="False" IsReadOnly="True"
                   BorderBrush="LightSteelBlue" HorizontalGridLinesBrush="LightSteelBlue" VerticalGridLinesBrush="LightSteelBlue">
+            <DataGrid.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightGray"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey }" Color="Black"/>
+            </DataGrid.Resources>
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Time of event" Binding="{Binding TimeOfEvent, StringFormat=u}"/>
                 <DataGridTextColumn Header="Source" Binding="{Binding Record.ProviderName}" MaxWidth="200">
