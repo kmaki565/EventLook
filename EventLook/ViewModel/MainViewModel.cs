@@ -20,6 +20,8 @@ namespace EventLook.ViewModel
             InitializeCommands();
             DataService = dataService;
             Events = new ObservableCollection<EventItem>();
+            EventSources = new ObservableCollection<string>();
+            SelectedEventSources = new ObservableCollection<string>();
 
             logSourceMgr = new LogSourceMgr();
             SelectedLogSource = LogSources.FirstOrDefault();
@@ -71,10 +73,39 @@ namespace EventLook.ViewModel
                     return;
 
                 selectedLogSource = value;
-                if (isWindowLoaded) Task.Run(() => LoadEvents());
+                if (isWindowLoaded) 
+                    Refresh();
             }
         }
 
+        /// <summary>
+        /// Gets or sets a list of event sources (ProviderName)  which is used to populate the filter
+        /// drop down list.
+        /// </summary>
+        private ObservableCollection<string> eventSources;
+        public ObservableCollection<string> EventSources
+        {
+            get { return eventSources; }
+            set
+            {
+                if ( eventSources == value)
+                    return;
+                eventSources = value;
+                RaisePropertyChanged();
+            }
+        }
+        private ObservableCollection<string> selectedEventSources;
+        public ObservableCollection<string> SelectedEventSources
+        {
+            get { return selectedEventSources; }
+            set
+            {
+                if (selectedEventSources == value)
+                    return;
+                selectedEventSources = value;
+                RaisePropertyChanged();
+            }
+        }
         private string statusText;
         public string StatusText
         {
@@ -110,9 +141,17 @@ namespace EventLook.ViewModel
             Refresh();
             isWindowLoaded = true;
         }
-        public void Refresh()
+        public async void Refresh()
         {
-            Task.Run(() => LoadEvents());
+            EventSources.Clear();
+            SelectedEventSources.Clear();
+            await Task.Run(() => LoadEvents());
+
+            var distinctSources = Events.Select(e => e.Record.ProviderName).Distinct();
+            foreach (var s in distinctSources)
+            {
+                EventSources.Add(s);
+            }
         }
         public void Cancel()
         {

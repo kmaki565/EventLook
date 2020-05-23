@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EventLook"
         xmlns:v="clr-namespace:EventLook.View"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
         DataContext="{Binding Source={StaticResource Locator}, Path=MainVm, Mode=OneWay}"
         ResizeMode="CanResizeWithGrip"
@@ -19,6 +20,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="25"/>
             <RowDefinition Height="25"/>
+            <RowDefinition Height="25"/>
             <RowDefinition/>
             <RowDefinition Height="25"/>
         </Grid.RowDefinitions>
@@ -27,7 +29,7 @@
             <ColumnDefinition Width="10*" />
         </Grid.ColumnDefinitions>
 
-        <ComboBox Grid.Row="0" Grid.Column="0"
+        <ComboBox Grid.Row="0" Grid.Column="0" 
                   ItemsSource="{Binding LogSources}" SelectedItem="{Binding SelectedLogSource}"
                   DisplayMemberPath="Name" SelectedValuePath="Name" 
                   HorizontalAlignment="Left" Margin="10,0,0,0" Width="235" />
@@ -38,8 +40,12 @@
             <Image Width="10" Height="10" Style="{DynamicResource ImageStyleForButtons}"/>
         </Button>
 
+        <TextBlock Grid.Row="1" Grid.Column="0" Margin="12,7,0,0" Text="Source filter" />
+        <xctk:CheckComboBox Grid.Row="2" Grid.Column="0" Margin="10,2,0,0"
+                            ItemsSource="{Binding EventSources}" SelectedItemsOverride="{Binding SelectedEventSources, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
         <!-- *** The ItemsSource of the data grid is bound to the CollectionViewSource object that was instantiated above -->
-        <DataGrid ItemsSource="{Binding Source={StaticResource X_CVS}}" Margin="5" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" AutoGenerateColumns="False" IsReadOnly="True"
+        <DataGrid ItemsSource="{Binding Source={StaticResource X_CVS}}" Margin="5" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" AutoGenerateColumns="False" IsReadOnly="True"
                   BorderBrush="LightSteelBlue" HorizontalGridLinesBrush="LightSteelBlue" VerticalGridLinesBrush="LightSteelBlue">
             <DataGrid.Resources>
                 <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightGray"/>
@@ -66,7 +72,7 @@
             </DataGrid.Columns>
         </DataGrid>
 
-        <StatusBar Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2">
+        <StatusBar Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2">
             <StatusBarItem>
                 <TextBlock Text="{Binding StatusText}" />
             </StatusBarItem>
