@@ -16,70 +16,71 @@
         <!-- This next line instantiates a CollectionViewSource with the collection of Events as its collection of objects-->
         <CollectionViewSource Source="{Binding Events}" x:Key="X_CVS"/>
     </Window.Resources>
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="25"/>
-            <RowDefinition Height="25"/>
-            <RowDefinition Height="25"/>
-            <RowDefinition/>
-            <RowDefinition Height="25"/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="3*" />
-            <ColumnDefinition Width="10*" />
-        </Grid.ColumnDefinitions>
-
-        <ComboBox Grid.Row="0" Grid.Column="0" 
-                  ItemsSource="{Binding LogSources}" SelectedItem="{Binding SelectedLogSource}"
-                  DisplayMemberPath="Name" SelectedValuePath="Name" 
-                  HorizontalAlignment="Left" Margin="10,0,0,0" Width="235" />
-        <Button Grid.Row="0" Grid.Column="2" HorizontalAlignment="Left" Margin="10,0,0,0" Width="25" Height="25"
-                FontFamily="{StaticResource WingDings3}" Content="P" Command="{Binding RefreshCommand, Mode=OneWay}" />
-        <Button Grid.Row="0" Grid.Column="2" HorizontalAlignment="Left" Margin="40,0,0,0" Width="25" Height="25"
-                Command="{Binding CancelCommand, Mode=OneWay}" IsEnabled="{Binding IsUpdating}">
-            <Image Width="10" Height="10" Style="{DynamicResource ImageStyleForButtons}"/>
-        </Button>
-        
-        <TextBlock Grid.Row="1" Grid.Column="0" Margin="12,7,0,0" Text="Source filter" />
-        <xctk:CheckComboBox Grid.Row="2" Grid.Column="0" Margin="10,2,0,0"
-                            IsSelectAllActive="True"
-                            ItemsSource="{Binding SourceFilters}" DisplayMemberPath="Name" SelectedMemberPath="Selected" />
-        <Button Grid.Row="2" Grid.Column="1" Content="Reset" HorizontalAlignment="Left" Margin="10,0,0,0" Width="50" 
-            Command="{Binding ResetFiltersCommand, Mode=OneWay}"/>
-
-        <!-- *** The ItemsSource of the data grid is bound to the CollectionViewSource object that was instantiated above -->
-        <DataGrid ItemsSource="{Binding Source={StaticResource X_CVS}}" Margin="5" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" AutoGenerateColumns="False" IsReadOnly="True"
-                  BorderBrush="LightSteelBlue" HorizontalGridLinesBrush="LightSteelBlue" VerticalGridLinesBrush="LightSteelBlue">
-            <DataGrid.Resources>
-                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightGray"/>
-                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey }" Color="Black"/>
-            </DataGrid.Resources>
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Time of event" Binding="{Binding TimeOfEvent, StringFormat=u}"/>
-                <DataGridTextColumn Header="Source" Binding="{Binding Record.ProviderName}" MaxWidth="200">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="TextWrapping" Value="Wrap" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-                <DataGridTextColumn Header="Level" Binding="{Binding Record.Level, Converter={StaticResource EventLevelToDisplayTextConverter}}"/>
-                <DataGridTextColumn Header="Event ID" Binding="{Binding Record.Id}"/>
-                <DataGridTextColumn Header="Message" Binding="{Binding Message}" Width="*">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="TextWrapping" Value="Wrap" />
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-            </DataGrid.Columns>
-        </DataGrid>
-
-        <StatusBar Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2">
+    <DockPanel>
+        <StatusBar DockPanel.Dock="Bottom" >
             <StatusBarItem>
                 <TextBlock Text="{Binding StatusText}" />
             </StatusBarItem>
         </StatusBar>
-        
-    </Grid>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="25"/>
+                <RowDefinition Height="50"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*" />
+                <ColumnDefinition Width="10*" />
+            </Grid.ColumnDefinitions>
+
+            <ComboBox Grid.Row="0" Grid.Column="0" 
+                  ItemsSource="{Binding LogSources}" SelectedItem="{Binding SelectedLogSource}"
+                  DisplayMemberPath="Name" SelectedValuePath="Name" 
+                  HorizontalAlignment="Left" Margin="10,0,0,0" Width="235" />
+            <Button Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Margin="10,0,0,0" Width="25" Height="25"
+                FontFamily="{StaticResource WingDings3}" Content="P" Command="{Binding RefreshCommand, Mode=OneWay}" />
+            <Button Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Margin="40,0,0,0" Width="25" Height="25"
+                Command="{Binding CancelCommand, Mode=OneWay}" IsEnabled="{Binding IsUpdating}">
+                <Image Width="10" Height="10" Style="{DynamicResource ImageStyleForButtons}"/>
+            </Button>
+
+            <Expander Header="Filters" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="10,5,0,0" ExpandDirection="Down">
+                <StackPanel Orientation="Horizontal">
+                    <xctk:CheckComboBox Width="200" Margin="10,0,0,0" 
+                            IsSelectAllActive="True"
+                            ItemsSource="{Binding SourceFilters}" DisplayMemberPath="Name" SelectedMemberPath="Selected" />
+                    <Button Content="Reset" Margin="10,0,0,0" Width="50" Command="{Binding ResetFiltersCommand, Mode=OneWay}"/>
+                </StackPanel>
+            </Expander>
+            <!-- *** The ItemsSource of the data grid is bound to the CollectionViewSource object that was instantiated above -->
+            <DataGrid ItemsSource="{Binding Source={StaticResource X_CVS}}" Margin="5" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" AutoGenerateColumns="False" IsReadOnly="True"
+                  BorderBrush="LightSteelBlue" HorizontalGridLinesBrush="LightSteelBlue" VerticalGridLinesBrush="LightSteelBlue">
+                <DataGrid.Resources>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightGray"/>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey }" Color="Black"/>
+                </DataGrid.Resources>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Time of event" Binding="{Binding TimeOfEvent, StringFormat=u}"/>
+                    <DataGridTextColumn Header="Source" Binding="{Binding Record.ProviderName}" MaxWidth="200">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="TextWrapping" Value="Wrap" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Level" Binding="{Binding Record.Level, Converter={StaticResource EventLevelToDisplayTextConverter}}"/>
+                    <DataGridTextColumn Header="Event ID" Binding="{Binding Record.Id}"/>
+                    <DataGridTextColumn Header="Message" Binding="{Binding Message}" Width="*">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="TextWrapping" Value="Wrap" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+
+        </Grid>
+    </DockPanel>
 </Window>
