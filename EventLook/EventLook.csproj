@@ -89,6 +89,7 @@
     <Compile Include="Model\EventItem.cs" />
     <Compile Include="Model\Progress.cs" />
     <Compile Include="Model\LogSource.cs" />
+    <Compile Include="Model\SourceFilter.cs" />
     <Compile Include="ViewModel\CvsMessageToken.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
@@ -129,6 +130,7 @@
     <Content Include="Font\WINGDNG3.TTF">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="ClassDiagram2.cd" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

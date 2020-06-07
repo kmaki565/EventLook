@@ -20,8 +20,7 @@ namespace EventLook.ViewModel
             InitializeCommands();
             DataService = dataService;
             Events = new ObservableCollection<EventItem>();
-            EventSources = new ObservableCollection<string>();
-            SelectedEventSources = new ObservableCollection<string>();
+            SourceFilters = new ObservableCollection<SourceFilterItem>();
 
             logSourceMgr = new LogSourceMgr();
             SelectedLogSource = LogSources.FirstOrDefault();
@@ -78,34 +77,19 @@ namespace EventLook.ViewModel
             }
         }
 
-        /// <summary>
-        /// Gets or sets a list of event sources (ProviderName)  which is used to populate the filter
-        /// drop down list.
-        /// </summary>
-        private ObservableCollection<string> eventSources;
-        public ObservableCollection<string> EventSources
+        private ObservableCollection<SourceFilterItem> sourceFilters;
+        public ObservableCollection<SourceFilterItem> SourceFilters 
         {
-            get { return eventSources; }
+            get => sourceFilters;
             set
             {
-                if ( eventSources == value)
+                if (sourceFilters == value)
                     return;
-                eventSources = value;
-                RaisePropertyChanged();
+                sourceFilters = value;
+                ApplySourceFilter();
             }
         }
-        private ObservableCollection<string> selectedEventSources;
-        public ObservableCollection<string> SelectedEventSources
-        {
-            get { return selectedEventSources; }
-            set
-            {
-                if (selectedEventSources == value)
-                    return;
-                selectedEventSources = value;
-                RaisePropertyChanged();
-            }
-        }
+
         private string statusText;
         public string StatusText
         {
@@ -143,14 +127,17 @@ namespace EventLook.ViewModel
         }
         public async void Refresh()
         {
-            EventSources.Clear();
-            SelectedEventSources.Clear();
+            SourceFilters.Clear();
             await Task.Run(() => LoadEvents());
 
             var distinctSources = Events.Select(e => e.Record.ProviderName).Distinct();
             foreach (var s in distinctSources)
             {
-                EventSources.Add(s);
+                SourceFilters.Add(new SourceFilterItem
+                {
+                    Name = s,
+                    Selected = true
+                });
             }
         }
         public void Cancel()
@@ -163,7 +150,30 @@ namespace EventLook.ViewModel
             Messenger.Default.Unregister<ViewCollectionViewSourceMessageToken>(this);
             base.Cleanup();
         }
-
+        public void ResetFilters()
+        {
+            RemoveSourceFilter();
+        }
+        private void RemoveSourceFilter()
+        {
+            CVS.Filter -= new FilterEventHandler(FilterBySources);
+            foreach (var sf in SourceFilters)
+            {
+                sf.Selected = false;
+            }
+        }
+        private void FilterBySources(object sender, FilterEventArgs e)
+        {
+            var src = e.Item as EventItem;
+            if (src == null)
+                e.Accepted = false;
+            else if (SourceFilters.Where(sf => sf.Selected).Any(sf => String.Compare(sf.Name, src.Record.ProviderName) != 0))
+                e.Accepted = false;
+        }
+        private void ApplySourceFilter()
+        {
+           // CVS.Filter += new FilterEventHandler(FilterBySources);
+        }
         public ICommand RefreshCommand
         {
             get;
@@ -174,11 +184,17 @@ namespace EventLook.ViewModel
             get;
             private set;
         }
+        public ICommand ResetFiltersCommand
+        {
+            get;
+            private set;
+        }
 
         private void InitializeCommands()
         {
             RefreshCommand = new RelayCommand(Refresh, null);
             CancelCommand = new RelayCommand(Cancel, () => IsUpdating);
+            ResetFiltersCommand = new RelayCommand(ResetFilters, null);
         }
         private async Task LoadEvents()
         {

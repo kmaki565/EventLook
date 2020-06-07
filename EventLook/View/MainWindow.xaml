@@ -39,10 +39,13 @@
                 Command="{Binding CancelCommand, Mode=OneWay}" IsEnabled="{Binding IsUpdating}">
             <Image Width="10" Height="10" Style="{DynamicResource ImageStyleForButtons}"/>
         </Button>
-
+        
         <TextBlock Grid.Row="1" Grid.Column="0" Margin="12,7,0,0" Text="Source filter" />
         <xctk:CheckComboBox Grid.Row="2" Grid.Column="0" Margin="10,2,0,0"
-                            ItemsSource="{Binding EventSources}" SelectedItemsOverride="{Binding SelectedEventSources, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            IsSelectAllActive="True"
+                            ItemsSource="{Binding SourceFilters}" DisplayMemberPath="Name" SelectedMemberPath="Selected" />
+        <Button Grid.Row="2" Grid.Column="1" Content="Reset" HorizontalAlignment="Left" Margin="10,0,0,0" Width="50" 
+            Command="{Binding ResetFiltersCommand, Mode=OneWay}"/>
 
         <!-- *** The ItemsSource of the data grid is bound to the CollectionViewSource object that was instantiated above -->
         <DataGrid ItemsSource="{Binding Source={StaticResource X_CVS}}" Margin="5" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" AutoGenerateColumns="False" IsReadOnly="True"
