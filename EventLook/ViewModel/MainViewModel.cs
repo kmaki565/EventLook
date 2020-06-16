@@ -94,10 +94,7 @@ namespace EventLook.ViewModel
         private string statusText;
         public string StatusText
         {
-            get
-            {
-                return statusText;
-            }
+            get { return statusText; }
             private set
             {
                 if (value == statusText)
@@ -120,6 +117,9 @@ namespace EventLook.ViewModel
                 RaisePropertyChanged();
             }
         }
+
+        public DateTime FromDateTime { get; set; } = DateTime.Now - TimeSpan.FromDays(7);
+        public DateTime ToDateTime { get; set; } = DateTime.Now;
 
         public void OnLoaded()
         {

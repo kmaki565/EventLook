@@ -23,7 +23,7 @@ namespace EventLook.Model
             }
             catch (Exception ex)
             {
-                Message = "Exception occurred while reading the description:\n" + ex.Message;
+                Message = "(EventLook) Exception occurred while reading the description:\n" + ex.Message;
             }
         }
         #region Properties

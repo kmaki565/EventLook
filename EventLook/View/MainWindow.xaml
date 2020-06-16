@@ -44,6 +44,15 @@
                 Command="{Binding CancelCommand, Mode=OneWay}" IsEnabled="{Binding IsUpdating}">
                 <Image Width="10" Height="10" Style="{DynamicResource ImageStyleForButtons}"/>
             </Button>
+            
+            <TextBlock Text="From:" Grid.Row="0" Grid.Column="1" Margin="90,0,0,0" VerticalAlignment="Center"/>
+            <xctk:DateTimePicker Format="SortableDateTime" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Margin="125,0,0,0" Width="180" 
+                                 AutoCloseCalendar="True" UpdateValueOnEnterKey="True"
+                                 Value="{Binding FromDateTime, Mode=TwoWay}" />
+            <TextBlock Text="To:" Grid.Row="0" Grid.Column="1" Margin="330,0,0,0" VerticalAlignment="Center"/>
+            <xctk:DateTimePicker Format="SortableDateTime" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Margin="350,0,0,0" Width="180" 
+                                 AutoCloseCalendar="True"
+                                 Value="{Binding ToDateTime, Mode=TwoWay}" />
 
             <Expander Header="Filters" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="10,5,0,0" ExpandDirection="Down">
                 <StackPanel Orientation="Horizontal">
