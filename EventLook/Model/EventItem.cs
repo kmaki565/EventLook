@@ -23,7 +23,6 @@ namespace EventLook.Model
             }
             catch (Exception ex)
             {
-                //TODO: This slows down reading logs?
                 Message = "Exception occurred while reading the description:\n" + ex.Message;
             }
         }

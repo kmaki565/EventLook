@@ -40,6 +40,7 @@ namespace EventLook.ViewModel
         private readonly Stopwatch stopwatch;
         private bool isWindowLoaded = false;
         private int loadedEventCount = 0;
+        private Task ongoingTask;
 
         internal IDataService DataService { get; set; }
 
@@ -143,7 +144,10 @@ namespace EventLook.ViewModel
         public void Cancel()
         {
             if (IsUpdating)
+            {
                 DataService.Cancel();
+                ongoingTask.Wait(); // Assumes the task will be cancelled quickly
+            }
         }
         public override void Cleanup()
         {
@@ -200,6 +204,7 @@ namespace EventLook.ViewModel
         {
             Cancel();
 
+            //TODO: Range should be specified by UI
             await Update(DataService.ReadEvents(selectedLogSource.Name, 7, progress));
         }
         private void ProgressCallback(ProgressInfo progressInfo)
@@ -219,6 +224,7 @@ namespace EventLook.ViewModel
         {
             try
             {
+                ongoingTask = task;
                 stopwatch.Restart();
                 loadedEventCount = 0;
                 IsUpdating = true;
