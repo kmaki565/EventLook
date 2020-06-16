@@ -11,14 +11,14 @@ namespace EventLook.Model
 {
     public interface IDataService
     {
-        Task<int> ReadEvents(string eventSource, int range, IProgress<ProgressInfo> progress);
+        Task<int> ReadEvents(string eventSource, DateTime fromTime, DateTime toTime, IProgress<ProgressInfo> progress);
         
         void Cancel();
     }
     public class DataService : IDataService
     {
         private CancellationTokenSource cts;
-        public async Task<int> ReadEvents(string eventSource, int range, IProgress<ProgressInfo> progress)
+        public async Task<int> ReadEvents(string eventSource, DateTime fromTime, DateTime toTime, IProgress<ProgressInfo> progress)
         {
             using (cts = new CancellationTokenSource())
             {
@@ -29,8 +29,8 @@ namespace EventLook.Model
                 try
                 {
                     string sQuery = string.Format(" *[System[TimeCreated[@SystemTime > '{0}' and @SystemTime <= '{1}']]]",
-    DateTime.UtcNow.AddDays(-1 * range).ToString("s"),
-    DateTime.UtcNow.ToString("s"));
+                        fromTime.ToUniversalTime().ToString("s"),
+                        toTime.ToUniversalTime().ToString("s"));
 
                     var elQuery = new EventLogQuery(eventSource, PathType.LogName, sQuery)
                     {

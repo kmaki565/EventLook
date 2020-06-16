@@ -204,8 +204,7 @@ namespace EventLook.ViewModel
         {
             Cancel();
 
-            //TODO: Range should be specified by UI
-            await Update(DataService.ReadEvents(selectedLogSource.Name, 7, progress));
+            await Update(DataService.ReadEvents(selectedLogSource.Name, FromDateTime, ToDateTime, progress));
         }
         private void ProgressCallback(ProgressInfo progressInfo)
         {
