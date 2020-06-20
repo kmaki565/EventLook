@@ -51,11 +51,22 @@
                                  AutoCloseCalendar="True"
                                  IsReadOnly="{Binding SelectedRange.IsCustom, Converter={StaticResource InverseBooleanConverter}}"
                                  Value="{Binding ToDateTime, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
-                <Button Margin="10,0,0,0" Width="25" Height="25"
-                FontFamily="{StaticResource WingDings3}" Content="P" Command="{Binding RefreshCommand, Mode=OneWay}" />
-                <Button Margin="10,0,0,0" Width="25" Height="25"
-                Command="{Binding CancelCommand, Mode=OneWay}" IsEnabled="{Binding IsUpdating}">
-                    <Image Width="10" Height="10" Style="{DynamicResource ImageStyleForButtons}"/>
+                <Button Command="{Binding RefreshCancelCommand, Mode=OneWay}"
+                        Margin="15,0,0,0" Width="25" Height="25">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsUpdating}" Value="False">
+                                    <Setter Property="FontFamily" Value="{StaticResource WingDings3}"/>
+                                    <Setter Property="Content" Value="P" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsUpdating}" Value="True">
+                                    <Setter Property="FontFamily" Value="Verdana"/>
+                                    <Setter Property="Content" Value="X" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
                 </Button>
             </StackPanel>
 
@@ -67,7 +78,7 @@
                     <Button Content="Reset" Margin="10,0,0,0" Width="50" Command="{Binding ResetFiltersCommand, Mode=OneWay}"/>
                 </StackPanel>
             </Expander>
-            
+
             <!-- *** The ItemsSource of the data grid is bound to the CollectionViewSource object that was instantiated above -->
             <DataGrid ItemsSource="{Binding Source={StaticResource X_CVS}}" Margin="5" Grid.Row="2" AutoGenerateColumns="False" IsReadOnly="True"
                   BorderBrush="LightSteelBlue" HorizontalGridLinesBrush="LightSteelBlue" VerticalGridLinesBrush="LightSteelBlue">
