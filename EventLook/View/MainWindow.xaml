@@ -32,33 +32,33 @@
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="0" Orientation="Horizontal">
-            <ComboBox  
+                <ComboBox  
                   ItemsSource="{Binding LogSources}" SelectedItem="{Binding SelectedLogSource}"
                   DisplayMemberPath="Name" SelectedValuePath="Name" 
                   HorizontalAlignment="Left" Margin="10,0,0,0" Width="235" />
 
-            <ComboBox  
+                <ComboBox  
                       ItemsSource="{Binding Ranges}" SelectedItem="{Binding SelectedRange}"
                       DisplayMemberPath="Text" SelectedValuePath="Text"
                       HorizontalAlignment="Left" Margin="10,0,0,0" Width="105" />
-            <TextBlock Text="From:" Margin="10,0,0,0" VerticalAlignment="Center"/>
-            <xctk:DateTimePicker Format="SortableDateTime" Margin="10,0,0,0" Width="160"  
+                <TextBlock Text="From:" Margin="10,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                <xctk:DateTimePicker Format="SortableDateTime" Margin="10,0,0,0" Width="160"  
                                  AutoCloseCalendar="True" 
                                  IsReadOnly="{Binding SelectedRange.IsCustom, Converter={StaticResource InverseBooleanConverter}}"
                                  Value="{Binding FromDateTime, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
-            <TextBlock Text="To:" Margin="10,0,0,0" VerticalAlignment="Center"/>
-            <xctk:DateTimePicker Format="SortableDateTime" Margin="10,0,0,0" Width="160" 
+                <TextBlock Text="To:" Margin="10,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                <xctk:DateTimePicker Format="SortableDateTime" Margin="10,0,0,0" Width="160" 
                                  AutoCloseCalendar="True"
                                  IsReadOnly="{Binding SelectedRange.IsCustom, Converter={StaticResource InverseBooleanConverter}}"
                                  Value="{Binding ToDateTime, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
-            <Button Margin="10,0,0,0" Width="25" Height="25"
+                <Button Margin="10,0,0,0" Width="25" Height="25"
                 FontFamily="{StaticResource WingDings3}" Content="P" Command="{Binding RefreshCommand, Mode=OneWay}" />
-            <Button Margin="10,0,0,0" Width="25" Height="25"
+                <Button Margin="10,0,0,0" Width="25" Height="25"
                 Command="{Binding CancelCommand, Mode=OneWay}" IsEnabled="{Binding IsUpdating}">
-                <Image Width="10" Height="10" Style="{DynamicResource ImageStyleForButtons}"/>
-            </Button>
+                    <Image Width="10" Height="10" Style="{DynamicResource ImageStyleForButtons}"/>
+                </Button>
             </StackPanel>
-            
+
             <Expander Header="Filters" Grid.Row="1" Margin="10,5,0,0" ExpandDirection="Down">
                 <StackPanel Orientation="Horizontal">
                     <xctk:CheckComboBox Width="200" Margin="10,0,0,0" 
@@ -67,6 +67,7 @@
                     <Button Content="Reset" Margin="10,0,0,0" Width="50" Command="{Binding ResetFiltersCommand, Mode=OneWay}"/>
                 </StackPanel>
             </Expander>
+            
             <!-- *** The ItemsSource of the data grid is bound to the CollectionViewSource object that was instantiated above -->
             <DataGrid ItemsSource="{Binding Source={StaticResource X_CVS}}" Margin="5" Grid.Row="2" AutoGenerateColumns="False" IsReadOnly="True"
                   BorderBrush="LightSteelBlue" HorizontalGridLinesBrush="LightSteelBlue" VerticalGridLinesBrush="LightSteelBlue">
