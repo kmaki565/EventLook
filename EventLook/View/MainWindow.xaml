@@ -13,6 +13,7 @@
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="conv" />
         <v:EventLevelToDisplayTextConverter x:Key="EventLevelToDisplayTextConverter"/>
+        <v:InverseBooleanConverter x:Key="InverseBooleanConverter" />
         <!-- This next line instantiates a CollectionViewSource with the collection of Events as its collection of objects-->
         <CollectionViewSource Source="{Binding Events}" x:Key="X_CVS"/>
     </Window.Resources>
@@ -38,21 +39,27 @@
                   ItemsSource="{Binding LogSources}" SelectedItem="{Binding SelectedLogSource}"
                   DisplayMemberPath="Name" SelectedValuePath="Name" 
                   HorizontalAlignment="Left" Margin="10,0,0,0" Width="235" />
-            <Button Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Margin="10,0,0,0" Width="25" Height="25"
+
+            <ComboBox Grid.Row="0" Grid.Column="1" 
+                      ItemsSource="{Binding Ranges}" SelectedItem="{Binding SelectedRange}"
+                      DisplayMemberPath="Text" SelectedValuePath="Text"
+                      HorizontalAlignment="Left" Margin="10,0,0,0" Width="105" />
+            <TextBlock Text="From:" Grid.Row="0" Grid.Column="1" Margin="130,0,0,0" VerticalAlignment="Center"/>
+            <xctk:DateTimePicker Format="SortableDateTime" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Margin="165,0,0,0" Width="160"  
+                                 AutoCloseCalendar="True" 
+                                 IsReadOnly="{Binding SelectedRange.IsCustom, Converter={StaticResource InverseBooleanConverter}}"
+                                 Value="{Binding FromDateTime, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
+            <TextBlock Text="To:" Grid.Row="0" Grid.Column="1" Margin="330,0,0,0" VerticalAlignment="Center"/>
+            <xctk:DateTimePicker Format="SortableDateTime" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Margin="350,0,0,0" Width="160" 
+                                 AutoCloseCalendar="True"
+                                 IsReadOnly="{Binding SelectedRange.IsCustom, Converter={StaticResource InverseBooleanConverter}}"
+                                 Value="{Binding ToDateTime, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
+            <Button Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Margin="540,0,0,0" Width="25" Height="25"
                 FontFamily="{StaticResource WingDings3}" Content="P" Command="{Binding RefreshCommand, Mode=OneWay}" />
-            <Button Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Margin="40,0,0,0" Width="25" Height="25"
+            <Button Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Margin="570,0,0,0" Width="25" Height="25"
                 Command="{Binding CancelCommand, Mode=OneWay}" IsEnabled="{Binding IsUpdating}">
                 <Image Width="10" Height="10" Style="{DynamicResource ImageStyleForButtons}"/>
             </Button>
-            
-            <TextBlock Text="From:" Grid.Row="0" Grid.Column="1" Margin="90,0,0,0" VerticalAlignment="Center"/>
-            <xctk:DateTimePicker Format="SortableDateTime" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Margin="125,0,0,0" Width="180" 
-                                 AutoCloseCalendar="True" 
-                                 Value="{Binding FromDateTime, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
-            <TextBlock Text="To:" Grid.Row="0" Grid.Column="1" Margin="330,0,0,0" VerticalAlignment="Center"/>
-            <xctk:DateTimePicker Format="SortableDateTime" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Margin="350,0,0,0" Width="180" 
-                                 AutoCloseCalendar="True"
-                                 Value="{Binding ToDateTime, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
 
             <Expander Header="Filters" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="10,5,0,0" ExpandDirection="Down">
                 <StackPanel Orientation="Horizontal">

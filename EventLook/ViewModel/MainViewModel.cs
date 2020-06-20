@@ -25,6 +25,9 @@ namespace EventLook.ViewModel
             logSourceMgr = new LogSourceMgr();
             SelectedLogSource = LogSources.FirstOrDefault();
 
+            rangeMgr = new RangeMgr();
+            SelectedRange = Ranges.FirstOrDefault(r => r.DaysFromNow == 3);
+
             progress = new Progress<ProgressInfo>(ProgressCallback); // Needs to instantiate in UI thread
             stopwatch = new Stopwatch();
 
@@ -36,6 +39,7 @@ namespace EventLook.ViewModel
             Messenger.Default.Register<ViewCollectionViewSourceMessageToken>(this, Handle_ViewCollectionViewSourceMessageToken);
         }
         private readonly LogSourceMgr logSourceMgr;
+        private readonly RangeMgr rangeMgr;
         private readonly Progress<ProgressInfo> progress;
         private readonly Stopwatch stopwatch;
         private bool isWindowLoaded = false;
@@ -74,6 +78,28 @@ namespace EventLook.ViewModel
 
                 selectedLogSource = value;
                 if (isWindowLoaded) 
+                    Refresh();
+            }
+        }
+
+        public ObservableCollection<Range> Ranges
+        {
+            get { return rangeMgr.Ranges; }
+        }
+
+        private Range selectedRange;
+        public Range SelectedRange
+        {
+            get { return selectedRange; }
+            set
+            {
+                if (value == selectedRange)
+                    return;
+
+                selectedRange = value;
+                RaisePropertyChanged();
+
+                if (isWindowLoaded && !selectedRange.IsCustom)
                     Refresh();
             }
         }
@@ -118,8 +144,32 @@ namespace EventLook.ViewModel
             }
         }
 
-        public DateTime FromDateTime { get; set; } = DateTime.Now - TimeSpan.FromDays(7);
-        public DateTime ToDateTime { get; set; } = DateTime.Now;
+        private DateTime fromDateTime;
+        public DateTime FromDateTime
+        {
+            get { return fromDateTime; }
+            set
+            {
+                if (value == fromDateTime)
+                    return;
+
+                fromDateTime = value;
+                RaisePropertyChanged();
+            }
+        }
+        private DateTime toDateTime;
+        public DateTime ToDateTime
+        {
+            get { return toDateTime; }
+            set
+            {
+                if (value == toDateTime)
+                    return;
+
+                toDateTime = value;
+                RaisePropertyChanged();
+            }
+        }
 
         public void OnLoaded()
         {
@@ -129,6 +179,8 @@ namespace EventLook.ViewModel
         public async void Refresh()
         {
             SourceFilters.Clear();
+            UpdateDateTimes();
+
             await Task.Run(() => LoadEvents());
 
             var distinctSources = Events.Select(e => e.Record.ProviderName).Distinct();
@@ -199,6 +251,15 @@ namespace EventLook.ViewModel
             RefreshCommand = new RelayCommand(Refresh, null);
             CancelCommand = new RelayCommand(Cancel, () => IsUpdating);
             ResetFiltersCommand = new RelayCommand(ResetFilters, null);
+        }
+        private void UpdateDateTimes()
+        {
+            if (!SelectedRange.IsCustom)
+            {
+                ToDateTime = DateTime.Now;
+                FromDateTime = ToDateTime - TimeSpan.FromDays(SelectedRange.DaysFromNow);
+                RaisePropertyChanged("FromDateTime");   // Workaround for (probably) DateTimePicker's bug
+            }
         }
         private async Task LoadEvents()
         {

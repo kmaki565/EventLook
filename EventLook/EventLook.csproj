@@ -92,6 +92,7 @@
     <Compile Include="Model\EventItem.cs" />
     <Compile Include="Model\Progress.cs" />
     <Compile Include="Model\LogSource.cs" />
+    <Compile Include="Model\Range.cs" />
     <Compile Include="Model\SourceFilter.cs" />
     <Compile Include="ViewModel\CvsMessageToken.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
