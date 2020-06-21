@@ -255,12 +255,21 @@ namespace EventLook.ViewModel
         }
         private void UpdateDateTimes()
         {
-            if (!SelectedRange.IsCustom)
+            if (SelectedRange.IsCustom)
+                return;
+
+            if (SelectedRange.DaysFromNow == 0)
+            {
+                FromDateTime = new DateTime(1970, 1, 1, 0, 0, 0);
+                ToDateTime = new DateTime(2030, 12, 31, 0, 0, 0);
+            }
+            else
             {
                 ToDateTime = DateTime.Now;
                 FromDateTime = ToDateTime - TimeSpan.FromDays(SelectedRange.DaysFromNow);
-                RaisePropertyChanged("FromDateTime");   // Workaround for (probably) DateTimePicker's bug
             }
+            RaisePropertyChanged("FromDateTime");   // Workaround for (probably) DateTimePicker's bug
+            RaisePropertyChanged("ToDateTime");
         }
         private async Task LoadEvents()
         {
