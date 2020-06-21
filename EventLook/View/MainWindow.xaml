@@ -13,6 +13,7 @@
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="conv" />
         <v:EventLevelToDisplayTextConverter x:Key="EventLevelToDisplayTextConverter"/>
+        <v:ExpandedToGridLengthConverter x:Key="ExpandedToGridLengthConverter"/>
         <v:InverseBooleanConverter x:Key="InverseBooleanConverter" />
         <!-- This next line instantiates a CollectionViewSource with the collection of Events as its collection of objects-->
         <CollectionViewSource Source="{Binding Events}" x:Key="X_CVS"/>
@@ -26,12 +27,12 @@
 
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="25"/>
-                <RowDefinition Height="50"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="{Binding ElementName=Ex1, Path=IsExpanded, Converter={StaticResource ExpandedToGridLengthConverter}, ConverterParameter=25}" />
                 <RowDefinition/>
             </Grid.RowDefinitions>
 
-            <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,5">
                 <ComboBox  
                   ItemsSource="{Binding LogSources}" SelectedItem="{Binding SelectedLogSource}"
                   DisplayMemberPath="Name" SelectedValuePath="Name" 
@@ -70,7 +71,7 @@
                 </Button>
             </StackPanel>
 
-            <Expander Header="Filters" Grid.Row="1" Margin="10,5,0,0" ExpandDirection="Down">
+            <Expander x:Name="Ex1" Header="Filters" Grid.Row="1" Margin="10,0,0,0" ExpandDirection="Down">
                 <StackPanel Orientation="Horizontal">
                     <xctk:CheckComboBox Width="200" Margin="10,0,0,0" 
                             IsSelectAllActive="True"
