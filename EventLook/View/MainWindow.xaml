@@ -48,12 +48,12 @@
                       DisplayMemberPath="Text" SelectedValuePath="Text"
                       HorizontalAlignment="Left" Margin="10,0,0,0" Width="105" />
                 <TextBlock Text="From:" Margin="10,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-                <xctk:DateTimePicker Format="SortableDateTime" Margin="10,0,0,0" Width="160"  
+                <xctk:DateTimePicker Format="SortableDateTime" Margin="8,0,0,0" Width="160"  
                                  AutoCloseCalendar="True" 
                                  IsReadOnly="{Binding SelectedRange.IsCustom, Converter={StaticResource InverseBooleanConverter}}"
                                  Value="{Binding FromDateTime, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
                 <TextBlock Text="To:" Margin="10,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-                <xctk:DateTimePicker Format="SortableDateTime" Margin="10,0,0,0" Width="160" 
+                <xctk:DateTimePicker Format="SortableDateTime" Margin="8,0,0,0" Width="160" 
                                  AutoCloseCalendar="True"
                                  IsReadOnly="{Binding SelectedRange.IsCustom, Converter={StaticResource InverseBooleanConverter}}"
                                  Value="{Binding ToDateTime, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
