@@ -176,13 +176,7 @@ namespace EventLook.ViewModel
             Refresh();
             isWindowLoaded = true;
         }
-        public void RefreshCancel()
-        {
-            if (IsUpdating)
-                Cancel();
-            else
-                Refresh();
-        }
+
         public async void Refresh()
         {
             SourceFilters.Clear();
@@ -237,7 +231,12 @@ namespace EventLook.ViewModel
         {
            // CVS.Filter += new FilterEventHandler(FilterBySources);
         }
-        public ICommand RefreshCancelCommand
+        public ICommand RefreshCommand
+        {
+            get;
+            private set;
+        }
+        public ICommand CancelCommand
         {
             get;
             private set;
@@ -250,7 +249,8 @@ namespace EventLook.ViewModel
 
         private void InitializeCommands()
         {
-            RefreshCancelCommand = new RelayCommand(RefreshCancel, null);
+            RefreshCommand = new RelayCommand(Refresh, null);
+            CancelCommand = new RelayCommand(Cancel, () => IsUpdating);
             ResetFiltersCommand = new RelayCommand(ResetFilters, null);
         }
         private void UpdateDateTimes()

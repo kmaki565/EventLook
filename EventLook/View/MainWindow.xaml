@@ -18,6 +18,11 @@
         <!-- This next line instantiates a CollectionViewSource with the collection of Events as its collection of objects-->
         <CollectionViewSource Source="{Binding Events}" x:Key="X_CVS"/>
     </Window.Resources>
+    <Window.InputBindings>
+        <KeyBinding Key="F5" Command="{Binding RefreshCommand}"/>
+        <KeyBinding Key="Esc" Command="{Binding CancelCommand}"/>
+    </Window.InputBindings>
+    
     <DockPanel>
         <StatusBar DockPanel.Dock="Bottom" >
             <StatusBarItem>
@@ -52,16 +57,17 @@
                                  AutoCloseCalendar="True"
                                  IsReadOnly="{Binding SelectedRange.IsCustom, Converter={StaticResource InverseBooleanConverter}}"
                                  Value="{Binding ToDateTime, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
-                <Button Command="{Binding RefreshCancelCommand, Mode=OneWay}"
-                        Margin="15,0,0,0" Width="25" Height="25">
+                <Button Margin="15,0,0,0" Width="25" Height="25">
                     <Button.Style>
                         <Style TargetType="Button">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsUpdating}" Value="False">
+                                    <Setter Property="Command" Value="{Binding RefreshCommand, Mode=OneWay}"/>
                                     <Setter Property="FontFamily" Value="{StaticResource WingDings3}"/>
                                     <Setter Property="Content" Value="P" />
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding IsUpdating}" Value="True">
+                                    <Setter Property="Command" Value="{Binding CancelCommand, Mode=OneWay}"/>
                                     <Setter Property="FontFamily" Value="Verdana"/>
                                     <Setter Property="Content" Value="X" />
                                 </DataTrigger>
