@@ -65,11 +65,13 @@
                                     <Setter Property="Command" Value="{Binding RefreshCommand, Mode=OneWay}"/>
                                     <Setter Property="FontFamily" Value="{StaticResource WingDings3}"/>
                                     <Setter Property="Content" Value="P" />
+                                    <Setter Property="ToolTip" Value="Refresh (F5)"/>
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding IsUpdating}" Value="True">
                                     <Setter Property="Command" Value="{Binding CancelCommand, Mode=OneWay}"/>
                                     <Setter Property="FontFamily" Value="Verdana"/>
                                     <Setter Property="Content" Value="X" />
+                                    <Setter Property="ToolTip" Value="Stop (Esc)"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
