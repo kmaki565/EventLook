@@ -169,11 +169,14 @@ namespace EventLook.ViewModel
         public async void Refresh()
         {
             SourceFilters.Clear();
+            if (isWindowLoaded)
+                CVS.Filter -= FilterBySources; 
             UpdateDateTimes();
 
             await Task.Run(() => LoadEvents());
 
-            var distinctSources = Events.Select(e => e.Record.ProviderName).Distinct();
+            //TODO: Put to filter operations to Model
+            var distinctSources = Events.Select(e => e.Record.ProviderName).Distinct().OrderBy(s => s);
             foreach (var s in distinctSources)
             {
                 SourceFilters.Add(new SourceFilterItem
@@ -182,6 +185,7 @@ namespace EventLook.ViewModel
                     Selected = true
                 });
             }
+            CVS.Filter += FilterBySources;
         }
         public void Cancel()
         {
@@ -202,11 +206,12 @@ namespace EventLook.ViewModel
         }
         private void RemoveSourceFilter()
         {
-            CVS.Filter -= new FilterEventHandler(FilterBySources);
             foreach (var sf in SourceFilters)
             {
                 sf.Selected = true;
             }
+            if (isWindowLoaded)
+                CVS.Filter -= FilterBySources;  // Should be safe to unsubscribe twice...
         }
         private void FilterBySources(object sender, FilterEventArgs e)
         {
@@ -218,7 +223,6 @@ namespace EventLook.ViewModel
             else if (!SourceFilters.Where(sf => sf.Selected).Any(sf => String.Compare(sf.Name, evt.Record.ProviderName) == 0))
                 e.Accepted = false;
         }
-        private bool isSourceFilterApplied = false;
         private async void ApplySourceFilter()
         {
             await ApplySourceFilterWithDelay();
@@ -227,17 +231,9 @@ namespace EventLook.ViewModel
         {
             // FIX ME: Workaround as the command is called BEFORE the filter value is actually modified
             await Task.Delay(50);
-            
-            if (isSourceFilterApplied)
-            {
-                CVS.Filter -= new FilterEventHandler(FilterBySources);
-                CVS.Filter += new FilterEventHandler(FilterBySources);
-            }
-            else
-            {
-                CVS.Filter += new FilterEventHandler(FilterBySources);
-                isSourceFilterApplied = true;
-            }
+
+            CVS.Filter -= FilterBySources;
+            CVS.Filter += FilterBySources;
         }
         public ICommand RefreshCommand
         {
