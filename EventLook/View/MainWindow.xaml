@@ -81,9 +81,11 @@
 
             <Expander x:Name="Ex1" Header="Filters" Grid.Row="1" Margin="10,0,0,0" ExpandDirection="Down">
                 <StackPanel Orientation="Horizontal">
-                    <xctk:CheckComboBox Width="200" Margin="10,0,0,0" 
+                    <xctk:CheckComboBox Width="300" Margin="10,0,0,0" 
                             IsSelectAllActive="True"
-                            ItemsSource="{Binding SourceFilters}" DisplayMemberPath="Name" SelectedMemberPath="Selected" />
+                            Delimiter=", "
+                            ItemsSource="{Binding SourceFilters}" DisplayMemberPath="Name" SelectedMemberPath="Selected"
+                            Command="{Binding ApplySourceFilterCommand}"/>
                     <Button Content="Reset" Margin="10,0,0,0" Width="50" Command="{Binding ResetFiltersCommand, Mode=OneWay}"/>
                 </StackPanel>
             </Expander>

@@ -104,19 +104,8 @@ namespace EventLook.ViewModel
             }
         }
 
-        private ObservableCollection<SourceFilterItem> sourceFilters;
-        public ObservableCollection<SourceFilterItem> SourceFilters 
-        {
-            get => sourceFilters;
-            set
-            {
-                if (sourceFilters == value)
-                    return;
-                sourceFilters = value;
-                ApplySourceFilter();
-            }
-        }
-
+        public ObservableCollection<SourceFilterItem> SourceFilters { get; set; }
+     
         private string statusText;
         public string StatusText
         {
@@ -216,20 +205,39 @@ namespace EventLook.ViewModel
             CVS.Filter -= new FilterEventHandler(FilterBySources);
             foreach (var sf in SourceFilters)
             {
-                sf.Selected = false;
+                sf.Selected = true;
             }
         }
         private void FilterBySources(object sender, FilterEventArgs e)
         {
-            var src = e.Item as EventItem;
-            if (src == null)
+            var evt = e.Item as EventItem;
+
+            // Set false if the event does not match any checked items in the CheckComboBox
+            if (evt == null)
                 e.Accepted = false;
-            else if (SourceFilters.Where(sf => sf.Selected).Any(sf => String.Compare(sf.Name, src.Record.ProviderName) != 0))
+            else if (!SourceFilters.Where(sf => sf.Selected).Any(sf => String.Compare(sf.Name, evt.Record.ProviderName) == 0))
                 e.Accepted = false;
         }
-        private void ApplySourceFilter()
+        private bool isSourceFilterApplied = false;
+        private async void ApplySourceFilter()
         {
-           // CVS.Filter += new FilterEventHandler(FilterBySources);
+            await ApplySourceFilterWithDelay();
+        }
+        private async Task ApplySourceFilterWithDelay()
+        {
+            // FIX ME: Workaround as the command is called BEFORE the filter value is actually modified
+            await Task.Delay(50);
+            
+            if (isSourceFilterApplied)
+            {
+                CVS.Filter -= new FilterEventHandler(FilterBySources);
+                CVS.Filter += new FilterEventHandler(FilterBySources);
+            }
+            else
+            {
+                CVS.Filter += new FilterEventHandler(FilterBySources);
+                isSourceFilterApplied = true;
+            }
         }
         public ICommand RefreshCommand
         {
@@ -237,6 +245,11 @@ namespace EventLook.ViewModel
             private set;
         }
         public ICommand CancelCommand
+        {
+            get;
+            private set;
+        }
+        public ICommand ApplySourceFilterCommand
         {
             get;
             private set;
@@ -252,6 +265,7 @@ namespace EventLook.ViewModel
             RefreshCommand = new RelayCommand(Refresh, null);
             CancelCommand = new RelayCommand(Cancel, () => IsUpdating);
             ResetFiltersCommand = new RelayCommand(ResetFilters, null);
+            ApplySourceFilterCommand = new RelayCommand(ApplySourceFilter, null);
         }
         private void UpdateDateTimes()
         {
