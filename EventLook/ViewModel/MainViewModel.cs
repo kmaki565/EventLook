@@ -229,7 +229,7 @@ namespace EventLook.ViewModel
         }
         private async Task ApplySourceFilterWithDelay()
         {
-            // FIX ME: Workaround as the command is called BEFORE the filter value is actually modified
+            // TODO: Workaround as the command is called BEFORE the filter value is actually modified
             await Task.Delay(50);
 
             CVS.Filter -= FilterBySources;
