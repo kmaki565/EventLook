@@ -296,7 +296,7 @@ namespace EventLook.ViewModel
                 Events.Add(evt);
             }
             loadedEventCount = Events.Count;
-            UpdateStatusText();
+            UpdateStatusText(progressInfo.Message);
         }
         private async Task Update(Task task)
         {
@@ -316,11 +316,11 @@ namespace EventLook.ViewModel
                 UpdateStatusText();
             }
         }
-        private void UpdateStatusText()
+        private void UpdateStatusText(string additionalNote = "")
         {
             StatusText = IsUpdating ?
-                $"Loading {loadedEventCount} events..." :
-                $"{loadedEventCount} events loaded. ({stopwatch.Elapsed.TotalSeconds:F1} sec)"; // 1 digit after decimal point
+                $"Loading {loadedEventCount} events... {additionalNote}" :
+                $"{loadedEventCount} events loaded. ({stopwatch.Elapsed.TotalSeconds:F1} sec) {additionalNote}"; // 1 digit after decimal point
         }
         /// <summary>
         /// Gets or sets the CollectionViewSource which is the proxy for the 

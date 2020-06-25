@@ -24,6 +24,7 @@ namespace EventLook.Model
             {
                 // Event records to be sent to the ViewModel
                 var eventRecords = new List<EventRecord>();
+                string errMsg = "";
                 int count = 0;
                 bool isFirst = true;
                 try
@@ -38,7 +39,7 @@ namespace EventLook.Model
                     };
                     var reader = new System.Diagnostics.Eventing.Reader.EventLogReader(elQuery);
                     var eventRecord = reader.ReadEvent();
-                    Debug.WriteLine("Start Reading");
+                    Debug.WriteLine("Begin Reading");
                     await Task.Run(() =>
                     {
                         for (; eventRecord != null; eventRecord = reader.ReadEvent())
@@ -56,15 +57,25 @@ namespace EventLook.Model
                                 eventRecords.Clear();
                             }
                         }
-                        var info2 = new ProgressInfo(eventRecords.ConvertAll(e => new EventItem(e)), true, isFirst);
-                        cts.Token.ThrowIfCancellationRequested();
-                        progress.Report(info2);
-                        Debug.WriteLine("End Reading");
                     });
                 }
-                catch (OperationCanceledException)
+                catch (OperationCanceledException ex)
                 {
-                    Debug.WriteLine("Cancelled");
+                    errMsg = ex.Message;
+                }
+                catch (EventLogNotFoundException ex)
+                {
+                    errMsg = ex.Message;
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    errMsg = "Unauthorized access to the channel. Try Run as Administrator.";
+                }
+                finally
+                {
+                    var info_comp = new ProgressInfo(eventRecords.ConvertAll(e => new EventItem(e)), true, isFirst, errMsg);
+                    progress.Report(info_comp);
+                    Debug.WriteLine("End Reading");
                 }
                 return count;
             }
