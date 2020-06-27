@@ -20,26 +20,23 @@ namespace EventLook.ViewModel
             InitializeCommands();
             DataService = dataService;
             Events = new ObservableCollection<EventItem>();
-            SourceFilters = new ObservableCollection<SourceFilterItem>();
-
+            
             logSourceMgr = new LogSourceMgr();
             SelectedLogSource = LogSources.FirstOrDefault();
 
             rangeMgr = new RangeMgr();
             SelectedRange = Ranges.FirstOrDefault(r => r.DaysFromNow == 3);
 
+            sourceFilterMgr = new SourceFilterMgr();
+
             progress = new Progress<ProgressInfo>(ProgressCallback); // Needs to instantiate in UI thread
             stopwatch = new Stopwatch();
 
-            //--------------------------------------------------------------
-            // This 'registers' the instance of this view model to receive messages with this type of token.  This 
-            // is used to receive a reference from the view that the collectionViewSource has been instantiated
-            // and to receive a reference to the CollectionViewSource which will be used in the view model for 
-            // filtering
             Messenger.Default.Register<ViewCollectionViewSourceMessageToken>(this, Handle_ViewCollectionViewSourceMessageToken);
         }
         private readonly LogSourceMgr logSourceMgr;
         private readonly RangeMgr rangeMgr;
+        private readonly SourceFilterMgr sourceFilterMgr;
         private readonly Progress<ProgressInfo> progress;
         private readonly Stopwatch stopwatch;
         private bool isWindowLoaded = false;
@@ -104,7 +101,10 @@ namespace EventLook.ViewModel
             }
         }
 
-        public ObservableCollection<SourceFilterItem> SourceFilters { get; set; }
+        public ReadOnlyObservableCollection<SourceFilterItem> SourceFilters 
+        {
+            get { return sourceFilterMgr.SourceFilters; }
+        }
      
         private string statusText;
         public string StatusText
@@ -165,27 +165,16 @@ namespace EventLook.ViewModel
             Refresh();
             isWindowLoaded = true;
         }
-
         public async void Refresh()
         {
-            SourceFilters.Clear();
-            if (isWindowLoaded)
-                CVS.Filter -= FilterBySources; 
+            sourceFilterMgr.Clear();
+            sourceFilterMgr.RemoveFilter(CVS); 
             UpdateDateTimes();
 
             await Task.Run(() => LoadEvents());
 
-            //TODO: Put to filter operations to Model
-            var distinctSources = Events.Select(e => e.Record.ProviderName).Distinct().OrderBy(s => s);
-            foreach (var s in distinctSources)
-            {
-                SourceFilters.Add(new SourceFilterItem
-                {
-                    Name = s,
-                    Selected = true
-                });
-            }
-            CVS.Filter += FilterBySources;
+            sourceFilterMgr.PopulateEvents(Events);
+            sourceFilterMgr.AddFilter(CVS);
         }
         public void Cancel()
         {
@@ -202,24 +191,7 @@ namespace EventLook.ViewModel
         }
         public void ResetFilters()
         {
-            RemoveSourceFilter();
-        }
-        private void RemoveSourceFilter()
-        {
-            foreach (var sf in SourceFilters)
-            {
-                sf.Selected = true;
-            }
-            if (isWindowLoaded)
-                CVS.Filter -= FilterBySources;  // Should be safe to unsubscribe twice...
-        }
-        private void FilterBySources(object sender, FilterEventArgs e)
-        {
-            // Set false if the event does not match any checked items in the CheckComboBox
-            if (!(e.Item is EventItem evt))
-                e.Accepted = false;
-            else if (!SourceFilters.Where(sf => sf.Selected).Any(sf => String.Compare(sf.Name, evt.Record.ProviderName) == 0))
-                e.Accepted = false;
+            sourceFilterMgr.ResetFilter(CVS);
         }
         private async void ApplySourceFilter()
         {
@@ -229,9 +201,7 @@ namespace EventLook.ViewModel
         {
             // TODO: Workaround as the command is called BEFORE the filter value is actually modified
             await Task.Delay(50);
-
-            CVS.Filter -= FilterBySources;
-            CVS.Filter += FilterBySources;
+            sourceFilterMgr.RefreshFilter(CVS);
         }
         public ICommand RefreshCommand
         {
@@ -290,7 +260,7 @@ namespace EventLook.ViewModel
             if (progressInfo.IsFirst)
                 Events.Clear();
 
-            //TODO: AddRange
+            //TODO: Improve performance with AddRange in ObservableCollection...
             foreach (var evt in progressInfo.LoadedEvents)
             {
                 Events.Add(evt);
