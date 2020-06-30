@@ -61,12 +61,9 @@ namespace EventLook.Model
             private set; 
         }
 
-        public void Clear()
+        public void InitFilter(IEnumerable<EventItem> events)
         {
             sourceFilters.Clear();
-        }
-        public void PopulateEvents(IEnumerable<EventItem> events)
-        {
             var distinctSources = events.Select(e => e.Record.ProviderName).Distinct().OrderBy(s => s);
             foreach (var s in distinctSources)
             {
@@ -77,33 +74,41 @@ namespace EventLook.Model
                 });
             }
         }
-
-        private bool hasFilterAdded = false;
-        public void AddFilter(CollectionViewSource cvs)
+        public void ClearFilter(CollectionViewSource cvs)
         {
-            cvs.Filter += FilterBySources;
-            hasFilterAdded = true;
+            RemoveFilter(cvs);
+            sourceFilters.Clear();
         }
-        public void RemoveFilter(CollectionViewSource cvs)
-        {
-            if (hasFilterAdded)
-                cvs.Filter -= FilterBySources;
-        }
-        public void RefreshFilter(CollectionViewSource cvs)
+        public void ApplyFilter(CollectionViewSource cvs)
         {
             RemoveFilter(cvs);
             AddFilter(cvs);
         }
         public void ResetFilter(CollectionViewSource cvs)
         {
+            RemoveFilter(cvs);
             foreach (var sf in SourceFilters)
             {
                 sf.Selected = true;
             }
-            RemoveFilter(cvs);
         }
 
-        private void FilterBySources(object sender, FilterEventArgs e)
+        private bool isFilterAdded = false;
+        private void AddFilter(CollectionViewSource cvs)
+        {
+            if (isFilterAdded) return;
+
+            cvs.Filter += DoFilter;
+            isFilterAdded = true;
+        }
+        private void RemoveFilter(CollectionViewSource cvs)
+        {
+            if (!isFilterAdded) return;
+            
+            cvs.Filter -= DoFilter;
+            isFilterAdded = false;
+        }
+        private void DoFilter(object sender, FilterEventArgs e)
         {
             // Set false if the event does not match any checked items in the CheckComboBox
             if (!(e.Item is EventItem evt))

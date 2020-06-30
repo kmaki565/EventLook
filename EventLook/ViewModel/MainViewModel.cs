@@ -167,14 +167,12 @@ namespace EventLook.ViewModel
         }
         public async void Refresh()
         {
-            sourceFilterMgr.Clear();
-            sourceFilterMgr.RemoveFilter(CVS); 
+            sourceFilterMgr.ClearFilter(CVS);
             UpdateDateTimes();
 
             await Task.Run(() => LoadEvents());
 
-            sourceFilterMgr.PopulateEvents(Events);
-            sourceFilterMgr.AddFilter(CVS);
+            sourceFilterMgr.InitFilter(Events);
         }
         public void Cancel()
         {
@@ -195,14 +193,11 @@ namespace EventLook.ViewModel
         }
         private async void ApplySourceFilter()
         {
-            await ApplySourceFilterWithDelay();
-        }
-        private async Task ApplySourceFilterWithDelay()
-        {
             // TODO: Workaround as the command is called BEFORE the filter value is actually modified
             await Task.Delay(50);
-            sourceFilterMgr.RefreshFilter(CVS);
+            sourceFilterMgr.ApplyFilter(CVS);
         }
+
         public ICommand RefreshCommand
         {
             get;
