@@ -86,6 +86,9 @@
                             Delimiter=", "
                             ItemsSource="{Binding SourceFilters}" DisplayMemberPath="Name" SelectedMemberPath="Selected"
                             Command="{Binding ApplySourceFilterCommand}"/>
+                    <TextBlock Text="Message contains: " Margin="10,0,0,0" VerticalAlignment="Center"/>
+                    <TextBox Text="{Binding MessageFilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=300}"
+                             Width="100" VerticalContentAlignment="Center" />
                     <Button Content="Reset" Margin="10,0,0,0" Width="50" Command="{Binding ResetFiltersCommand, Mode=OneWay}"/>
                 </StackPanel>
             </Expander>

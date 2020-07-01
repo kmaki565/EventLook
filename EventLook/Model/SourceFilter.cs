@@ -9,6 +9,61 @@ using System.Windows.Data;
 
 namespace EventLook.Model
 {
+    public class SourceFilter : FilterBase
+    {
+        public SourceFilter()
+        {
+            sourceFilters = new ObservableCollection<SourceFilterItem>();
+            SourceFilters = new ReadOnlyObservableCollection<SourceFilterItem>(sourceFilters);
+        }
+
+        /// <summary>
+        /// Collection of the checkboxes to filter by event source
+        /// </summary>
+        private readonly ObservableCollection<SourceFilterItem> sourceFilters;
+        public ReadOnlyObservableCollection<SourceFilterItem> SourceFilters 
+        { 
+            get; 
+            private set; 
+        }
+
+        public override void Init(IEnumerable<EventItem> events)
+        {
+            sourceFilters.Clear();
+            var distinctSources = events.Select(e => e.Record.ProviderName).Distinct().OrderBy(s => s);
+            foreach (var s in distinctSources)
+            {
+                sourceFilters.Add(new SourceFilterItem
+                {
+                    Name = s,
+                    Selected = true
+                });
+            }
+        }
+        public override void Clear(CollectionViewSource cvs)
+        {
+            RemoveFilter(cvs);
+            sourceFilters.Clear();
+        }
+        public override void Reset(CollectionViewSource cvs)
+        {
+            RemoveFilter(cvs);
+            foreach (var sf in SourceFilters)
+            {
+                sf.Selected = true;
+            }
+        }
+
+        protected override void DoFilter(object sender, FilterEventArgs e)
+        {
+            // Set false if the event does not match any checked items in the CheckComboBox
+            if (!(e.Item is EventItem evt))
+                e.Accepted = false;
+            else if (!SourceFilters.Where(sf => sf.Selected).Any(sf => String.Compare(sf.Name, evt.Record.ProviderName) == 0))
+                e.Accepted = false;
+        }
+    }
+
     public class SourceFilterItem : INotifyPropertyChanged
     {
         private bool _selected;
@@ -42,79 +97,5 @@ namespace EventLook.Model
 
         public event PropertyChangedEventHandler
                        PropertyChanged;
-    }
-    public class SourceFilter
-    {
-        public SourceFilter()
-        {
-            sourceFilters = new ObservableCollection<SourceFilterItem>();
-            SourceFilters = new ReadOnlyObservableCollection<SourceFilterItem>(sourceFilters);
-        }
-
-        /// <summary>
-        /// Collection of the checkboxes to filter by event source
-        /// </summary>
-        private readonly ObservableCollection<SourceFilterItem> sourceFilters;
-        public ReadOnlyObservableCollection<SourceFilterItem> SourceFilters 
-        { 
-            get; 
-            private set; 
-        }
-
-        public void Init(IEnumerable<EventItem> events)
-        {
-            sourceFilters.Clear();
-            var distinctSources = events.Select(e => e.Record.ProviderName).Distinct().OrderBy(s => s);
-            foreach (var s in distinctSources)
-            {
-                sourceFilters.Add(new SourceFilterItem
-                {
-                    Name = s,
-                    Selected = true
-                });
-            }
-        }
-        public void Clear(CollectionViewSource cvs)
-        {
-            RemoveFilter(cvs);
-            sourceFilters.Clear();
-        }
-        public void Apply(CollectionViewSource cvs)
-        {
-            RemoveFilter(cvs);
-            AddFilter(cvs);
-        }
-        public void Reset(CollectionViewSource cvs)
-        {
-            RemoveFilter(cvs);
-            foreach (var sf in SourceFilters)
-            {
-                sf.Selected = true;
-            }
-        }
-
-        private bool isFilterAdded = false;
-        private void AddFilter(CollectionViewSource cvs)
-        {
-            if (isFilterAdded) return;
-
-            cvs.Filter += DoFilter;
-            isFilterAdded = true;
-        }
-        private void RemoveFilter(CollectionViewSource cvs)
-        {
-            if (!isFilterAdded) return;
-            
-            cvs.Filter -= DoFilter;
-            isFilterAdded = false;
-        }
-        private void DoFilter(object sender, FilterEventArgs e)
-        {
-            // Set false if the event does not match any checked items in the CheckComboBox
-            if (!(e.Item is EventItem evt))
-                e.Accepted = false;
-            else if (!SourceFilters.Where(sf => sf.Selected).Any(sf => String.Compare(sf.Name, evt.Record.ProviderName) == 0))
-                e.Accepted = false;
-        }
     }
 }

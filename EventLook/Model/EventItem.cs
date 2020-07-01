@@ -20,6 +20,10 @@ namespace EventLook.Model
             try
             {
                 Message = eventRecord.FormatDescription();
+
+                //TODO: Align to Event Viewer (e.g. Event ID 27 of e1dexpress)
+                if (Message == null)
+                    Message = "(EventLook) The description for the event cannot be found.";
             }
             catch (Exception ex)
             {

@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Data;
@@ -28,6 +29,8 @@ namespace EventLook.ViewModel
             SelectedRange = Ranges.FirstOrDefault(r => r.DaysFromNow == 3);
 
             sourceFilter = new Model.SourceFilter();
+            messageFilter = new MessageFilter();
+            filters = new List<FilterBase> { sourceFilter, messageFilter };
 
             progress = new Progress<ProgressInfo>(ProgressCallback); // Needs to instantiate in UI thread
             stopwatch = new Stopwatch();
@@ -37,6 +40,8 @@ namespace EventLook.ViewModel
         private readonly LogSourceMgr logSourceMgr;
         private readonly RangeMgr rangeMgr;
         private readonly Model.SourceFilter sourceFilter;
+        private readonly MessageFilter messageFilter;
+        private readonly List<FilterBase> filters;
         private readonly Progress<ProgressInfo> progress;
         private readonly Stopwatch stopwatch;
         private bool isWindowLoaded = false;
@@ -105,7 +110,27 @@ namespace EventLook.ViewModel
         {
             get { return sourceFilter.SourceFilters; }
         }
-     
+
+        public string MessageFilterText
+        {
+            get { return messageFilter.MessageFilterText; }
+            set 
+            {
+                if (value == messageFilter.MessageFilterText)
+                    return;
+
+                messageFilter.MessageFilterText = value;
+
+                if (isWindowLoaded)
+                {
+                    if (value == "")
+                        messageFilter.Reset(CVS);
+                    else
+                        messageFilter.Apply(CVS);
+                }
+            }
+        }
+
         private string statusText;
         public string StatusText
         {
@@ -167,12 +192,15 @@ namespace EventLook.ViewModel
         }
         public async void Refresh()
         {
-            sourceFilter.Clear(CVS);
+            foreach (var filter in filters)
+                filter.Clear(CVS);
+            
             UpdateDateTimes();
 
             await Task.Run(() => LoadEvents());
 
-            sourceFilter.Init(Events);
+            foreach (var filter in filters)
+                filter.Init(Events);
         }
         public void Cancel()
         {
@@ -189,7 +217,8 @@ namespace EventLook.ViewModel
         }
         public void ResetFilters()
         {
-            sourceFilter.Reset(CVS);
+            foreach (var filter in filters)
+                filter.Reset(CVS);
         }
         private async void ApplySourceFilter()
         {
