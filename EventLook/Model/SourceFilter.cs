@@ -40,14 +40,14 @@ namespace EventLook.Model
                 });
             }
         }
-        public override void Clear(CollectionViewSource cvs)
+        public override void Clear()
         {
-            RemoveFilter(cvs);
+            RemoveFilter();
             sourceFilters.Clear();
         }
-        public override void Reset(CollectionViewSource cvs)
+        public override void Reset()
         {
-            RemoveFilter(cvs);
+            RemoveFilter();
             foreach (var sf in SourceFilters)
             {
                 sf.Selected = true;
@@ -64,38 +64,34 @@ namespace EventLook.Model
         }
     }
 
-    public class SourceFilterItem : INotifyPropertyChanged
+    public class SourceFilterItem : Monitorable
     {
-        private bool _selected;
         private string _name;
-
         public string Name
         {
-            get => _name; set
+            get { return _name; }
+            set
             {
+                if (value == _name)
+                    return;
+
                 _name = value;
-                EmitChange(nameof(Name));
+                NotifyPropertyChanged();
             }
         }
+
+        private bool _selected;
         public bool Selected
         {
-            get => _selected; set
+            get { return _selected; }
+            set
             {
+                if (value == _selected)
+                    return;
+
                 _selected = value;
-                EmitChange(nameof(Selected));
+                NotifyPropertyChanged();
             }
         }
-
-        private void EmitChange(params string[] names)
-        {
-            if (PropertyChanged == null)
-                return;
-            foreach (var name in names)
-                PropertyChanged(this,
-                  new PropertyChangedEventArgs(name));
-        }
-
-        public event PropertyChangedEventHandler
-                       PropertyChanged;
     }
 }

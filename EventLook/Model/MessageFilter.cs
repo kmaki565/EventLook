@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,26 +8,42 @@ using System.Windows.Data;
 
 namespace EventLook.Model
 {
-    class MessageFilter : FilterBase
+    public class MessageFilter : FilterBase
     {
         public MessageFilter()
         {
             MessageFilterText = "";
         }
-        public string MessageFilterText { get; set; }   //TODO: Notify to UI
+
+        private string messageFilterText;
+        public string MessageFilterText 
+        {
+            get { return messageFilterText; }
+            set 
+            {
+                if (value == messageFilterText)
+                    return;
+
+                messageFilterText = value;
+                NotifyPropertyChanged();
+
+                if (value == "")
+                    RemoveFilter();
+                else
+                    Apply();
+            }
+        }
 
         public override void Init(IEnumerable<EventItem> events)
         {
             MessageFilterText = "";
         }
-        public override void Clear(CollectionViewSource cvs)
+        public override void Clear()
         {
-            RemoveFilter(cvs);
             MessageFilterText = "";
         }
-        public override void Reset(CollectionViewSource cvs)
+        public override void Reset()
         {
-            RemoveFilter(cvs);
             MessageFilterText = "";
         }
 

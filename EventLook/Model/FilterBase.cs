@@ -7,8 +7,17 @@ using System.Windows.Data;
 
 namespace EventLook.Model
 {
-    public abstract class FilterBase
+    public abstract class FilterBase : Monitorable
     {
+        private CollectionViewSource cvs;
+        /// <summary>
+        /// Injects the collection view source to the class. This must be called as soon as CVS is populated in the view.
+        /// </summary>
+        /// <param name="cvs"></param>
+        public void SetCvs(CollectionViewSource cvs)
+        {
+            this.cvs = cvs;
+        }
         /// <summary>
         /// Initializes filter UI (e.g. populate filter items in a drop down) after loading events.
         /// </summary>
@@ -18,36 +27,33 @@ namespace EventLook.Model
         /// <summary>
         /// Removes filter and clear the UI before loading events.
         /// </summary>
-        /// <param name="cvs"></param>
-        public abstract void Clear(CollectionViewSource cvs);
+        public abstract void Clear();
 
         /// <summary>
         /// Removes filter and restores the default UI for the Reset button.
         /// </summary>
-        /// <param name="cvs"></param>
-        public abstract void Reset(CollectionViewSource cvs);
+        public abstract void Reset();
 
         /// <summary>
         /// Applies filter when the user operates the filter UI.
         /// </summary>
-        /// <param name="cvs"></param>
-        public virtual void Apply(CollectionViewSource cvs)
+        public virtual void Apply()
         {
-            RemoveFilter(cvs);
-            AddFilter(cvs);
+            RemoveFilter();
+            AddFilter();
         }
 
         private bool isFilterAdded = false;
-        protected void AddFilter(CollectionViewSource cvs)
+        protected void AddFilter()
         {
-            if (isFilterAdded) return;
+            if (isFilterAdded || cvs == null) return;
 
             cvs.Filter += DoFilter;
             isFilterAdded = true;
         }
-        protected void RemoveFilter(CollectionViewSource cvs)
+        protected void RemoveFilter()
         {
-            if (!isFilterAdded) return;
+            if (!isFilterAdded || cvs == null) return;
 
             cvs.Filter -= DoFilter;
             isFilterAdded = false;
