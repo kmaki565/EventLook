@@ -43,9 +43,9 @@ namespace EventLook.Model
         public event PropertyChangedEventHandler
                        PropertyChanged;
     }
-    public class SourceFilterMgr
+    public class SourceFilter
     {
-        public SourceFilterMgr()
+        public SourceFilter()
         {
             sourceFilters = new ObservableCollection<SourceFilterItem>();
             SourceFilters = new ReadOnlyObservableCollection<SourceFilterItem>(sourceFilters);
@@ -61,7 +61,7 @@ namespace EventLook.Model
             private set; 
         }
 
-        public void InitFilter(IEnumerable<EventItem> events)
+        public void Init(IEnumerable<EventItem> events)
         {
             sourceFilters.Clear();
             var distinctSources = events.Select(e => e.Record.ProviderName).Distinct().OrderBy(s => s);
@@ -74,17 +74,17 @@ namespace EventLook.Model
                 });
             }
         }
-        public void ClearFilter(CollectionViewSource cvs)
+        public void Clear(CollectionViewSource cvs)
         {
             RemoveFilter(cvs);
             sourceFilters.Clear();
         }
-        public void ApplyFilter(CollectionViewSource cvs)
+        public void Apply(CollectionViewSource cvs)
         {
             RemoveFilter(cvs);
             AddFilter(cvs);
         }
-        public void ResetFilter(CollectionViewSource cvs)
+        public void Reset(CollectionViewSource cvs)
         {
             RemoveFilter(cvs);
             foreach (var sf in SourceFilters)
