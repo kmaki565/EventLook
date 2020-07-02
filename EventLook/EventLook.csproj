@@ -90,6 +90,9 @@
     </ApplicationDefinition>
     <Compile Include="Model\DataService.cs" />
     <Compile Include="Model\EventItem.cs" />
+    <Compile Include="Model\FilterBase.cs" />
+    <Compile Include="Model\MessageFilter.cs" />
+    <Compile Include="Model\Monitorable.cs" />
     <Compile Include="Model\Progress.cs" />
     <Compile Include="Model\LogSource.cs" />
     <Compile Include="Model\Range.cs" />

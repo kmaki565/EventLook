@@ -5,7 +5,9 @@ using GalaSoft.MvvmLight.Messaging;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Data;
@@ -27,7 +29,9 @@ namespace EventLook.ViewModel
             rangeMgr = new RangeMgr();
             SelectedRange = Ranges.FirstOrDefault(r => r.DaysFromNow == 3);
 
-            sourceFilterMgr = new SourceFilterMgr();
+            sourceFilter = new Model.SourceFilter();
+            MsgFilter = new MessageFilter();
+            filters = new List<FilterBase> { sourceFilter, MsgFilter };
 
             progress = new Progress<ProgressInfo>(ProgressCallback); // Needs to instantiate in UI thread
             stopwatch = new Stopwatch();
@@ -36,7 +40,12 @@ namespace EventLook.ViewModel
         }
         private readonly LogSourceMgr logSourceMgr;
         private readonly RangeMgr rangeMgr;
-        private readonly SourceFilterMgr sourceFilterMgr;
+        private readonly Model.SourceFilter sourceFilter;
+        // I had to bind the property of MessageFilter directly,
+        // since NotifyPropertyChanged from inside MessageFilter didn't work. 
+        // This may be controversial. 
+        public MessageFilter MsgFilter { get; }
+        private readonly List<FilterBase> filters;
         private readonly Progress<ProgressInfo> progress;
         private readonly Stopwatch stopwatch;
         private bool isWindowLoaded = false;
@@ -103,9 +112,9 @@ namespace EventLook.ViewModel
 
         public ReadOnlyObservableCollection<SourceFilterItem> SourceFilters 
         {
-            get { return sourceFilterMgr.SourceFilters; }
+            get { return sourceFilter.SourceFilters; }
         }
-     
+
         private string statusText;
         public string StatusText
         {
@@ -162,19 +171,19 @@ namespace EventLook.ViewModel
 
         public void OnLoaded()
         {
+            filters.ForEach(f => f.SetCvs(CVS));
+
             Refresh();
             isWindowLoaded = true;
         }
         public async void Refresh()
         {
-            sourceFilterMgr.Clear();
-            sourceFilterMgr.RemoveFilter(CVS); 
+            filters.ForEach(f => f.Clear());
             UpdateDateTimes();
 
             await Task.Run(() => LoadEvents());
 
-            sourceFilterMgr.PopulateEvents(Events);
-            sourceFilterMgr.AddFilter(CVS);
+            filters.ForEach(f => f.Init(Events));
         }
         public void Cancel()
         {
@@ -191,18 +200,15 @@ namespace EventLook.ViewModel
         }
         public void ResetFilters()
         {
-            sourceFilterMgr.ResetFilter(CVS);
+            filters.ForEach(f => f.Reset());
         }
         private async void ApplySourceFilter()
         {
-            await ApplySourceFilterWithDelay();
-        }
-        private async Task ApplySourceFilterWithDelay()
-        {
             // TODO: Workaround as the command is called BEFORE the filter value is actually modified
             await Task.Delay(50);
-            sourceFilterMgr.RefreshFilter(CVS);
+            sourceFilter.Apply();
         }
+
         public ICommand RefreshCommand
         {
             get;
