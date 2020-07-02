@@ -47,27 +47,12 @@ namespace EventLook.Model
             MessageFilterText = "";
         }
 
-        protected override void DoFilter(object sender, FilterEventArgs e)
+        protected override bool IsFilterMatched(EventItem evt)
         {
-            //TODO: Could use the Base class method
-
-            // Set false if the event does not match any checked items in the CheckComboBox
-            if (!(e.Item is EventItem evt))
-            {
-                e.Accepted = false;
-                return;
-            }
-
             if (MessageFilterText.Any(char.IsUpper))
-            {
-                if (!evt.Message.Contains(MessageFilterText))
-                    e.Accepted = false;
-            }
+                return evt.Message.Contains(MessageFilterText);
             else
-            {
-                if (!evt.Message.ToLower().Contains(MessageFilterText))
-                    e.Accepted = false;
-            }
+                return evt.Message.ToLower().Contains(MessageFilterText);
         }
     }
 }

@@ -54,13 +54,9 @@ namespace EventLook.Model
             }
         }
 
-        protected override void DoFilter(object sender, FilterEventArgs e)
+        protected override bool IsFilterMatched(EventItem evt)
         {
-            // Set false if the event does not match any checked items in the CheckComboBox
-            if (!(e.Item is EventItem evt))
-                e.Accepted = false;
-            else if (!SourceFilters.Where(sf => sf.Selected).Any(sf => String.Compare(sf.Name, evt.Record.ProviderName) == 0))
-                e.Accepted = false;
+            return SourceFilters.Where(sf => sf.Selected).Any(sf => String.Compare(sf.Name, evt.Record.ProviderName) == 0);
         }
     }
 

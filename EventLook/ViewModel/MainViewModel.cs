@@ -41,8 +41,9 @@ namespace EventLook.ViewModel
         private readonly LogSourceMgr logSourceMgr;
         private readonly RangeMgr rangeMgr;
         private readonly Model.SourceFilter sourceFilter;
-        // Not sure property is the best here. Since NotifyPropertyChanged from inside MessageFilter didn't work, 
-        // I had to bind the property of MessageFilter directly.
+        // I had to bind the property of MessageFilter directly,
+        // since NotifyPropertyChanged from inside MessageFilter didn't work. 
+        // This may be controversial. 
         public MessageFilter MsgFilter { get; }
         private readonly List<FilterBase> filters;
         private readonly Progress<ProgressInfo> progress;
@@ -170,23 +171,19 @@ namespace EventLook.ViewModel
 
         public void OnLoaded()
         {
-            foreach (var filter in filters)
-                filter.SetCvs(CVS);
+            filters.ForEach(f => f.SetCvs(CVS));
 
             Refresh();
             isWindowLoaded = true;
         }
         public async void Refresh()
         {
-            foreach (var filter in filters)
-                filter.Clear();
-            
+            filters.ForEach(f => f.Clear());
             UpdateDateTimes();
 
             await Task.Run(() => LoadEvents());
 
-            foreach (var filter in filters)
-                filter.Init(Events);
+            filters.ForEach(f => f.Init(Events));
         }
         public void Cancel()
         {
@@ -203,10 +200,7 @@ namespace EventLook.ViewModel
         }
         public void ResetFilters()
         {
-            foreach (var filter in filters)
-                filter.Reset();
-
-
+            filters.ForEach(f => f.Reset());
         }
         private async void ApplySourceFilter()
         {

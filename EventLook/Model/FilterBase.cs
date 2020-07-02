@@ -58,6 +58,19 @@ namespace EventLook.Model
             cvs.Filter -= DoFilter;
             isFilterAdded = false;
         }
-        protected abstract void DoFilter(object sender, FilterEventArgs e);
+        protected void DoFilter(object sender, FilterEventArgs e)
+        {
+            // Set false if the event does not match to the filter criteria.
+            // When using multiple filters, do not explicitly set anything to true.
+
+            if (!(e.Item is EventItem evt))
+                e.Accepted = false;
+            else if (!IsFilterMatched(evt))
+                e.Accepted = false;
+        }
+        /// <summary>
+        /// Returns true if the given event item should be displayed, or false if the event should be filtered out.
+        /// </summary>
+        protected abstract bool IsFilterMatched(EventItem evt);
     }
 }
