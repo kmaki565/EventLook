@@ -49,10 +49,20 @@ namespace EventLook.Model
 
         protected override bool IsFilterMatched(EventItem evt)
         {
-            if (MessageFilterText.Any(char.IsUpper))
-                return evt.Message.Contains(MessageFilterText);
-            else
-                return evt.Message.ToLower().Contains(MessageFilterText);
+            if (MessageFilterText.Any())
+            {
+                //Split multiple filters. Currently the delimeter is space
+                string[] filterlist = MessageFilterText.Split(' ');
+                foreach (string item in filterlist)
+                {
+                    StringComparison comp = StringComparison.OrdinalIgnoreCase;
+                    if (evt.Message.IndexOf(item, comp) >= 0)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
     }
 }
