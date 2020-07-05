@@ -82,11 +82,17 @@
             <Expander x:Name="Ex1" Header="Filters" Grid.Row="1" Margin="10,0,0,0" ExpandDirection="Down">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Source: " Margin="5,0,0,0" VerticalAlignment="Center"/>
-                    <xctk:CheckComboBox Width="200" 
+                    <xctk:CheckComboBox Width="220" 
                             IsSelectAllActive="True"
                             Delimiter=", "
                             ItemsSource="{Binding SourceFilters}" DisplayMemberPath="Name" SelectedMemberPath="Selected"
                             Command="{Binding ApplySourceFilterCommand}"/>
+                    <TextBlock Text="Level: " Margin="5,0,0,0" VerticalAlignment="Center"/>
+                    <xctk:CheckComboBox Width="120" 
+                            IsSelectAllActive="True"
+                            Delimiter=", "
+                            ItemsSource="{Binding LevelFilters}" SelectedMemberPath="Selected"
+                            Command="{Binding ApplyLevelFilterCommand}"/>
                     <TextBlock Text="Event ID: " Margin="10,0,0,0" VerticalAlignment="Center"/>
                     <TextBox Text="{Binding IdFilter.IdFilterNum, TargetNullValue='', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=300}"
                              Width="50" VerticalContentAlignment="Center" />

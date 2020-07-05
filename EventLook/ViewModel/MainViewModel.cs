@@ -30,10 +30,11 @@ namespace EventLook.ViewModel
             SelectedRange = Ranges.FirstOrDefault(r => r.DaysFromNow == 3);
 
             sourceFilter = new Model.SourceFilter();
+            levelFilter = new LevelFilter();
             MsgFilter = new MessageFilter();
             IdFilter = new IdFilter();
 
-            filters = new List<FilterBase> { sourceFilter, MsgFilter, IdFilter };
+            filters = new List<FilterBase> { sourceFilter, levelFilter, MsgFilter, IdFilter };
 
             progress = new Progress<ProgressInfo>(ProgressCallback); // Needs to instantiate in UI thread
             stopwatch = new Stopwatch();
@@ -43,6 +44,7 @@ namespace EventLook.ViewModel
         private readonly LogSourceMgr logSourceMgr;
         private readonly RangeMgr rangeMgr;
         private readonly Model.SourceFilter sourceFilter;
+        private readonly LevelFilter levelFilter;
         // I had to bind the property of MessageFilter directly,
         // since NotifyPropertyChanged from inside MessageFilter didn't work. 
         // This may be controversial. 
@@ -116,6 +118,10 @@ namespace EventLook.ViewModel
         public ReadOnlyObservableCollection<SourceFilterItem> SourceFilters 
         {
             get { return sourceFilter.SourceFilters; }
+        }
+        public ReadOnlyObservableCollection<LevelFilterItem> LevelFilters
+        {
+            get { return levelFilter.LevelFilters; }
         }
 
         private string statusText;
@@ -211,6 +217,12 @@ namespace EventLook.ViewModel
             await Task.Delay(50);
             sourceFilter.Apply();
         }
+        private async void ApplyLevelFilter()
+        {
+            // TODO: Workaround as the command is called BEFORE the filter value is actually modified
+            await Task.Delay(50);
+            levelFilter.Apply();
+        }
 
         public ICommand RefreshCommand
         {
@@ -227,6 +239,11 @@ namespace EventLook.ViewModel
             get;
             private set;
         }
+        public ICommand ApplyLevelFilterCommand
+        {
+            get;
+            private set;
+        }
         public ICommand ResetFiltersCommand
         {
             get;
@@ -239,6 +256,7 @@ namespace EventLook.ViewModel
             CancelCommand = new RelayCommand(Cancel, () => IsUpdating);
             ResetFiltersCommand = new RelayCommand(ResetFilters, null);
             ApplySourceFilterCommand = new RelayCommand(ApplySourceFilter, null);
+            ApplyLevelFilterCommand = new RelayCommand(ApplyLevelFilter, null);
         }
         private void UpdateDateTimes()
         {
