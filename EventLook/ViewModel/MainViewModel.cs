@@ -31,7 +31,9 @@ namespace EventLook.ViewModel
 
             sourceFilter = new Model.SourceFilter();
             MsgFilter = new MessageFilter();
-            filters = new List<FilterBase> { sourceFilter, MsgFilter };
+            IdFilter = new IdFilter();
+
+            filters = new List<FilterBase> { sourceFilter, MsgFilter, IdFilter };
 
             progress = new Progress<ProgressInfo>(ProgressCallback); // Needs to instantiate in UI thread
             stopwatch = new Stopwatch();
@@ -45,6 +47,7 @@ namespace EventLook.ViewModel
         // since NotifyPropertyChanged from inside MessageFilter didn't work. 
         // This may be controversial. 
         public MessageFilter MsgFilter { get; }
+        public IdFilter IdFilter { get; }
         private readonly List<FilterBase> filters;
         private readonly Progress<ProgressInfo> progress;
         private readonly Stopwatch stopwatch;

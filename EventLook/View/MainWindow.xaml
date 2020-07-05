@@ -81,15 +81,19 @@
 
             <Expander x:Name="Ex1" Header="Filters" Grid.Row="1" Margin="10,0,0,0" ExpandDirection="Down">
                 <StackPanel Orientation="Horizontal">
-                    <xctk:CheckComboBox Width="300" Margin="10,0,0,0" 
+                    <TextBlock Text="Source: " Margin="5,0,0,0" VerticalAlignment="Center"/>
+                    <xctk:CheckComboBox Width="200" 
                             IsSelectAllActive="True"
                             Delimiter=", "
                             ItemsSource="{Binding SourceFilters}" DisplayMemberPath="Name" SelectedMemberPath="Selected"
                             Command="{Binding ApplySourceFilterCommand}"/>
+                    <TextBlock Text="Event ID: " Margin="10,0,0,0" VerticalAlignment="Center"/>
+                    <TextBox Text="{Binding IdFilter.IdFilterNum, TargetNullValue='', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=300}"
+                             Width="50" VerticalContentAlignment="Center" />
                     <TextBlock Text="Message contains: " Margin="10,0,0,0" VerticalAlignment="Center"/>
                     <TextBox Text="{Binding MsgFilter.MessageFilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=300}"
-                             Width="100" VerticalContentAlignment="Center" />
-                    <Button Content="Reset" Margin="10,0,0,0" Width="50" Command="{Binding ResetFiltersCommand, Mode=OneWay}"/>
+                             Width="150" VerticalContentAlignment="Center" />
+                    <Button Content="Reset all" Margin="10,0,0,0" Width="50" Command="{Binding ResetFiltersCommand, Mode=OneWay}"/>
                 </StackPanel>
             </Expander>
 
