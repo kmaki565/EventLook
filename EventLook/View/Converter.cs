@@ -27,7 +27,7 @@ namespace EventLook.View
                 return $"{level} - {levelDisplayName}";
             }
             else
-                throw new ArgumentException("Invalid type object was specified.");
+                return "Invalid level";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
