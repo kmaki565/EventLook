@@ -50,21 +50,23 @@ namespace EventLook.Model
         protected override bool IsFilterMatched(EventItem evt)
         {
             string[] filterlist = {};
-            if (MessageFilterText.Any())
-            {
-                //search fo "|" if exist do OR search
-                if(MessageFilterText.Contains('|'))
-                {
-                    filterlist = MessageFilterText.Split('|');
-                    return filterlist.Any(filter => evt.Message.ToLower().Contains(filter.Trim().ToLower()));
-                }
+            string message = evt.Message;
 
-                //AND search
-                filterlist = MessageFilterText.Split(' ');
-                return filterlist.All(filter => evt.Message.ToLower().Contains(filter.ToLower()));
+            //search fo "|" if exist do OR search
+            if (MessageFilterText.Contains('|'))
+            {
+                filterlist = MessageFilterText.Split('|');
+
+                return filterlist.Any(filter => filter.Any(c => char.IsUpper(c) 
+                    ? evt.Message.Contains(filter.Trim()) 
+                    : evt.Message.ToLower().Contains(filter.Trim())));
             }
 
-            return false;
+            //AND search
+            filterlist = MessageFilterText.Split(' ');
+            return filterlist.All(filter => filter.Any(c => char.IsUpper(c)
+                ? evt.Message.Contains(filter)
+                : evt.Message.ToLower().Contains(filter)));
         }
     }
 }
