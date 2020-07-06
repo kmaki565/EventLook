@@ -49,19 +49,21 @@ namespace EventLook.Model
 
         protected override bool IsFilterMatched(EventItem evt)
         {
+            string[] filterlist = {};
             if (MessageFilterText.Any())
             {
-                //Split multiple filters. Currently the delimeter is space
-                string[] filterlist = MessageFilterText.Split(' ');
-                foreach (string item in filterlist)
+                //search fo "|" if exist do OR search
+                if(MessageFilterText.Contains('|'))
                 {
-                    StringComparison comp = StringComparison.OrdinalIgnoreCase;
-                    if (evt.Message.IndexOf(item, comp) >= 0)
-                    {
-                        return true;
-                    }
+                    filterlist = MessageFilterText.Split('|');
+                    return filterlist.Any(filter => evt.Message.ToLower().Contains(filter.Trim().ToLower()));
                 }
+
+                //AND search
+                filterlist = MessageFilterText.Split(' ');
+                return filterlist.All(filter => evt.Message.ToLower().Contains(filter.ToLower()));
             }
+
             return false;
         }
     }
