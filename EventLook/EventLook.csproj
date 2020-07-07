@@ -137,9 +137,7 @@
     <Resource Include="Asset\1385_Disable_16x16_72.png" />
     <Resource Include="Asset\1385_Disable_16x16_72_disabled.png" />
     <Resource Include="Asset\Ev.ico" />
-    <Content Include="Font\WINGDNG3.TTF">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Resource Include="Font\WINGDNG3.TTF" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
