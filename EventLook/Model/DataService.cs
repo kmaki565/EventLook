@@ -11,14 +11,14 @@ namespace EventLook.Model
 {
     public interface IDataService
     {
-        Task<int> ReadEvents(string eventSource, DateTime fromTime, DateTime toTime, IProgress<ProgressInfo> progress);
-        
+        Task<int> ReadEvents(LogSource eventSource, DateTime fromTime, DateTime toTime, IProgress<ProgressInfo> progress);
+
         void Cancel();
     }
     public class DataService : IDataService
     {
         private CancellationTokenSource cts;
-        public async Task<int> ReadEvents(string eventSource, DateTime fromTime, DateTime toTime, IProgress<ProgressInfo> progress)
+        public async Task<int> ReadEvents(LogSource eventSource, DateTime fromTime, DateTime toTime, IProgress<ProgressInfo> progress)
         {
             using (cts = new CancellationTokenSource())
             {
@@ -33,7 +33,7 @@ namespace EventLook.Model
                         fromTime.ToUniversalTime().ToString("s"),
                         toTime.ToUniversalTime().ToString("s"));
 
-                    var elQuery = new EventLogQuery(eventSource, PathType.LogName, sQuery)
+                    var elQuery = new EventLogQuery(eventSource.Name, eventSource.PathType, sQuery)
                     {
                         ReverseDirection = true
                     };
