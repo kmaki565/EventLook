@@ -34,5 +34,24 @@ namespace EventLook
 
             ContentRendered += (s, e) => { ((MainViewModel)DataContext).OnLoaded(); };
         }
+
+        private void OnPreviewDragOver(object sender, DragEventArgs e)
+        {
+            e.Effects = DragDropEffects.Copy;
+            e.Handled = e.Data.GetDataPresent(DataFormats.FileDrop);
+        }
+
+        private void onDrop(object sender, DragEventArgs e)
+        {
+            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+            if (files != null)
+            {
+                foreach (string uriString in files)
+                {
+                    // Pass the file name to the MainViewModel
+                    Messenger.Default.Send(new FileToBeProcessedMessageToken() { FilePath = uriString });
+                }
+            }
+        }
     }
 }

@@ -13,6 +13,7 @@ The inbox Windows Event Viewer is a great app that provides comprehensive functi
 - Asynchronous event fetching for quick glance
 - Provides quicker sort, specifying range, filters, and search (coming soon) 
 - Quick access to your favorite Applications and Services Logs
+- To view logs in an evtx file, drag & drop the file, then choose it from the list of event sources.
 
 # Install
 Just download the latest artifact, unzip it, and run EventLook.exe. No registry/local storage is used as of now.

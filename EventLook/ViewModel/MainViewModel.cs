@@ -22,7 +22,7 @@ namespace EventLook.ViewModel
             InitializeCommands();
             DataService = dataService;
             Events = new ObservableCollection<EventItem>();
-            
+
             logSourceMgr = new LogSourceMgr();
             SelectedLogSource = LogSources.FirstOrDefault();
 
@@ -40,14 +40,15 @@ namespace EventLook.ViewModel
             stopwatch = new Stopwatch();
 
             Messenger.Default.Register<ViewCollectionViewSourceMessageToken>(this, Handle_ViewCollectionViewSourceMessageToken);
+            Messenger.Default.Register<FileToBeProcessedMessageToken>(this, Handle_FileToBeProcessedMessageToken);
         }
         private readonly LogSourceMgr logSourceMgr;
         private readonly RangeMgr rangeMgr;
         private readonly Model.SourceFilter sourceFilter;
         private readonly LevelFilter levelFilter;
         // I had to bind the property of MessageFilter directly,
-        // since NotifyPropertyChanged from inside MessageFilter didn't work. 
-        // This may be controversial. 
+        // since NotifyPropertyChanged from inside MessageFilter didn't work.
+        // This may be controversial.
         public MessageFilter MsgFilter { get; }
         public IdFilter IdFilter { get; }
         private readonly List<FilterBase> filters;
@@ -73,8 +74,8 @@ namespace EventLook.ViewModel
             }
         }
 
-        public ObservableCollection<LogSource> LogSources 
-        { 
+        public ObservableCollection<LogSource> LogSources
+        {
             get { return logSourceMgr.LogSources; }
         }
 
@@ -82,13 +83,13 @@ namespace EventLook.ViewModel
         public LogSource SelectedLogSource
         {
             get { return selectedLogSource; }
-            set 
+            set
             {
                 if (value == selectedLogSource)
                     return;
 
                 selectedLogSource = value;
-                if (isWindowLoaded) 
+                if (isWindowLoaded)
                     Refresh();
             }
         }
@@ -115,7 +116,7 @@ namespace EventLook.ViewModel
             }
         }
 
-        public ReadOnlyObservableCollection<SourceFilterItem> SourceFilters 
+        public ReadOnlyObservableCollection<SourceFilterItem> SourceFilters
         {
             get { return sourceFilter.SourceFilters; }
         }
@@ -205,6 +206,7 @@ namespace EventLook.ViewModel
         public override void Cleanup()
         {
             Messenger.Default.Unregister<ViewCollectionViewSourceMessageToken>(this);
+            Messenger.Default.Unregister<FileToBeProcessedMessageToken>(this);
             base.Cleanup();
         }
         public void ResetFilters()
@@ -280,7 +282,7 @@ namespace EventLook.ViewModel
         {
             Cancel();
 
-            await Update(DataService.ReadEvents(selectedLogSource.Name, FromDateTime, ToDateTime, progress));
+            await Update(DataService.ReadEvents(selectedLogSource, FromDateTime, ToDateTime, progress));
         }
         private void ProgressCallback(ProgressInfo progressInfo)
         {
@@ -320,7 +322,7 @@ namespace EventLook.ViewModel
                 $"{loadedEventCount} events loaded. ({stopwatch.Elapsed.TotalSeconds:F1} sec) {additionalNote}"; // 1 digit after decimal point
         }
         /// <summary>
-        /// Gets or sets the CollectionViewSource which is the proxy for the 
+        /// Gets or sets the CollectionViewSource which is the proxy for the
         /// collection of Things and the datagrid in which each thing is displayed.
         /// </summary>
         private CollectionViewSource CVS { get; set; }
@@ -331,6 +333,14 @@ namespace EventLook.ViewModel
         private void Handle_ViewCollectionViewSourceMessageToken(ViewCollectionViewSourceMessageToken token)
         {
             CVS = token.CVS;
+        }
+
+        /// <summary>
+        /// This method handles a message received from the View which passes a file name that was Drag & Dropped.
+        /// </summary>
+        private void Handle_FileToBeProcessedMessageToken(FileToBeProcessedMessageToken token)
+        {
+            logSourceMgr.AddSourcePath(token.FilePath);
         }
     }
 }
