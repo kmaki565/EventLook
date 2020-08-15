@@ -20,6 +20,8 @@ namespace EventLook.ViewModel
         public MainViewModel(IDataService dataService)
         {
             InitializeCommands();
+
+            MainWindowTitle = "EventLook" + (ProcessHelper.IsElevated ? " (Administrator)" : "");
             DataService = dataService;
             Events = new ObservableCollection<EventItem>();
 
@@ -178,6 +180,7 @@ namespace EventLook.ViewModel
                 RaisePropertyChanged();
             }
         }
+        public string MainWindowTitle { get; }
 
         public void OnLoaded()
         {

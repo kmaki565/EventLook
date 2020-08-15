@@ -9,7 +9,7 @@
         mc:Ignorable="d"
         DataContext="{Binding Source={StaticResource Locator}, Path=MainVm, Mode=OneWay}"
         ResizeMode="CanResizeWithGrip"
-        Title="EventLook">
+        Title="{Binding MainWindowTitle}">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="conv" />
         <v:EventLevelToDisplayTextConverter x:Key="EventLevelToDisplayTextConverter"/>
