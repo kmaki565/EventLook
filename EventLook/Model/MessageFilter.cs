@@ -49,10 +49,16 @@ namespace EventLook.Model
 
         protected override bool IsFilterMatched(EventItem evt)
         {
-            if (MessageFilterText.Any(char.IsUpper))
-                return evt.Message.Contains(MessageFilterText);
-            else
-                return evt.Message.ToLower().Contains(MessageFilterText);
+            // First, make text groups for OR search.
+            var filterGroups = MessageFilterText.Split('|').Where(x => !string.IsNullOrWhiteSpace(x));
+            foreach (var filterText in filterGroups)
+            {
+                // Then, do AND search for each group. 
+                var searchWords = filterText.ToLower().Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                if (searchWords.All(x => evt.Message.ToLower().Contains(x)))
+                    return true;
+            }
+            return false;
         }
     }
 }
