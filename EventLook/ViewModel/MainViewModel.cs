@@ -75,6 +75,7 @@ namespace EventLook.ViewModel
                 RaisePropertyChanged();
             }
         }
+        public EventItem SelectedEvent { get; set; }
 
         public ObservableCollection<LogSource> LogSources
         {
@@ -228,6 +229,11 @@ namespace EventLook.ViewModel
             await Task.Delay(50);
             levelFilter.Apply();
         }
+        private void OpenDetails()
+        {
+            //TODO: Open a new window here
+            Debug.WriteLine(SelectedEvent.Record.ToXml());
+        }
 
         public ICommand RefreshCommand
         {
@@ -254,6 +260,11 @@ namespace EventLook.ViewModel
             get;
             private set;
         }
+        public ICommand OpenDetailsCommand
+        {
+            get;
+            private set;
+        }
 
         private void InitializeCommands()
         {
@@ -262,6 +273,7 @@ namespace EventLook.ViewModel
             ResetFiltersCommand = new RelayCommand(ResetFilters, null);
             ApplySourceFilterCommand = new RelayCommand(ApplySourceFilter, null);
             ApplyLevelFilterCommand = new RelayCommand(ApplyLevelFilter, null);
+            OpenDetailsCommand = new RelayCommand(OpenDetails, null);
         }
         private void UpdateDateTimes()
         {
