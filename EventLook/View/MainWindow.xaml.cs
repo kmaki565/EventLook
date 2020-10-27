@@ -1,4 +1,5 @@
-﻿using EventLook.ViewModel;
+﻿using EventLook.View;
+using EventLook.ViewModel;
 using GalaSoft.MvvmLight.Messaging;
 using System;
 using System.Collections.Generic;
@@ -29,8 +30,9 @@ namespace EventLook
             // Here we send a message which is caught by the view model.  The message contains a reference
             // to the CollectionViewSource which is instantiated when the view is instantiated (before the view model).
             Messenger.Default.Send(new ViewCollectionViewSourceMessageToken() { CVS = (CollectionViewSource)(this.Resources["X_CVS"]) });
-
-            // Note to MVVM purists:  Not an ideal solution.  But based on the amount if time spent on this it was acceptable, especially to the client.
+            
+            var showWindowService = new ShowWindowService<DetailWindow, DetailViewModel>(){ Owner = this };
+            Messenger.Default.Send(new DetailWindowMessageToken() { ShowWindowService = showWindowService });
 
             ContentRendered += (s, e) => { ((MainViewModel)DataContext).OnLoaded(); };
         }
@@ -41,7 +43,7 @@ namespace EventLook
             e.Handled = e.Data.GetDataPresent(DataFormats.FileDrop);
         }
 
-        private void onDrop(object sender, DragEventArgs e)
+        private void OnDrop(object sender, DragEventArgs e)
         {
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
             if (files != null)

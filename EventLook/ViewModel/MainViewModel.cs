@@ -1,4 +1,5 @@
 using EventLook.Model;
+using EventLook.View;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using GalaSoft.MvvmLight.Messaging;
@@ -43,6 +44,7 @@ namespace EventLook.ViewModel
 
             Messenger.Default.Register<ViewCollectionViewSourceMessageToken>(this, Handle_ViewCollectionViewSourceMessageToken);
             Messenger.Default.Register<FileToBeProcessedMessageToken>(this, Handle_FileToBeProcessedMessageToken);
+            Messenger.Default.Register<DetailWindowMessageToken>(this, Handle_DetailWindowMessageToken);
         }
         private readonly LogSourceMgr logSourceMgr;
         private readonly RangeMgr rangeMgr;
@@ -61,6 +63,7 @@ namespace EventLook.ViewModel
         private Task ongoingTask;
 
         internal IDataService DataService { get; set; }
+        private ShowWindowService<DetailWindow, DetailViewModel> showWindowService;
 
         private ObservableCollection<EventItem> _events;
         public ObservableCollection<EventItem> Events
@@ -231,8 +234,8 @@ namespace EventLook.ViewModel
         }
         private void OpenDetails()
         {
-            //TODO: Open a new window here
-            Debug.WriteLine(SelectedEvent.Record.ToXml());
+            var detailVm = new DetailViewModel(SelectedEvent);
+            showWindowService.Show(detailVm);
         }
 
         public ICommand RefreshCommand
@@ -356,6 +359,11 @@ namespace EventLook.ViewModel
         private void Handle_FileToBeProcessedMessageToken(FileToBeProcessedMessageToken token)
         {
             logSourceMgr.AddSourcePath(token.FilePath);
+        }
+        //TODO: This is too redundant... 
+        private void Handle_DetailWindowMessageToken(DetailWindowMessageToken token)
+        {
+            showWindowService = token.ShowWindowService;
         }
     }
 }

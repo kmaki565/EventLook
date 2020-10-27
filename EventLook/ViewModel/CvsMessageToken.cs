@@ -1,4 +1,5 @@
-﻿using System.Windows.Data;
+﻿using EventLook.View;
+using System.Windows.Data;
 
 namespace EventLook.ViewModel
 {
@@ -16,5 +17,9 @@ namespace EventLook.ViewModel
     public class FileToBeProcessedMessageToken
     {
         public string FilePath { get; set; }
+    }
+    public class DetailWindowMessageToken
+    {
+        public ShowWindowService<DetailWindow, DetailViewModel> ShowWindowService { get; set; }
     }
 }
