@@ -5,12 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EventLook.View"
         mc:Ignorable="d"
-        Title="DetailWindow" Height="450" Width="800">
+        FocusManager.FocusedElement="{Binding ElementName=EventXml}"
+        Title="Event Details" Height="450" Width="800">
     <Grid>
-        <TextBox
-            Text="{Binding FormattedXml, Mode=OneWay}"
-        IsReadOnly="True"
-        VerticalScrollBarVisibility="Auto"
-        HorizontalScrollBarVisibility="Auto"/>
+        <TextBox Name="EventXml" Text="{Binding FormattedXml, Mode=OneWay}"
+                 IsReadOnly="True" IsReadOnlyCaretVisible="True"
+                 VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
     </Grid>
 </Window>
