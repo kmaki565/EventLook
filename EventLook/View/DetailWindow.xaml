@@ -1,0 +1,15 @@
+﻿<Window x:Class="EventLook.View.DetailWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:EventLook.View"
+        mc:Ignorable="d"
+        FocusManager.FocusedElement="{Binding ElementName=EventXml}"
+        Title="Event Details" Height="450" Width="800">
+    <Grid>
+        <TextBox Name="EventXml" Text="{Binding FormattedXml, Mode=OneWay}"
+                 IsReadOnly="True" IsReadOnlyCaretVisible="True"
+                 VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
+    </Grid>
+</Window>

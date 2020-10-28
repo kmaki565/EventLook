@@ -1,4 +1,5 @@
 using EventLook.Model;
+using EventLook.View;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using GalaSoft.MvvmLight.Messaging;
@@ -43,6 +44,7 @@ namespace EventLook.ViewModel
 
             Messenger.Default.Register<ViewCollectionViewSourceMessageToken>(this, Handle_ViewCollectionViewSourceMessageToken);
             Messenger.Default.Register<FileToBeProcessedMessageToken>(this, Handle_FileToBeProcessedMessageToken);
+            Messenger.Default.Register<DetailWindowMessageToken>(this, Handle_DetailWindowMessageToken);
         }
         private readonly LogSourceMgr logSourceMgr;
         private readonly RangeMgr rangeMgr;
@@ -61,6 +63,7 @@ namespace EventLook.ViewModel
         private Task ongoingTask;
 
         internal IDataService DataService { get; set; }
+        private ShowWindowService<DetailWindow, DetailViewModel> showWindowService;
 
         private ObservableCollection<EventItem> _events;
         public ObservableCollection<EventItem> Events
@@ -75,6 +78,7 @@ namespace EventLook.ViewModel
                 RaisePropertyChanged();
             }
         }
+        public EventItem SelectedEvent { get; set; }
 
         public ObservableCollection<LogSource> LogSources
         {
@@ -228,6 +232,11 @@ namespace EventLook.ViewModel
             await Task.Delay(50);
             levelFilter.Apply();
         }
+        private void OpenDetails()
+        {
+            var detailVm = new DetailViewModel(SelectedEvent);
+            showWindowService.Show(detailVm);
+        }
 
         public ICommand RefreshCommand
         {
@@ -254,6 +263,11 @@ namespace EventLook.ViewModel
             get;
             private set;
         }
+        public ICommand OpenDetailsCommand
+        {
+            get;
+            private set;
+        }
 
         private void InitializeCommands()
         {
@@ -262,6 +276,7 @@ namespace EventLook.ViewModel
             ResetFiltersCommand = new RelayCommand(ResetFilters, null);
             ApplySourceFilterCommand = new RelayCommand(ApplySourceFilter, null);
             ApplyLevelFilterCommand = new RelayCommand(ApplyLevelFilter, null);
+            OpenDetailsCommand = new RelayCommand(OpenDetails, null);
         }
         private void UpdateDateTimes()
         {
@@ -344,6 +359,11 @@ namespace EventLook.ViewModel
         private void Handle_FileToBeProcessedMessageToken(FileToBeProcessedMessageToken token)
         {
             logSourceMgr.AddSourcePath(token.FilePath);
+        }
+        //TODO: This is too redundant... 
+        private void Handle_DetailWindowMessageToken(DetailWindowMessageToken token)
+        {
+            showWindowService = token.ShowWindowService;
         }
     }
 }

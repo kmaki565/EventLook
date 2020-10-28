@@ -98,18 +98,23 @@
                              Width="50" VerticalContentAlignment="Center" />
                     <TextBlock Text="Message contains: " Margin="10,0,0,0" VerticalAlignment="Center"/>
                     <TextBox Text="{Binding MsgFilter.MessageFilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=300}"
-                             Width="150" VerticalContentAlignment="Center" />
+                             Width="180" VerticalContentAlignment="Center" />
                     <Button Content="Reset all" Margin="10,0,0,0" Width="50" Command="{Binding ResetFiltersCommand, Mode=OneWay}"/>
                 </StackPanel>
             </Expander>
 
             <!-- *** The ItemsSource of the data grid is bound to the CollectionViewSource object that was instantiated above -->
-            <DataGrid ItemsSource="{Binding Source={StaticResource X_CVS}}" Margin="5" Grid.Row="2" AutoGenerateColumns="False" IsReadOnly="True"
-                  BorderBrush="LightSteelBlue" HorizontalGridLinesBrush="LightSteelBlue" VerticalGridLinesBrush="LightSteelBlue" AllowDrop="True" PreviewDragOver="OnPreviewDragOver" Drop="onDrop">
+            <DataGrid ItemsSource="{Binding Source={StaticResource X_CVS}}" SelectedItem="{Binding SelectedEvent}" 
+                      Margin="5" Grid.Row="2" AutoGenerateColumns="False" IsReadOnly="True"
+                  BorderBrush="LightSteelBlue" HorizontalGridLinesBrush="LightSteelBlue" VerticalGridLinesBrush="LightSteelBlue" AllowDrop="True" PreviewDragOver="OnPreviewDragOver" Drop="OnDrop">
                 <DataGrid.Resources>
                     <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightGray"/>
                     <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey }" Color="Black"/>
                 </DataGrid.Resources>
+                <DataGrid.InputBindings>
+                    <MouseBinding Gesture="LeftDoubleClick" Command="{Binding OpenDetailsCommand}" />
+                    <KeyBinding Key="Enter" Command="{Binding OpenDetailsCommand}" />
+                </DataGrid.InputBindings>
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Time of event" Binding="{Binding TimeOfEvent, StringFormat=u}"/>
                     <DataGridTextColumn Header="Source" Binding="{Binding Record.ProviderName}" MaxWidth="200">
