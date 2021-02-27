@@ -19,15 +19,11 @@ namespace EventLook.Model
             this.cvs = cvs;
         }
         /// <summary>
-        /// Initializes filter UI (e.g. populate filter items in a drop down) after loading events.
+        /// Refreshes filter UI (e.g. populate filter items in a drop down) by loaded events,
+        /// trying to carry over filters user specified.
         /// </summary>
         /// <param name="events">Loaded event items</param>
-        public abstract void Init(IEnumerable<EventItem> events);
-
-        /// <summary>
-        /// Removes filter and clear the UI before loading events.
-        /// </summary>
-        public abstract void Clear();
+        public virtual void Refresh(IEnumerable<EventItem> events) { }
 
         /// <summary>
         /// Removes filter and restores the default UI for the Reset button.

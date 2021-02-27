@@ -35,14 +35,6 @@ namespace EventLook.Model
             }
         }
 
-        public override void Init(IEnumerable<EventItem> events)
-        {
-            IdFilterNum = null;
-        }
-        public override void Clear()
-        {
-            IdFilterNum = null;
-        }
         public override void Reset()
         {
             IdFilterNum = null;

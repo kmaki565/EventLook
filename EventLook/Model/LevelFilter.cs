@@ -25,8 +25,10 @@ namespace EventLook.Model
             private set;
         }
 
-        public override void Init(IEnumerable<EventItem> events)
+        public override void Refresh(IEnumerable<EventItem> events)
         {
+            // Make a copy before clearing
+            var prevFilters = levelFilters.Select(f => new LevelFilterItem { Level = f.Level, Selected = f.Selected }).ToList();
             levelFilters.Clear();
 
             // Check null, just in case.
@@ -35,7 +37,7 @@ namespace EventLook.Model
                 levelFilters.Add(new LevelFilterItem
                 {
                     Level = null,
-                    Selected = true
+                    Selected = prevFilters.FirstOrDefault(f => f.Level == null)?.Selected ?? true
                 });
             }
 
@@ -45,14 +47,11 @@ namespace EventLook.Model
                 levelFilters.Add(new LevelFilterItem
                 {
                     Level = lv,
-                    Selected = true
+                    Selected = prevFilters.FirstOrDefault(f => f.Level == lv)?.Selected ?? true
                 });
             }
-        }
-        public override void Clear()
-        {
-            RemoveFilter();
-            levelFilters.Clear();
+
+            Apply();
         }
         public override void Reset()
         {

@@ -195,12 +195,11 @@ namespace EventLook.ViewModel
         }
         public async void Refresh()
         {
-            filters.ForEach(f => f.Clear());
             UpdateDateTimes();
 
             await Task.Run(() => LoadEvents());
 
-            filters.ForEach(f => f.Init(Events));
+            filters.ForEach(f => f.Refresh(Events));
         }
         public void Cancel()
         {

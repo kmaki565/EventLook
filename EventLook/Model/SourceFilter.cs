@@ -27,23 +27,23 @@ namespace EventLook.Model
             private set; 
         }
 
-        public override void Init(IEnumerable<EventItem> events)
+        public override void Refresh(IEnumerable<EventItem> events)
         {
+            // Make a copy before clearing
+            var prevFilters = sourceFilters.Select(f => new SourceFilterItem { Name = f.Name, Selected = f.Selected }).ToList();
             sourceFilters.Clear();
+
             var distinctSources = events.Select(e => e.Record.ProviderName).Distinct().OrderBy(s => s);
             foreach (var s in distinctSources)
             {
                 sourceFilters.Add(new SourceFilterItem
                 {
                     Name = s,
-                    Selected = true
+                    Selected = prevFilters.FirstOrDefault(f => f.Name == s)?.Selected ?? true
                 });
             }
-        }
-        public override void Clear()
-        {
-            RemoveFilter();
-            sourceFilters.Clear();
+
+            Apply();
         }
         public override void Reset()
         {

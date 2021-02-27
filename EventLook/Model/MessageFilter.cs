@@ -34,14 +34,6 @@ namespace EventLook.Model
             }
         }
 
-        public override void Init(IEnumerable<EventItem> events)
-        {
-            MessageFilterText = "";
-        }
-        public override void Clear()
-        {
-            MessageFilterText = "";
-        }
         public override void Reset()
         {
             MessageFilterText = "";
