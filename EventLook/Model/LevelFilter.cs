@@ -31,17 +31,7 @@ namespace EventLook.Model
             var prevFilters = levelFilters.Select(f => new LevelFilterItem { Level = f.Level, Selected = f.Selected }).ToList();
             levelFilters.Clear();
 
-            // Check null, just in case.
-            if (events.Select(e => e.Record.Level).Any(lv => !lv.HasValue))
-            {
-                levelFilters.Add(new LevelFilterItem
-                {
-                    Level = null,
-                    Selected = prevFilters.FirstOrDefault(f => f.Level == null)?.Selected ?? true
-                });
-            }
-
-            var distinctLevels = events.Select(e => e.Record.Level).Where(lv => lv.HasValue).Distinct().OrderBy(lv => lv);
+            var distinctLevels = events.Select(e => e.Record.Level).Distinct().OrderBy(lv => lv);
             foreach (var lv in distinctLevels)
             {
                 levelFilters.Add(new LevelFilterItem
