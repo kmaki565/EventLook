@@ -158,6 +158,13 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Asset\StatusCriticalError_16x.png" />
+    <Resource Include="Asset\StatusHidden_16x.png" />
+    <Resource Include="Asset\StatusInformationOutline_16x.png" />
+    <Resource Include="Asset\StatusInformation_16x.png" />
+    <Resource Include="Asset\StatusInvalid_16x.png" />
+    <Resource Include="Asset\StatusWarning_16x.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

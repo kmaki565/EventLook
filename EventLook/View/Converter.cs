@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Media.Imaging;
 
 namespace EventLook.View
 {
@@ -24,10 +25,42 @@ namespace EventLook.View
                     (level == 5) ? "Verbose" :
                     "Unknown level";
 
-                return $"{level} - {levelDisplayName}";
+                return $"{levelDisplayName}";
             }
             else
                 return "Invalid level";
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+    public class EventLevelToImageConverter : IValueConverter
+    {
+        public string CriticalIconPath { get; set; }
+        public string ErrorIconPath { get; set; }
+        public string WarningIconPath { get; set; }
+        public string InformationIconPath { get; set; }
+        public string VerboseIconPath { get; set; }
+        public string UnknownIconPath { get; set; }
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is byte level)
+            {
+                // In the Event Viewer, Level 0 is shown as Information.
+                string iconPath =
+                    (level == 1) ? CriticalIconPath :
+                    (level == 2) ? ErrorIconPath :
+                    (level == 3) ? WarningIconPath :
+                    (level == 4) ? InformationIconPath :
+                    (level == 5) ? VerboseIconPath :
+                    UnknownIconPath;
+
+                return new BitmapImage(new Uri(iconPath, UriKind.Relative));
+            }
+            else
+                return new BitmapImage();
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

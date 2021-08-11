@@ -13,6 +13,13 @@
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="conv" />
         <v:EventLevelToDisplayTextConverter x:Key="EventLevelToDisplayTextConverter"/>
+        <v:EventLevelToImageConverter x:Key="EventLevelToImageConv"
+                                     CriticalIconPath="/Asset/StatusCriticalError_16x.png"
+                                     ErrorIconPath="/Asset/StatusInvalid_16x.png"
+                                     WarningIconPath="/Asset/StatusWarning_16x.png"
+                                     InformationIconPath="/Asset/StatusInformationOutline_16x.png"
+                                     VerboseIconPath="/Asset/StatusInformation_16x.png"
+                                     UnknownIconPath="/Asset/StatusHidden_16x.png"/>
         <v:ExpandedToGridLengthConverter x:Key="ExpandedToGridLengthConverter"/>
         <v:InverseBooleanConverter x:Key="InverseBooleanConverter" />
         <!-- This next line instantiates a CollectionViewSource with the collection of Events as its collection of objects-->
@@ -124,7 +131,16 @@
                             </Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
-                    <DataGridTextColumn Header="Level" Binding="{Binding Record.Level, Converter={StaticResource EventLevelToDisplayTextConverter}}"/>
+                    <DataGridTemplateColumn Header="Level" SortMemberPath="Record.Level">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
+                                    <Image Source="{Binding Path=Record.Level, Converter={StaticResource EventLevelToImageConv}}" Margin="1,0"/>
+                                    <TextBlock Text="{Binding Path=Record.Level, Converter={StaticResource EventLevelToDisplayTextConverter}}" Margin="1,0"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                     <DataGridTextColumn Header="Event ID" Binding="{Binding Record.Id}"/>
                     <DataGridTextColumn Header="Message" Binding="{Binding Message}" Width="*">
                         <DataGridTextColumn.ElementStyle>
