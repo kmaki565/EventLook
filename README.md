@@ -2,7 +2,7 @@ EventLook
 ===
 A fast & handy alternative to Windows Event Viewer built on WPF
 
-![gif](/Screenshot.png)
+![gif](/Screenshot-1.png)
 
 # Overview
 The inbox Windows Event Viewer is a great app that provides comprehensive functionalities in examining events. However, the user experience is not as good as I wish in some usage scenarios - for example, as the list view does not provide a preview for event messages, it would not be suitable to overview what was happening in the machine. 
@@ -13,7 +13,7 @@ The inbox Windows Event Viewer is a great app that provides comprehensive functi
 - Asynchronous event fetching for quick glance
 - Provides quicker sort, specifying range, filters, and search (coming soon) 
 - Quick access to your favorite Applications and Services Logs
-- To view logs in an evtx file, drag & drop the file, then choose it from the list of event sources.
+- View other machine's event logs from evtx file (drag & drop .evtx and choose it in the drop-down of event sources)
 
 # Install
 Just download the latest artifact, unzip it, and run EventLook.exe. No registry/local storage is used as of now.
