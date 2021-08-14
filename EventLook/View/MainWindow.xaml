@@ -126,10 +126,19 @@
                 </DataGrid.InputBindings>
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Time of event" Binding="{Binding TimeOfEvent, StringFormat=u}"/>
-                    <DataGridTextColumn Header="Source" Binding="{Binding Record.ProviderName}" MaxWidth="200">
+                    <DataGridTextColumn Header="Source" Binding="{Binding Record.ProviderName}" Width="200">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
-                                <Setter Property="TextWrapping" Value="Wrap" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsChecked, Source={x:Reference CheckTruncate}}" Value="False">
+                                        <Setter Property="TextWrapping" Value="Wrap" />
+                                        <Setter Property="TextTrimming" Value="None" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsChecked, Source={x:Reference CheckTruncate}}" Value="True">
+                                        <Setter Property="TextWrapping" Value="NoWrap" />
+                                        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                                    </DataTrigger>
+                                </Style.Triggers>
                             </Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>

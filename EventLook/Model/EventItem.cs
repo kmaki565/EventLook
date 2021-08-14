@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace EventLook.Model
@@ -34,7 +35,7 @@ namespace EventLook.Model
         public EventRecord Record { get; set; }
         public DateTime TimeOfEvent { get; }
         public string Message { get; }
-        public string MessageOneLine { get { return Message.Replace(System.Environment.NewLine, " "); } }
+        public string MessageOneLine { get { return Regex.Replace(Message, @"[\r\n]+", " "); } }
         #endregion
     }
 }
