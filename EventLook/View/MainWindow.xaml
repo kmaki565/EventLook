@@ -11,7 +11,8 @@
         ResizeMode="CanResizeWithGrip"
         Title="{Binding MainWindowTitle}">
     <Window.Resources>
-        <BooleanToVisibilityConverter x:Key="conv" />
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <v:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
         <v:EventLevelToDisplayTextConverter x:Key="EventLevelToDisplayTextConverter"/>
         <v:EventLevelToImageConverter x:Key="EventLevelToImageConv"
                                      CriticalIconPath="/Asset/StatusCriticalError_16x.png"
@@ -84,6 +85,7 @@
                         </Style>
                     </Button.Style>
                 </Button>
+                <CheckBox Content="Truncate long text" Margin="20,0,0,0" VerticalAlignment="Center" x:Name="CheckTruncate"/>
             </StackPanel>
 
             <Expander x:Name="Ex1" Header="Filters" Grid.Row="1" Margin="10,0,0,0" ExpandDirection="Down">
@@ -142,10 +144,17 @@
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
                     <DataGridTextColumn Header="Event ID" Binding="{Binding Record.Id}"/>
-                    <DataGridTextColumn Header="Message" Binding="{Binding Message}" Width="*">
+                    <DataGridTextColumn Header="Message" Binding="{Binding Message}" Width="*" Visibility="{Binding IsChecked, Source={x:Reference CheckTruncate}, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
                                 <Setter Property="TextWrapping" Value="Wrap" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Message" Binding="{Binding MessageOneLine}" Width="*" Visibility="{Binding IsChecked, Source={x:Reference CheckTruncate}, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="TextTrimming" Value="CharacterEllipsis" />
                             </Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>

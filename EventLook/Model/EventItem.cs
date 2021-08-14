@@ -34,6 +34,7 @@ namespace EventLook.Model
         public EventRecord Record { get; set; }
         public DateTime TimeOfEvent { get; }
         public string Message { get; }
+        public string MessageOneLine { get { return Message.Replace(System.Environment.NewLine, " "); } }
         #endregion
     }
 }
