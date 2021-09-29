@@ -3,6 +3,7 @@ using EventLook.ViewModel;
 using GalaSoft.MvvmLight.Messaging;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,6 +36,26 @@ namespace EventLook
             Messenger.Default.Send(new DetailWindowMessageToken() { ShowWindowService = showWindowService });
 
             ContentRendered += (s, e) => { ((MainViewModel)DataContext).OnLoaded(); };
+
+            ProcessCommandLine();
+        }
+
+        private void ProcessCommandLine()
+        {
+            var args = Environment.GetCommandLineArgs();
+            if (args.Length > 1)
+            {
+                var fileName = args[1];
+                if (File.Exists(fileName))
+                {
+                    var extension = System.IO.Path.GetExtension(fileName);
+                    if (extension == ".evtx")
+                    {
+                        //TODO: Select the file in the log source UI
+                        Messenger.Default.Send(new FileToBeProcessedMessageToken() { FilePath = fileName });
+                    }
+                }
+            }
         }
 
         private void OnPreviewDragOver(object sender, DragEventArgs e)
@@ -42,7 +63,6 @@ namespace EventLook
             e.Effects = DragDropEffects.Copy;
             e.Handled = e.Data.GetDataPresent(DataFormats.FileDrop);
         }
-
         private void OnDrop(object sender, DragEventArgs e)
         {
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
