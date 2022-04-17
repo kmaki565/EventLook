@@ -75,5 +75,11 @@ namespace EventLook
                 }
             }
         }
+
+        private void DataGrid_SelectedCellsChanged(object sender, SelectedCellsChangedEventArgs e)
+        {
+            if (sender is DataGrid dataGrid && dataGrid.SelectedItem != null)
+                dataGrid.ScrollIntoView(dataGrid.SelectedItem);
+        }
     }
 }

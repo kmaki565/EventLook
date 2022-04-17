@@ -113,7 +113,7 @@
             </Expander>
 
             <!-- *** The ItemsSource of the data grid is bound to the CollectionViewSource object that was instantiated above -->
-            <DataGrid ItemsSource="{Binding Source={StaticResource X_CVS}}" SelectedItem="{Binding SelectedEventItem}" 
+            <DataGrid ItemsSource="{Binding Source={StaticResource X_CVS}}" SelectedItem="{Binding SelectedEventItem}" SelectedCellsChanged="DataGrid_SelectedCellsChanged"
                       Margin="5" Grid.Row="2" AutoGenerateColumns="False" IsReadOnly="True"
                   BorderBrush="LightSteelBlue" HorizontalGridLinesBrush="LightSteelBlue" VerticalGridLinesBrush="LightSteelBlue" AllowDrop="True" PreviewDragOver="OnPreviewDragOver" Drop="OnDrop">
                 <DataGrid.Resources>
