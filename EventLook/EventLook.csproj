@@ -35,7 +35,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Asset\Ev.ico</ApplicationIcon>
+    <ApplicationIcon>Asset\favicon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CommonServiceLocator, Version=2.0.5.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
@@ -147,7 +147,7 @@
     </EmbeddedResource>
     <Resource Include="Asset\1385_Disable_16x16_72.png" />
     <Resource Include="Asset\1385_Disable_16x16_72_disabled.png" />
-    <Resource Include="Asset\Ev.ico" />
+    <Resource Include="Asset\favicon.ico" />
     <Resource Include="Font\WINGDNG3.TTF" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
