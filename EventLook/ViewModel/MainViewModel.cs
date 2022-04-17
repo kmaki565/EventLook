@@ -78,7 +78,7 @@ namespace EventLook.ViewModel
                 RaisePropertyChanged();
             }
         }
-        public EventItem SelectedEvent { get; set; }
+        public EventItem SelectedEventItem { get; set; }
 
         public ObservableCollection<LogSource> LogSources
         {
@@ -233,7 +233,7 @@ namespace EventLook.ViewModel
         }
         private void OpenDetails()
         {
-            var detailVm = new DetailViewModel(SelectedEvent);
+            var detailVm = new DetailViewModel(SelectedEventItem);
             showWindowService.Show(detailVm);
         }
 
