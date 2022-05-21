@@ -1,8 +1,13 @@
-EventLook
-===
+<img align="left" width="80" height="80" src="https://user-images.githubusercontent.com/16055659/169651886-f53360a0-ccad-49f0-8c68-d8f0d5306ecc.png" alt="app_icon">
+
+# EventLook
+
+| :point_up: EventLook is now available in [Microsoft Store](https://www.microsoft.com/store/apps/9NJV5FQ089Z0)! |
+|-----|
+
 A fast & handy alternative to Windows Event Viewer built on WPF
 
-![gif](/Screenshot-1.png)
+![screenshot](/Screenshot-1.png)
 
 # Overview
 The inbox Windows Event Viewer is a great app that provides comprehensive functionalities in examining events. However, the user experience is not as good as I wish in some usage scenarios - for example, as the list view does not provide a preview for event messages, it would not be suitable to overview what was happening in the machine. 
