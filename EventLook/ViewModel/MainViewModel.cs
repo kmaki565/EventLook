@@ -95,6 +95,8 @@ namespace EventLook.ViewModel
                     return;
 
                 selectedLogSource = value;
+                RaisePropertyChanged();
+
                 if (isWindowLoaded)
                     Refresh();
             }
@@ -357,9 +359,9 @@ namespace EventLook.ViewModel
         /// </summary>
         private void Handle_FileToBeProcessedMessageToken(FileToBeProcessedMessageToken token)
         {
-            logSourceMgr.AddSourcePath(token.FilePath);
+            SelectedLogSource = logSourceMgr.AddEvtx(token.FilePath);
         }
-        //TODO: This is too redundant... 
+
         private void Handle_DetailWindowMessageToken(DetailWindowMessageToken token)
         {
             showWindowService = token.ShowWindowService;

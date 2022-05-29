@@ -43,13 +43,21 @@ namespace EventLook.Model
         }
         public ObservableCollection<LogSource> LogSources { get; set; }
 
-        public LogSource AddSourcePath(string file)
+        /// <summary>
+        /// Adds an evtx file to the log source list. 
+        /// By default, it will be added to the beginning of the list.
+        /// </summary>
+        /// <returns>the added log source</returns>
+        public LogSource AddEvtx(string file, bool addToBottom = false)
         {
             LogSource logSource = null;
             if (Path.GetExtension(file).Equals(".evtx", StringComparison.OrdinalIgnoreCase))
             {
                 logSource = new LogSource(file, PathType.FilePath);
-                LogSources.Add(logSource);
+                if (addToBottom)
+                    LogSources.Add(logSource);
+                else
+                    LogSources.Insert(0, logSource);
             }
             return logSource;
         }
