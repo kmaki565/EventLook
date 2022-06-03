@@ -11,20 +11,29 @@ namespace EventLook.Model
 {
     public class LogSource
     {
-        public string Name { get; set; }
-        public PathType PathType { get; set; }
-
-        public LogSource(string name, PathType type)
+        public LogSource(string path, PathType type = PathType.LogName)
         {
-            Name = name;
+            Path = path;
             PathType = type;
+
+            FileWriteTime = DateTime.Now;
+            if (type == PathType.FilePath)
+            {
+                try
+                {
+                    FileWriteTime = File.GetLastWriteTime(path);
+                }
+                catch (Exception) { }
+            }
         }
 
-        public LogSource(string name)
-        {
-            Name = name;
-            PathType = PathType.LogName;
-        }
+        public string Path { get; }
+        public PathType PathType { get; }
+        /// <summary>
+        /// If the source is a .evtx file, represents the file's last write time.
+        /// </summary>
+        public DateTime FileWriteTime { get; }
+
     }
     public class LogSourceMgr
     {
@@ -48,12 +57,12 @@ namespace EventLook.Model
         /// By default, it will be added to the beginning of the list.
         /// </summary>
         /// <returns>the added log source</returns>
-        public LogSource AddEvtx(string file, bool addToBottom = false)
+        public LogSource AddEvtx(string filePath, bool addToBottom = false)
         {
             LogSource logSource = null;
-            if (Path.GetExtension(file).Equals(".evtx", StringComparison.OrdinalIgnoreCase))
+            if (Path.GetExtension(filePath).Equals(".evtx", StringComparison.OrdinalIgnoreCase))
             {
-                logSource = new LogSource(file, PathType.FilePath);
+                logSource = new LogSource(filePath, PathType.FilePath);
                 if (addToBottom)
                     LogSources.Add(logSource);
                 else

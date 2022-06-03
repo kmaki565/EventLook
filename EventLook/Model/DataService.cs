@@ -33,7 +33,7 @@ namespace EventLook.Model
                         fromTime.ToUniversalTime().ToString("s"),
                         toTime.ToUniversalTime().ToString("s"));
 
-                    var elQuery = new EventLogQuery(eventSource.Name, eventSource.PathType, sQuery)
+                    var elQuery = new EventLogQuery(eventSource.Path, eventSource.PathType, sQuery)
                     {
                         ReverseDirection = true
                     };

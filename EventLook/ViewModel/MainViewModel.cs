@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -291,10 +292,15 @@ namespace EventLook.ViewModel
             }
             else
             {
-                ToDateTime = DateTime.Now;
+                // If the log source is a .evtx file, put the file's modified date instead of current time.
+                ToDateTime = (SelectedLogSource.PathType == PathType.FilePath) 
+                    ? SelectedLogSource.FileWriteTime
+                    : DateTime.Now;
                 FromDateTime = ToDateTime - TimeSpan.FromDays(SelectedRange.DaysFromNow);
             }
-            RaisePropertyChanged("FromDateTime");   // Workaround for (probably) DateTimePicker's bug
+
+            // These seem necessary to ensure DateTimePicker be updated
+            RaisePropertyChanged("FromDateTime");
             RaisePropertyChanged("ToDateTime");
         }
         private async Task LoadEvents()
