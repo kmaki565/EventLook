@@ -63,7 +63,7 @@
     <GenerateTemporaryStoreCertificate>True</GenerateTemporaryStoreCertificate>
     <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
     <EntryPointProjectUniqueName>..\EventLook\EventLook.csproj</EntryPointProjectUniqueName>
-    <PackageCertificateThumbprint>1EE2E7DEEF4820744C68B184B76B657F9FA1C051</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>05F484B6B42A0AF894FF52EE0E3CC7577014C062</PackageCertificateThumbprint>
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">

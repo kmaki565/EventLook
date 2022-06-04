@@ -21,7 +21,7 @@ jobs:
     - uses: nuget/setup-nuget@v1
     - run: nuget restore ${{ env.PROJECT_NAME }}.sln
     - uses: microsoft/setup-msbuild@v1.0.2
-    - run: msbuild ${{ env.PROJECT_NAME }}.sln '/p:Configuration=Release;Platform="Any CPU"'
+    - run: msbuild ${{ env.PROJECT_NAME }}.sln '/p:Configuration=Release;Platform="Any CPU"' /p:AppxPackageSigningEnabled=false
     # Save artifacts
     - uses: actions/upload-artifact@v2
       with:

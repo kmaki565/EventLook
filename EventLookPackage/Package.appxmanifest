@@ -9,7 +9,7 @@
   <Identity
     Name="64247kmaki565.323654BB1C7D"
     Publisher="CN=B5234934-E68F-4911-8E10-60FECC338A02"
-    Version="1.0.2.0" />
+    Version="1.0.3.0" />
 
   <Properties>
     <DisplayName>EventLook</DisplayName>
@@ -39,11 +39,21 @@
         <uap:DefaultTile Wide310x150Logo="Images\Wide310x150Logo.png"  Square71x71Logo="Images\SmallTile.png" Square310x310Logo="Images\LargeTile.png"/>
         <uap:SplashScreen Image="Images\SplashScreen.png" />
       </uap:VisualElements>
+      <Extensions>
+        <uap:Extension Category="windows.fileTypeAssociation">
+          <uap:FileTypeAssociation Name="eventlook">
+            <uap:SupportedFileTypes>
+              <uap:FileType>.evtx</uap:FileType>
+            </uap:SupportedFileTypes>
+            <uap:DisplayName>EventLook</uap:DisplayName>
+            <uap:EditFlags OpenIsSafe="true"/>
+          </uap:FileTypeAssociation>
+        </uap:Extension>
+      </Extensions>
     </Application>
   </Applications>
 
   <Capabilities>
-    <Capability Name="internetClient" />
     <rescap:Capability Name="runFullTrust" />
   </Capabilities>
 </Package>
