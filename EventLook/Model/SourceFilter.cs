@@ -58,6 +58,23 @@ namespace EventLook.Model
         {
             return SourceFilters.Where(sf => sf.Selected).Any(sf => String.Compare(sf.Name, evt.Record.ProviderName) == 0);
         }
+
+        /// <summary>
+        /// Selects (Checks) only filter with the given name, and unchecks the other filters.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns>Returns true if success.</returns>
+        public bool SetSingleFilter(string name)
+        {
+            if (SourceFilters.Any(x => x.Name == name) == false)
+                return false;
+
+            foreach (var filterItem in SourceFilters)
+            {
+                filterItem.Selected = (filterItem.Name == name);
+            }
+            return true;
+        }
     }
 
     public class SourceFilterItem : Monitorable

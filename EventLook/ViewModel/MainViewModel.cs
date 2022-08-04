@@ -239,6 +239,16 @@ namespace EventLook.ViewModel
             var detailVm = new DetailViewModel(SelectedEventItem);
             showWindowService.Show(detailVm);
         }
+        private void ContextMenu()
+        {
+            //TODO: Implement Exclude
+            if (SelectedEventItem != null)
+            {
+                // Filter to the event item's event source
+                if (sourceFilter.SetSingleFilter(SelectedEventItem.Record.ProviderName))
+                    sourceFilter.Apply();
+            }
+        }
 
         public ICommand RefreshCommand
         {
@@ -270,6 +280,11 @@ namespace EventLook.ViewModel
             get;
             private set;
         }
+        public ICommand ContextMenuCommand
+        {
+            get;
+            private set;
+        }
 
         private void InitializeCommands()
         {
@@ -279,6 +294,7 @@ namespace EventLook.ViewModel
             ApplySourceFilterCommand = new RelayCommand(ApplySourceFilter, null);
             ApplyLevelFilterCommand = new RelayCommand(ApplyLevelFilter, null);
             OpenDetailsCommand = new RelayCommand(OpenDetails, null);
+            ContextMenuCommand = new RelayCommand(ContextMenu, null);
         }
         private void UpdateDateTimes()
         {
