@@ -239,14 +239,33 @@ namespace EventLook.ViewModel
             var detailVm = new DetailViewModel(SelectedEventItem);
             showWindowService.Show(detailVm);
         }
-        private void ContextMenu()
+        private void ContextMenu(object menuKind)
         {
-            //TODO: Implement Exclude
-            if (SelectedEventItem != null)
+            if (menuKind is ContextMenuKind kind)
             {
-                // Filter to the event item's event source
-                if (sourceFilter.SetSingleFilter(SelectedEventItem.Record.ProviderName))
-                    sourceFilter.Apply();
+                switch (kind)
+                {
+                    case ContextMenuKind.FilterToTheSource:
+                        if (SelectedEventItem != null)
+                        {
+                            // Filter to the event item's event source
+                            if (sourceFilter.SetSingleFilter(SelectedEventItem.Record.ProviderName))
+                                sourceFilter.Apply();
+                        }
+                        break;
+                    case ContextMenuKind.ExcludeTheSource:
+                        if (SelectedEventItem != null)
+                        {
+                            if (sourceFilter.UncheckFilter(SelectedEventItem.Record.ProviderName))
+                                sourceFilter.Apply();
+                        }
+                        break;
+                    case ContextMenuKind.ResetFilters:
+                        ResetFilters();
+                        break;
+                    default:
+                        break;
+                }
             }
         }
 
@@ -294,7 +313,7 @@ namespace EventLook.ViewModel
             ApplySourceFilterCommand = new RelayCommand(ApplySourceFilter, null);
             ApplyLevelFilterCommand = new RelayCommand(ApplyLevelFilter, null);
             OpenDetailsCommand = new RelayCommand(OpenDetails, null);
-            ContextMenuCommand = new RelayCommand(ContextMenu, null);
+            ContextMenuCommand = new RelayCommand<object>(ContextMenu, null);
         }
         private void UpdateDateTimes()
         {

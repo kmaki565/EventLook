@@ -123,8 +123,13 @@
                     <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey }" Color="Black"/>
                     <ContextMenu x:Key="dataGridContextMenu">
                         <ContextMenu.Items>
-                            <MenuItem Header="Filter to selected Source" Command="{Binding DataContext.ContextMenuCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}" />
-                            <MenuItem Header="Exclude selected Source" Command="{Binding DataContext.ContextMenuCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}" />
+                            <MenuItem Header="Filter to selected Source" Command="{Binding DataContext.ContextMenuCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"
+                                      CommandParameter="{x:Static v:ContextMenuKind.FilterToTheSource}"/>
+                            <MenuItem Header="Exclude selected Source" Command="{Binding DataContext.ContextMenuCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}" 
+                                      CommandParameter="{x:Static v:ContextMenuKind.ExcludeTheSource}" />
+                            <Separator/>
+                            <MenuItem Header="Reset filters" Command="{Binding DataContext.ContextMenuCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}" 
+                                      CommandParameter="{x:Static v:ContextMenuKind.ResetFilters}" />
                         </ContextMenu.Items>
                     </ContextMenu>
                 </DataGrid.Resources>
