@@ -34,7 +34,10 @@
     <DockPanel>
         <StatusBar DockPanel.Dock="Bottom" >
             <StatusBarItem>
-                <TextBlock Text="{Binding StatusText}" />
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{Binding StatusText}" />
+                    <TextBlock Text="{Binding FilterInfoText}" />
+                </StackPanel>
             </StatusBarItem>
         </StatusBar>
 

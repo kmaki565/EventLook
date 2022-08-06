@@ -147,6 +147,9 @@ namespace EventLook.ViewModel
                 RaisePropertyChanged();
             }
         }
+        private string filterInfoText;
+        public string FilterInfoText { get => filterInfoText; set => Set(ref filterInfoText, value); }
+
         private bool isUpdating = false;
         public bool IsUpdating
         {
@@ -191,7 +194,10 @@ namespace EventLook.ViewModel
 
         public void OnLoaded()
         {
-            filters.ForEach(f => f.SetCvs(CVS));
+            filters.ForEach(f => {
+                f.SetCvs(CVS);
+                f.FilterUpdated += OnFilterUpdated;
+            });
 
             Refresh();
             isWindowLoaded = true;
@@ -267,6 +273,10 @@ namespace EventLook.ViewModel
                         break;
                 }
             }
+        }
+        private void OnFilterUpdated(object sender, System.EventArgs e)
+        {
+            UpdateFilterInfoText();
         }
 
         public ICommand RefreshCommand
@@ -366,6 +376,7 @@ namespace EventLook.ViewModel
                 loadedEventCount = 0;
                 IsUpdating = true;
                 UpdateStatusText();
+                UpdateFilterInfoText();
                 await task;
             }
             finally
@@ -380,6 +391,16 @@ namespace EventLook.ViewModel
             StatusText = IsUpdating ?
                 $"Loading {loadedEventCount} events... {additionalNote}" :
                 $"{loadedEventCount} events loaded. ({stopwatch.Elapsed.TotalSeconds:F1} sec) {additionalNote}"; // 1 digit after decimal point
+        }
+        private void UpdateFilterInfoText()
+        {
+            if (IsUpdating)
+                FilterInfoText = "";
+            else
+            {
+                int visibleRowCounts = CVS.View.Cast<object>().Count();
+                FilterInfoText = (visibleRowCounts == Events.Count) ? "" : $" {visibleRowCounts} events matched to the filter(s).";
+            }
         }
         /// <summary>
         /// Gets or sets the CollectionViewSource which is the proxy for the
