@@ -274,7 +274,7 @@ namespace EventLook.ViewModel
                 }
             }
         }
-        private void OnFilterUpdated(object sender, System.EventArgs e)
+        private void OnFilterUpdated(object sender, EventArgs e)
         {
             UpdateFilterInfoText();
         }
