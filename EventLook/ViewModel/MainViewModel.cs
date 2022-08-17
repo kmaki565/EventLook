@@ -266,6 +266,27 @@ namespace EventLook.ViewModel
                                 sourceFilter.Apply();
                         }
                         break;
+                    case ContextMenuKind.FilterToTheLevel:
+                        if (SelectedEventItem != null)
+                        {
+                            if (levelFilter.SetSingleFilter(SelectedEventItem.Record.Level))
+                                levelFilter.Apply();
+                        }
+                        break;
+                    case ContextMenuKind.ExcludeTheLevel:
+                        if (SelectedEventItem != null)
+                        {
+                            if (levelFilter.UncheckFilter(SelectedEventItem.Record.Level))
+                                levelFilter.Apply();
+                        }
+                        break;
+                    case ContextMenuKind.FilterToTheId:
+                        if (SelectedEventItem != null)
+                        {
+                            IdFilter.IdFilterNum = SelectedEventItem.Record.Id;
+                            IdFilter.Apply();
+                        }
+                        break;
                     case ContextMenuKind.ResetFilters:
                         ResetFilters();
                         break;

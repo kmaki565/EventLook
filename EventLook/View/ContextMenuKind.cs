@@ -10,6 +10,9 @@ namespace EventLook.View
     {
         FilterToTheSource,
         ExcludeTheSource,
+        FilterToTheLevel,
+        ExcludeTheLevel,
+        FilterToTheId,
         ResetFilters
     }
 }
