@@ -88,7 +88,7 @@
                         </Style>
                     </Button.Style>
                 </Button>
-                <CheckBox Content="Truncate long text" Margin="20,0,0,0" VerticalAlignment="Center" x:Name="CheckTruncate"/>
+                <CheckBox Content="Truncate long text" Margin="20,0,0,0" VerticalAlignment="Center" x:Name="CheckTruncate" IsChecked="True"/>
             </StackPanel>
 
             <Expander x:Name="Ex1" Header="Filters" Grid.Row="1" Margin="10,0,0,0" ExpandDirection="Down">
