@@ -76,10 +76,15 @@ namespace EventLook
             }
         }
 
-        private void DataGrid_SelectedCellsChanged(object sender, SelectedCellsChangedEventArgs e)
+        private async void DataGrid_SelectedCellsChanged(object sender, SelectedCellsChangedEventArgs e)
         {
-            if (sender is DataGrid dataGrid && dataGrid.SelectedItem != null)
-                dataGrid.ScrollIntoView(dataGrid.SelectedItem);
+            if (sender is DataGrid dataGrid)
+            {
+                // Without a delay it may fail to scroll to the selected event when resetting filters.
+                await Task.Delay(1);
+                if (dataGrid.SelectedItem != null)
+                    dataGrid.ScrollIntoView(dataGrid.SelectedItem);
+            }
         }
     }
 }
