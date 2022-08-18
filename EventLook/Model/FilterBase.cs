@@ -46,6 +46,7 @@ namespace EventLook.Model
 
             cvs.Filter += DoFilter;
             isFilterAdded = true;
+            FireFilterUpdated(EventArgs.Empty);
         }
         protected void RemoveFilter()
         {
@@ -53,6 +54,7 @@ namespace EventLook.Model
 
             cvs.Filter -= DoFilter;
             isFilterAdded = false;
+            FireFilterUpdated(EventArgs.Empty);
         }
         protected void DoFilter(object sender, FilterEventArgs e)
         {
@@ -68,5 +70,14 @@ namespace EventLook.Model
         /// Returns true if the given event item should be displayed, or false if the event should be filtered out.
         /// </summary>
         protected abstract bool IsFilterMatched(EventItem evt);
+
+        /// <summary>
+        /// Event that fires when a new filter is applied.
+        /// </summary>
+        public event EventHandler FilterUpdated;
+        protected virtual void FireFilterUpdated(EventArgs e)
+        {
+            FilterUpdated?.Invoke(this, e);
+        }
     }
 }

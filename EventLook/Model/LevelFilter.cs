@@ -56,6 +56,38 @@ namespace EventLook.Model
         {
             return LevelFilters.Where(lf => lf.Selected).Any(lf => lf.Level == evt.Record.Level);
         }
+
+        /// <summary>
+        /// Selects (Checks) only filter with the given level, and unchecks the other filters.
+        /// </summary>
+        /// <returns>Returns true if success.</returns>
+        public bool SetSingleFilter(byte? level)
+        {
+            if (LevelFilters.Any(x => x.Level == level) == false)
+                return false;
+
+            foreach (var filterItem in LevelFilters)
+            {
+                filterItem.Selected = (filterItem.Level == level);
+            }
+            return true;
+        }
+        /// <summary>
+        /// Unchecks filter with the given level. i.e., Filters out the level.
+        /// </summary>
+        /// <returns>Returns true if success.</returns>
+        public bool UncheckFilter(byte? level)
+        {
+            if (LevelFilters.Any(x => x.Level == level) == false)
+                return false;
+
+            foreach (var filterItem in LevelFilters)
+            {
+                if (filterItem.Level == level)
+                    filterItem.Selected = false;
+            }
+            return true;
+        }
     }
 
     public class LevelFilterItem : Monitorable

@@ -22,6 +22,7 @@ namespace EventLook.Model
                 new Range() { Text = "Last 24 hours", DaysFromNow = 1, IsCustom = false },
                 new Range() { Text = "Last 3 days", DaysFromNow = 3, IsCustom = false },
                 new Range() { Text = "Last 7 days", DaysFromNow = 7, IsCustom = false },
+                new Range() { Text = "Last 15 days", DaysFromNow = 15, IsCustom = false },
                 new Range() { Text = "Last 30 days", DaysFromNow = 30, IsCustom = false },
                 new Range() { Text = "Any time", DaysFromNow = 0, IsCustom = false },
                 new Range() { Text = "Custom range", DaysFromNow = 0, IsCustom = true },

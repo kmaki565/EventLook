@@ -34,7 +34,10 @@
     <DockPanel>
         <StatusBar DockPanel.Dock="Bottom" >
             <StatusBarItem>
-                <TextBlock Text="{Binding StatusText}" />
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{Binding StatusText}" />
+                    <TextBlock Text="{Binding FilterInfoText}" />
+                </StackPanel>
             </StatusBarItem>
         </StatusBar>
 
@@ -85,7 +88,7 @@
                         </Style>
                     </Button.Style>
                 </Button>
-                <CheckBox Content="Truncate long text" Margin="20,0,0,0" VerticalAlignment="Center" x:Name="CheckTruncate"/>
+                <CheckBox Content="Truncate long text" Margin="20,0,0,0" VerticalAlignment="Center" x:Name="CheckTruncate" IsChecked="True"/>
             </StackPanel>
 
             <Expander x:Name="Ex1" Header="Filters" Grid.Row="1" Margin="10,0,0,0" ExpandDirection="Down">
@@ -108,7 +111,7 @@
                     <TextBlock Text="Message contains: " Margin="10,0,0,0" VerticalAlignment="Center"/>
                     <TextBox Text="{Binding MsgFilter.MessageFilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=300}"
                              Width="180" VerticalContentAlignment="Center" />
-                    <Button Content="Reset all" Margin="10,0,0,0" Width="50" Command="{Binding ResetFiltersCommand, Mode=OneWay}"/>
+                    <Button Content="Reset filters" Margin="10,0,0,0" Command="{Binding ResetFiltersCommand, Mode=OneWay}"/>
                 </StackPanel>
             </Expander>
 
@@ -121,6 +124,24 @@
                     <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey }" Color="Black"/>
                     <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="LightSteelBlue"/>
                     <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey }" Color="Black"/>
+                    <ContextMenu x:Key="dataGridContextMenu">
+                        <ContextMenu.Items>
+                            <MenuItem Header="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.DataContext.Record.ProviderName}" HeaderStringFormat="Filter to &quot;{0}&quot;"
+                                      Command="{Binding DataContext.FilterToSelectedSourceCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"/>
+                            <MenuItem Header="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.DataContext.Record.ProviderName}" HeaderStringFormat="Exclude &quot;{0}&quot;" 
+                                      Command="{Binding DataContext.ExcludeSelectedSourceCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"/>
+                            <Separator/>
+                            <MenuItem Header="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.DataContext.Record.Level, Converter={StaticResource EventLevelToDisplayTextConverter}}" HeaderStringFormat="Filter to {0}"
+                                      Command="{Binding DataContext.FilterToSelectedLevelCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"/>
+                            <MenuItem Header="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.DataContext.Record.Level, Converter={StaticResource EventLevelToDisplayTextConverter}}" HeaderStringFormat="Exclude {0}"
+                                      Command="{Binding DataContext.ExcludeSelectedLevelCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"/>
+                            <Separator/>
+                            <MenuItem Header="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.DataContext.Record.Id}" HeaderStringFormat="Filter to ID {0}"
+                                      Command="{Binding DataContext.FilterToSelectedIdCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"/>
+                            <Separator/>
+                            <MenuItem Header="Reset filters" Command="{Binding DataContext.ResetFiltersCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"/>
+                        </ContextMenu.Items>
+                    </ContextMenu>
                 </DataGrid.Resources>
                 <DataGrid.CellStyle>
                     <Style TargetType="DataGridCell">
@@ -128,6 +149,11 @@
                         <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
                     </Style>
                 </DataGrid.CellStyle>
+                <DataGrid.RowStyle>
+                    <Style TargetType="DataGridRow" BasedOn="{StaticResource {x:Type DataGridRow}}">
+                        <Setter Property="ContextMenu" Value="{StaticResource dataGridContextMenu}" />
+                    </Style>
+                </DataGrid.RowStyle>
                 <DataGrid.InputBindings>
                     <MouseBinding Gesture="LeftDoubleClick" Command="{Binding OpenDetailsCommand}" />
                     <KeyBinding Key="Enter" Command="{Binding OpenDetailsCommand}" />

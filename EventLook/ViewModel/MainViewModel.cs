@@ -147,6 +147,9 @@ namespace EventLook.ViewModel
                 RaisePropertyChanged();
             }
         }
+        private string filterInfoText;
+        public string FilterInfoText { get => filterInfoText; set => Set(ref filterInfoText, value); }
+
         private bool isUpdating = false;
         public bool IsUpdating
         {
@@ -191,7 +194,10 @@ namespace EventLook.ViewModel
 
         public void OnLoaded()
         {
-            filters.ForEach(f => f.SetCvs(CVS));
+            filters.ForEach(f => {
+                f.SetCvs(CVS);
+                f.FilterUpdated += OnFilterUpdated;
+            });
 
             Refresh();
             isWindowLoaded = true;
@@ -239,7 +245,52 @@ namespace EventLook.ViewModel
             var detailVm = new DetailViewModel(SelectedEventItem);
             showWindowService.Show(detailVm);
         }
+        private void FilterToSelectedSource()
+        {
+            if (SelectedEventItem != null)
+            {
+                if (sourceFilter.SetSingleFilter(SelectedEventItem.Record.ProviderName))
+                    sourceFilter.Apply();
+            }
+        }
+        private void ExcludeSelectedSource()
+        {
+            if (SelectedEventItem != null)
+            {
+                if (sourceFilter.UncheckFilter(SelectedEventItem.Record.ProviderName))
+                    sourceFilter.Apply();
+            }
+        }
+        private void FilterToSelectedLevel()
+        {
+            if (SelectedEventItem != null)
+            {
+                if (levelFilter.SetSingleFilter(SelectedEventItem.Record.Level))
+                    levelFilter.Apply();
+            }
+        }
+        private void ExcludeSelectedLevel()
+        {
+            if (SelectedEventItem != null)
+            {
+                if (levelFilter.UncheckFilter(SelectedEventItem.Record.Level))
+                    levelFilter.Apply();
+            }
+        }
+        private void FilterToSelectedId()
+        {
+            if (SelectedEventItem != null)
+            {
+                IdFilter.IdFilterNum = SelectedEventItem.Record.Id;
+                IdFilter.Apply();
+            }
+        }
+        private void OnFilterUpdated(object sender, EventArgs e)
+        {
+            UpdateFilterInfoText();
+        }
 
+        #region commands
         public ICommand RefreshCommand
         {
             get;
@@ -270,6 +321,31 @@ namespace EventLook.ViewModel
             get;
             private set;
         }
+        public ICommand FilterToSelectedSourceCommand
+        {
+            get;
+            private set;
+        }
+        public ICommand ExcludeSelectedSourceCommand
+        {
+            get;
+            private set;
+        }
+        public ICommand FilterToSelectedLevelCommand
+        {
+            get;
+            private set;
+        }
+        public ICommand ExcludeSelectedLevelCommand
+        {
+            get;
+            private set;
+        }
+        public ICommand FilterToSelectedIdCommand
+        {
+            get;
+            private set;
+        }
 
         private void InitializeCommands()
         {
@@ -279,7 +355,14 @@ namespace EventLook.ViewModel
             ApplySourceFilterCommand = new RelayCommand(ApplySourceFilter, null);
             ApplyLevelFilterCommand = new RelayCommand(ApplyLevelFilter, null);
             OpenDetailsCommand = new RelayCommand(OpenDetails, null);
+            FilterToSelectedSourceCommand = new RelayCommand(FilterToSelectedSource, null);
+            ExcludeSelectedSourceCommand = new RelayCommand(ExcludeSelectedSource, null);
+            FilterToSelectedLevelCommand = new RelayCommand(FilterToSelectedLevel, null);
+            ExcludeSelectedLevelCommand = new RelayCommand(ExcludeSelectedLevel, null);
+            FilterToSelectedIdCommand = new RelayCommand(FilterToSelectedId, null);
         }
+        #endregion
+
         private void UpdateDateTimes()
         {
             if (SelectedRange.IsCustom)
@@ -331,6 +414,7 @@ namespace EventLook.ViewModel
                 loadedEventCount = 0;
                 IsUpdating = true;
                 UpdateStatusText();
+                UpdateFilterInfoText();
                 await task;
             }
             finally
@@ -345,6 +429,16 @@ namespace EventLook.ViewModel
             StatusText = IsUpdating ?
                 $"Loading {loadedEventCount} events... {additionalNote}" :
                 $"{loadedEventCount} events loaded. ({stopwatch.Elapsed.TotalSeconds:F1} sec) {additionalNote}"; // 1 digit after decimal point
+        }
+        private void UpdateFilterInfoText()
+        {
+            if (IsUpdating)
+                FilterInfoText = "";
+            else
+            {
+                int visibleRowCounts = CVS.View.Cast<object>().Count();
+                FilterInfoText = (visibleRowCounts == Events.Count) ? "" : $" {visibleRowCounts} events matched to the filter(s).";
+            }
         }
         /// <summary>
         /// Gets or sets the CollectionViewSource which is the proxy for the
