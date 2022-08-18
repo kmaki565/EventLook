@@ -75,7 +75,6 @@ namespace EventLook
                 }
             }
         }
-
         private async void DataGrid_SelectedCellsChanged(object sender, SelectedCellsChangedEventArgs e)
         {
             if (sender is DataGrid dataGrid)
@@ -85,6 +84,11 @@ namespace EventLook
                 if (dataGrid.SelectedItem != null)
                     dataGrid.ScrollIntoView(dataGrid.SelectedItem);
             }
+        }
+        private void CheckTruncate_Click(object sender, RoutedEventArgs e)
+        {
+            if (dataGrid1.SelectedItem != null)
+                dataGrid1.ScrollIntoView(dataGrid1.SelectedItem);
         }
     }
 }
