@@ -127,25 +127,19 @@
                     <ContextMenu x:Key="dataGridContextMenu">
                         <ContextMenu.Items>
                             <MenuItem Header="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.DataContext.Record.ProviderName}" HeaderStringFormat="Filter to &quot;{0}&quot;"
-                                      Command="{Binding DataContext.ContextMenuCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"
-                                      CommandParameter="{x:Static v:ContextMenuKind.FilterToTheSource}"/>
+                                      Command="{Binding DataContext.FilterToSelectedSourceCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"/>
                             <MenuItem Header="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.DataContext.Record.ProviderName}" HeaderStringFormat="Exclude &quot;{0}&quot;" 
-                                      Command="{Binding DataContext.ContextMenuCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}" 
-                                      CommandParameter="{x:Static v:ContextMenuKind.ExcludeTheSource}" />
+                                      Command="{Binding DataContext.ExcludeSelectedSourceCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"/>
                             <Separator/>
                             <MenuItem Header="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.DataContext.Record.Level, Converter={StaticResource EventLevelToDisplayTextConverter}}" HeaderStringFormat="Filter to {0}"
-                                      Command="{Binding DataContext.ContextMenuCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"
-                                      CommandParameter="{x:Static v:ContextMenuKind.FilterToTheLevel}"/>
+                                      Command="{Binding DataContext.FilterToSelectedLevelCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"/>
                             <MenuItem Header="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.DataContext.Record.Level, Converter={StaticResource EventLevelToDisplayTextConverter}}" HeaderStringFormat="Exclude {0}"
-                                      Command="{Binding DataContext.ContextMenuCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"
-                                      CommandParameter="{x:Static v:ContextMenuKind.ExcludeTheLevel}"/>
+                                      Command="{Binding DataContext.ExcludeSelectedLevelCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"/>
                             <Separator/>
                             <MenuItem Header="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.DataContext.Record.Id}" HeaderStringFormat="Filter to ID {0}"
-                                      Command="{Binding DataContext.ContextMenuCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"
-                                      CommandParameter="{x:Static v:ContextMenuKind.FilterToTheId}"/>
+                                      Command="{Binding DataContext.FilterToSelectedIdCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"/>
                             <Separator/>
-                            <MenuItem Header="Reset filters" Command="{Binding DataContext.ContextMenuCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}" 
-                                      CommandParameter="{x:Static v:ContextMenuKind.ResetFilters}" />
+                            <MenuItem Header="Reset filters" Command="{Binding DataContext.ResetFiltersCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"/>
                         </ContextMenu.Items>
                     </ContextMenu>
                 </DataGrid.Resources>

@@ -245,54 +245,44 @@ namespace EventLook.ViewModel
             var detailVm = new DetailViewModel(SelectedEventItem);
             showWindowService.Show(detailVm);
         }
-        private void ContextMenu(object menuKind)
+        private void FilterToSelectedSource()
         {
-            if (menuKind is ContextMenuKind kind)
+            if (SelectedEventItem != null)
             {
-                switch (kind)
-                {
-                    case ContextMenuKind.FilterToTheSource:
-                        if (SelectedEventItem != null)
-                        {
-                            // Filter to the event item's event source
-                            if (sourceFilter.SetSingleFilter(SelectedEventItem.Record.ProviderName))
-                                sourceFilter.Apply();
-                        }
-                        break;
-                    case ContextMenuKind.ExcludeTheSource:
-                        if (SelectedEventItem != null)
-                        {
-                            if (sourceFilter.UncheckFilter(SelectedEventItem.Record.ProviderName))
-                                sourceFilter.Apply();
-                        }
-                        break;
-                    case ContextMenuKind.FilterToTheLevel:
-                        if (SelectedEventItem != null)
-                        {
-                            if (levelFilter.SetSingleFilter(SelectedEventItem.Record.Level))
-                                levelFilter.Apply();
-                        }
-                        break;
-                    case ContextMenuKind.ExcludeTheLevel:
-                        if (SelectedEventItem != null)
-                        {
-                            if (levelFilter.UncheckFilter(SelectedEventItem.Record.Level))
-                                levelFilter.Apply();
-                        }
-                        break;
-                    case ContextMenuKind.FilterToTheId:
-                        if (SelectedEventItem != null)
-                        {
-                            IdFilter.IdFilterNum = SelectedEventItem.Record.Id;
-                            IdFilter.Apply();
-                        }
-                        break;
-                    case ContextMenuKind.ResetFilters:
-                        ResetFilters();
-                        break;
-                    default:
-                        break;
-                }
+                if (sourceFilter.SetSingleFilter(SelectedEventItem.Record.ProviderName))
+                    sourceFilter.Apply();
+            }
+        }
+        private void ExcludeSelectedSource()
+        {
+            if (SelectedEventItem != null)
+            {
+                if (sourceFilter.UncheckFilter(SelectedEventItem.Record.ProviderName))
+                    sourceFilter.Apply();
+            }
+        }
+        private void FilterToSelectedLevel()
+        {
+            if (SelectedEventItem != null)
+            {
+                if (levelFilter.SetSingleFilter(SelectedEventItem.Record.Level))
+                    levelFilter.Apply();
+            }
+        }
+        private void ExcludeSelectedLevel()
+        {
+            if (SelectedEventItem != null)
+            {
+                if (levelFilter.UncheckFilter(SelectedEventItem.Record.Level))
+                    levelFilter.Apply();
+            }
+        }
+        private void FilterToSelectedId()
+        {
+            if (SelectedEventItem != null)
+            {
+                IdFilter.IdFilterNum = SelectedEventItem.Record.Id;
+                IdFilter.Apply();
             }
         }
         private void OnFilterUpdated(object sender, EventArgs e)
@@ -300,6 +290,7 @@ namespace EventLook.ViewModel
             UpdateFilterInfoText();
         }
 
+        #region commands
         public ICommand RefreshCommand
         {
             get;
@@ -330,7 +321,27 @@ namespace EventLook.ViewModel
             get;
             private set;
         }
-        public ICommand ContextMenuCommand
+        public ICommand FilterToSelectedSourceCommand
+        {
+            get;
+            private set;
+        }
+        public ICommand ExcludeSelectedSourceCommand
+        {
+            get;
+            private set;
+        }
+        public ICommand FilterToSelectedLevelCommand
+        {
+            get;
+            private set;
+        }
+        public ICommand ExcludeSelectedLevelCommand
+        {
+            get;
+            private set;
+        }
+        public ICommand FilterToSelectedIdCommand
         {
             get;
             private set;
@@ -344,8 +355,14 @@ namespace EventLook.ViewModel
             ApplySourceFilterCommand = new RelayCommand(ApplySourceFilter, null);
             ApplyLevelFilterCommand = new RelayCommand(ApplyLevelFilter, null);
             OpenDetailsCommand = new RelayCommand(OpenDetails, null);
-            ContextMenuCommand = new RelayCommand<object>(ContextMenu, null);
+            FilterToSelectedSourceCommand = new RelayCommand(FilterToSelectedSource, null);
+            ExcludeSelectedSourceCommand = new RelayCommand(ExcludeSelectedSource, null);
+            FilterToSelectedLevelCommand = new RelayCommand(FilterToSelectedLevel, null);
+            ExcludeSelectedLevelCommand = new RelayCommand(ExcludeSelectedLevel, null);
+            FilterToSelectedIdCommand = new RelayCommand(FilterToSelectedId, null);
         }
+        #endregion
+
         private void UpdateDateTimes()
         {
             if (SelectedRange.IsCustom)
