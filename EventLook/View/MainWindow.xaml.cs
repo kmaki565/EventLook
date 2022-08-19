@@ -51,7 +51,6 @@ namespace EventLook
                     var extension = System.IO.Path.GetExtension(fileName);
                     if (extension == ".evtx")
                     {
-                        //TODO: Select the file in the log source UI
                         Messenger.Default.Send(new FileToBeProcessedMessageToken() { FilePath = fileName });
                     }
                 }

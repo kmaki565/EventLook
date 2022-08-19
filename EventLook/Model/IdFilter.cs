@@ -15,7 +15,7 @@ namespace EventLook.Model
             IdFilterNum = null;
         }
 
-        //TODO: Want to support comma-separated multiple IDs in the input
+        //TODO: May want to support comma-separated multiple IDs in the input
         private int? idFilterNum;
         public int? IdFilterNum
         {
