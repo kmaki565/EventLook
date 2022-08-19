@@ -230,14 +230,13 @@ namespace EventLook.ViewModel
         }
         private async void ApplySourceFilter()
         {
-            // TODO: Workaround as the command is called BEFORE the filter value is actually modified
-            await Task.Delay(50);
+            // Delay is needed to ensure filter update in UI is propagated to the source.
+            await Task.Delay(10);
             sourceFilter.Apply();
         }
         private async void ApplyLevelFilter()
         {
-            // TODO: Workaround as the command is called BEFORE the filter value is actually modified
-            await Task.Delay(50);
+            await Task.Delay(10);
             levelFilter.Apply();
         }
         private void OpenDetails()
@@ -397,7 +396,7 @@ namespace EventLook.ViewModel
             if (progressInfo.IsFirst)
                 Events.Clear();
 
-            //TODO: Improve performance with AddRange in ObservableCollection...
+            //TODO: Improve performance with AddRange in ObservableCollection.
             foreach (var evt in progressInfo.LoadedEvents)
             {
                 Events.Add(evt);

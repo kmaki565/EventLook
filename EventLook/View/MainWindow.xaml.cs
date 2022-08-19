@@ -51,7 +51,6 @@ namespace EventLook
                     var extension = System.IO.Path.GetExtension(fileName);
                     if (extension == ".evtx")
                     {
-                        //TODO: Select the file in the log source UI
                         Messenger.Default.Send(new FileToBeProcessedMessageToken() { FilePath = fileName });
                     }
                 }
@@ -75,11 +74,20 @@ namespace EventLook
                 }
             }
         }
-
-        private void DataGrid_SelectedCellsChanged(object sender, SelectedCellsChangedEventArgs e)
+        private async void DataGrid_SelectedCellsChanged(object sender, SelectedCellsChangedEventArgs e)
         {
-            if (sender is DataGrid dataGrid && dataGrid.SelectedItem != null)
-                dataGrid.ScrollIntoView(dataGrid.SelectedItem);
+            if (sender is DataGrid dataGrid)
+            {
+                // Without a delay it may fail to scroll to the selected event when resetting filters.
+                await Task.Delay(1);
+                if (dataGrid.SelectedItem != null)
+                    dataGrid.ScrollIntoView(dataGrid.SelectedItem);
+            }
+        }
+        private void CheckTruncate_Click(object sender, RoutedEventArgs e)
+        {
+            if (dataGrid1.SelectedItem != null)
+                dataGrid1.ScrollIntoView(dataGrid1.SelectedItem);
         }
     }
 }

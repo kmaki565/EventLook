@@ -16,12 +16,15 @@ The inbox Windows Event Viewer is a great app that provides comprehensive functi
 # Features
 - Overview events with Event Log messages
 - Asynchronous event fetching for quick glance
-- Provides quicker sort, specifying range, filters, and search (coming soon) 
-- Quick access to your favorite Applications and Services Logs
-- View other machine's event logs from evtx file (drag & drop .evtx and choose it in the drop-down of event sources)
+- Provides quicker sort, specifying time range, and filters
+- Quick access to your favorite Applications and Services Logs (coming soon) 
+- Supports .evtx file (open from Explorer or drag & drop .evtx file)
+- Double click to view event details in XML format
+- Right click to filter quickly
 
 # Install
-Just download the latest artifact, unzip it, and run EventLook.exe. No registry/local storage is used as of now.
+Install from [Microsoft Store](https://www.microsoft.com/store/apps/9NJV5FQ089Z0).
+You could also download the latest artifact from [Actions](https://github.com/kmaki565/EventLook/actions), unzip it, and run EventLook.exe. No registry/local storage is used as of now.
 
 # Technologies
 - The basic structure for DataGrid with filters is based on an article in CodeProject: [Multi-filtered WPF DataGrid with MVVM](https://www.codeproject.com/Articles/442498/Multi-filtered-WPF-DataGrid-with-MVVM)
@@ -29,12 +32,12 @@ Just download the latest artifact, unzip it, and run EventLook.exe. No registry/
 - [Extended WPF Toolkit](https://github.com/xceedsoftware/wpftoolkit)
 - Reading event logs are done by APIs in [System.Diagnostics.Eventing.Reader](https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.eventing.reader?view=netframework-4.8) namespace. The API provides a unified access to logs both from the legacy [Event Logging](https://docs.microsoft.com/en-us/windows/win32/eventlog/event-logging) and the modern [Windows Event Log](https://docs.microsoft.com/en-us/windows/win32/wes/windows-event-log) infrastructure.
 
-# TODO
-In addition to `TODO` embedded in the code, wished features are listed up in Issues. I'd be happy if you could join the development!
-
-# Contribution
+# Contribute
+We welcome your code! A standard contribution procedure is as follows:
 1. Fork it to your account
 1. Create your feature branch (git checkout -b my-new-feature)
 1. Commit your changes (git commit -am 'Add some feature')
 1. Push to the branch (git push origin my-new-feature)
-1. Create new Pull Request
+1. Create a new Pull Request
+
+If you have a desired feature, please let me know by opening a new issue :wink:

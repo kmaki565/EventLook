@@ -88,7 +88,7 @@
                         </Style>
                     </Button.Style>
                 </Button>
-                <CheckBox Content="Truncate long text" Margin="20,0,0,0" VerticalAlignment="Center" x:Name="CheckTruncate" IsChecked="True"/>
+                <CheckBox Content="Truncate long text" Margin="20,0,0,0" VerticalAlignment="Center" x:Name="CheckTruncate" IsChecked="True" Click="CheckTruncate_Click"/>
             </StackPanel>
 
             <Expander x:Name="Ex1" Header="Filters" Grid.Row="1" Margin="10,0,0,0" ExpandDirection="Down">
@@ -116,9 +116,11 @@
             </Expander>
 
             <!-- *** The ItemsSource of the data grid is bound to the CollectionViewSource object that was instantiated above -->
-            <DataGrid ItemsSource="{Binding Source={StaticResource X_CVS}}" SelectedItem="{Binding SelectedEventItem}" SelectedCellsChanged="DataGrid_SelectedCellsChanged"
+            <DataGrid x:Name="dataGrid1" ItemsSource="{Binding Source={StaticResource X_CVS}}" 
+                      SelectedItem="{Binding SelectedEventItem}" SelectedCellsChanged="DataGrid_SelectedCellsChanged"
                       Margin="5" Grid.Row="2" AutoGenerateColumns="False" IsReadOnly="True"
-                  BorderBrush="LightSteelBlue" HorizontalGridLinesBrush="LightSteelBlue" VerticalGridLinesBrush="LightSteelBlue" AllowDrop="True" PreviewDragOver="OnPreviewDragOver" Drop="OnDrop">
+                      BorderBrush="LightSteelBlue" HorizontalGridLinesBrush="LightSteelBlue" VerticalGridLinesBrush="LightSteelBlue" 
+                      AllowDrop="True" PreviewDragOver="OnPreviewDragOver" Drop="OnDrop">
                 <DataGrid.Resources>
                     <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightSkyBlue"/>
                     <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey }" Color="Black"/>
