@@ -9,7 +9,13 @@
         mc:Ignorable="d"
         DataContext="{Binding Source={StaticResource Locator}, Path=MainVm, Mode=OneWay}"
         ResizeMode="CanResizeWithGrip"
-        Title="{Binding MainWindowTitle}">
+        PreviewKeyDown="Window_PreviewKeyDown">
+    <Window.Title>
+        <MultiBinding StringFormat="{}{0} - {1}">
+            <Binding Path="SelectedLogSource.Path"/>
+            <Binding Path="MainWindowTitle"/>
+        </MultiBinding>
+    </Window.Title>
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <v:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
@@ -109,7 +115,7 @@
                     <TextBox Text="{Binding IdFilter.IdFilterNum, TargetNullValue='', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=300}"
                              Width="50" VerticalContentAlignment="Center" />
                     <TextBlock Text="Message contains: " Margin="10,0,0,0" VerticalAlignment="Center"/>
-                    <TextBox Text="{Binding MsgFilter.MessageFilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=300}"
+                    <TextBox x:Name="textBoxMsgFilter" Text="{Binding MsgFilter.MessageFilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=300}"
                              Width="180" VerticalContentAlignment="Center" />
                     <Button Content="Reset filters" Margin="10,0,0,0" Command="{Binding ResetFiltersCommand, Mode=OneWay}"/>
                 </StackPanel>

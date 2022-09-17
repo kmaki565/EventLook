@@ -89,5 +89,17 @@ namespace EventLook
             if (dataGrid1.SelectedItem != null)
                 dataGrid1.ScrollIntoView(dataGrid1.SelectedItem);
         }
+        private async void Window_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.F)
+            {
+                if (Ex1.IsExpanded == false)
+                {
+                    Ex1.IsExpanded = true;
+                    await Task.Delay(1);
+                }
+                textBoxMsgFilter.Focus();
+            }
+        }
     }
 }
