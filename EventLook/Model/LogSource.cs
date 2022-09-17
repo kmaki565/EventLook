@@ -46,6 +46,7 @@ namespace EventLook.Model
                 new LogSource("Lenovo-Power-BaseModule/Operational"),
                 new LogSource("Lenovo-Power-SmartStandby/Operational"),
                 new LogSource("Lenovo-Sif-Core/Operational"), // This channel requires admin privilege to read.
+                new LogSource("Microsoft-Windows-TaskScheduler/Operational"),
                 new LogSource("Microsoft-Windows-WindowsUpdateClient/Operational"),
                 new LogSource("Microsoft-Windows-Windows Defender/Operational")
             };
