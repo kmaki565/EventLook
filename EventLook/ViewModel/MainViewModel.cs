@@ -202,13 +202,22 @@ namespace EventLook.ViewModel
             Refresh();
             isWindowLoaded = true;
         }
+
+        public event Action Refreshing;
+        public event Action Refreshed;
         public async void Refresh()
         {
+            if (Refreshing != null)
+                Refreshing();
+
             UpdateDateTimes();
 
             await Task.Run(() => LoadEvents());
 
             filters.ForEach(f => f.Refresh(Events));
+
+            if (Refreshed != null)
+                Refreshed();
         }
         public void Cancel()
         {
@@ -216,6 +225,9 @@ namespace EventLook.ViewModel
             {
                 DataService.Cancel();
                 ongoingTask.Wait(); // Assumes the task will be cancelled quickly
+
+                if (Refreshed != null)
+                    Refreshed();
             }
         }
         public override void Cleanup()

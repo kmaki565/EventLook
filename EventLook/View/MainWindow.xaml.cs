@@ -36,6 +36,8 @@ namespace EventLook
             Messenger.Default.Send(new DetailWindowMessageToken() { ShowWindowService = showWindowService });
 
             ContentRendered += (s, e) => { ((MainViewModel)DataContext).OnLoaded(); };
+            ((MainViewModel)DataContext).Refreshing += OnRefreshing;
+            ((MainViewModel)DataContext).Refreshed += OnRefreshed;
 
             ProcessCommandLine();
         }
@@ -76,6 +78,9 @@ namespace EventLook
         }
         private async void DataGrid_SelectedCellsChanged(object sender, SelectedCellsChangedEventArgs e)
         {
+            if (isRefreshing)
+                return;
+
             if (sender is DataGrid dataGrid)
             {
                 // Without a delay it may fail to scroll to the selected event when resetting filters.
@@ -100,6 +105,24 @@ namespace EventLook
                 }
                 textBoxMsgFilter.Focus();
             }
+        }
+        private bool isRefreshing = false;
+        private void OnRefreshing()
+        {
+            isRefreshing = true;
+            ScrollToTop();
+        }
+        private void OnRefreshed()
+        {
+            isRefreshing = false;
+            dataGrid1.Focus();
+        }
+
+        private void ScrollToTop()
+        {
+            dataGrid1.SelectedIndex = 0;
+            if (dataGrid1.SelectedItem != null)
+                dataGrid1.ScrollIntoView(dataGrid1.SelectedItem);
         }
     }
 }
