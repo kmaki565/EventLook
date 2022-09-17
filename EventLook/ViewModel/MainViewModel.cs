@@ -225,9 +225,6 @@ namespace EventLook.ViewModel
             {
                 DataService.Cancel();
                 ongoingTask.Wait(); // Assumes the task will be cancelled quickly
-
-                if (Refreshed != null)
-                    Refreshed();
             }
         }
         public override void Cleanup()
