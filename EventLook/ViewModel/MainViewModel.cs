@@ -357,7 +357,7 @@ namespace EventLook.ViewModel
 
         private void InitializeCommands()
         {
-            RefreshCommand = new RelayCommand(Refresh, null);
+            RefreshCommand = new RelayCommand(Refresh, () => !IsUpdating);
             CancelCommand = new RelayCommand(Cancel, () => IsUpdating);
             ResetFiltersCommand = new RelayCommand(ResetFilters, null);
             ApplySourceFilterCommand = new RelayCommand(ApplySourceFilter, null);
