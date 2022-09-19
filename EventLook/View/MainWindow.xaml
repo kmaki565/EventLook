@@ -9,7 +9,13 @@
         mc:Ignorable="d"
         DataContext="{Binding Source={StaticResource Locator}, Path=MainVm, Mode=OneWay}"
         ResizeMode="CanResizeWithGrip"
-        Title="{Binding MainWindowTitle}">
+        PreviewKeyDown="Window_PreviewKeyDown">
+    <Window.Title>
+        <MultiBinding StringFormat="{}{0} - {1}">
+            <Binding Path="SelectedLogSource.Path"/>
+            <Binding Path="MainWindowTitle"/>
+        </MultiBinding>
+    </Window.Title>
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <v:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
@@ -28,7 +34,7 @@
     </Window.Resources>
     <Window.InputBindings>
         <KeyBinding Key="F5" Command="{Binding RefreshCommand}"/>
-        <KeyBinding Key="Esc" Command="{Binding CancelCommand}"/>
+        <KeyBinding Key="F5" Modifiers="Shift" Command="{Binding CancelCommand}"/>
     </Window.InputBindings>
     
     <DockPanel>
@@ -82,7 +88,7 @@
                                     <Setter Property="Command" Value="{Binding CancelCommand, Mode=OneWay}"/>
                                     <Setter Property="FontFamily" Value="Verdana"/>
                                     <Setter Property="Content" Value="X" />
-                                    <Setter Property="ToolTip" Value="Stop (Esc)"/>
+                                    <Setter Property="ToolTip" Value="Stop (Shift+F5)"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
@@ -107,9 +113,11 @@
                             Command="{Binding ApplyLevelFilterCommand}"/>
                     <TextBlock Text="Event ID: " Margin="10,0,0,0" VerticalAlignment="Center"/>
                     <TextBox Text="{Binding IdFilter.IdFilterNum, TargetNullValue='', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=300}"
+                             v:TextBoxBehavior.EscapeClearsText="True"
                              Width="50" VerticalContentAlignment="Center" />
                     <TextBlock Text="Message contains: " Margin="10,0,0,0" VerticalAlignment="Center"/>
-                    <TextBox Text="{Binding MsgFilter.MessageFilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=300}"
+                    <TextBox x:Name="textBoxMsgFilter" Text="{Binding MsgFilter.MessageFilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=300}"
+                             v:TextBoxBehavior.EscapeClearsText="True"
                              Width="180" VerticalContentAlignment="Center" />
                     <Button Content="Reset filters" Margin="10,0,0,0" Command="{Binding ResetFiltersCommand, Mode=OneWay}"/>
                 </StackPanel>

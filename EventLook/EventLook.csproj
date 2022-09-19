@@ -109,6 +109,8 @@
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
     <Compile Include="ViewModel\ShowWindowService.cs" />
+    <Compile Include="View\SelectRow.cs" />
+    <Compile Include="View\TextBoxBehavior.cs" />
     <Page Include="View\DetailWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
