@@ -116,7 +116,8 @@ namespace EventLook
         {
             isRefreshing = false;
             // After refresh, SelectedIndex is -1 unless you click the dataGrid during refresh.
-            SelectRow.SelectRowByIndex(dataGrid1, dataGrid1.SelectedIndex < 0 ? 0 : dataGrid1.SelectedIndex);
+            if (dataGrid1.Items.Count > 0)
+                SelectRow.SelectRowByIndex(dataGrid1, dataGrid1.SelectedIndex < 0 ? 0 : dataGrid1.SelectedIndex);
         }
 
         private void ScrollToTop()
