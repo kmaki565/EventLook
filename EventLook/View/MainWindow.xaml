@@ -29,6 +29,8 @@
                                      UnknownIconPath="/Asset/StatusHidden_16x.png"/>
         <v:ExpandedToGridLengthConverter x:Key="ExpandedToGridLengthConverter"/>
         <v:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+        <v:UtcToAnotherTimeZoneConverter x:Key="UtcToAnotherTimeZoneConverter"/>
+        <v:TimeZoneToOffsetTextConverter x:Key="TimeZoneToOffsetTextConverter"/>
         <!-- This next line instantiates a CollectionViewSource with the collection of Events as its collection of objects-->
         <CollectionViewSource Source="{Binding Events}" x:Key="X_CVS"/>
     </Window.Resources>
@@ -169,7 +171,19 @@
                     <KeyBinding Key="Enter" Command="{Binding OpenDetailsCommand}" />
                 </DataGrid.InputBindings>
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Time of event" Binding="{Binding TimeOfEvent, StringFormat=u}"/>
+                    <DataGridTextColumn SortMemberPath="TimeOfEvent">
+                        <DataGridTextColumn.Binding>
+                            <MultiBinding Converter="{StaticResource UtcToAnotherTimeZoneConverter}" StringFormat="yyyy-MM-dd HH:mm:ss">
+                                <Binding Path="TimeOfEvent"/>
+                                <Binding Path="DataContext.DisplayTimeZone" RelativeSource="{RelativeSource AncestorType=DataGrid}"/>
+                            </MultiBinding>
+                        </DataGridTextColumn.Binding>
+                        <DataGridTextColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DataContext.DisplayTimeZone, RelativeSource={RelativeSource AncestorType=DataGrid}, Converter={StaticResource TimeZoneToOffsetTextConverter}, StringFormat=Time of event ({0})}"/>
+                            </DataTemplate>
+                        </DataGridTextColumn.HeaderTemplate>
+                    </DataGridTextColumn>
                     <DataGridTextColumn Header="Source" Binding="{Binding Record.ProviderName}" Width="200">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">

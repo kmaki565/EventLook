@@ -132,4 +132,44 @@ namespace EventLook.View
             throw new NotImplementedException();
         }
     }
+
+    public class UtcToAnotherTimeZoneConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            if (values[0] is DateTime utcTime && values[1] is TimeZoneInfo timeZone)
+            {
+                return TimeZoneInfo.ConvertTimeFromUtc(utcTime, timeZone);
+            }
+            else
+                throw new ArgumentException("Arguments must be 1. UTC time and 2. TimeZoneInfo.");
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+    /// <summary>
+    /// Returns shorthand text of time offset from UTC. For example, JST will be "+09:00".
+    /// Note the actual time offset could be different due to daylight saving time. 
+    /// </summary>
+    public class TimeZoneToOffsetTextConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is TimeZoneInfo tzi)
+            {
+                TimeSpan ts = tzi.BaseUtcOffset;
+                return $"{(ts >= TimeSpan.Zero ? "+" : "-")}{ts:hh\\:mm}";
+            }
+            else
+                throw new ArgumentException("Argument must be a TimeZoneInfo.");
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

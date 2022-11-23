@@ -190,6 +190,10 @@ namespace EventLook.ViewModel
                 RaisePropertyChanged();
             }
         }
+
+        private TimeZoneInfo displayTimeZone = TimeZoneInfo.Local;
+        public TimeZoneInfo DisplayTimeZone { get => displayTimeZone; set => Set(ref displayTimeZone, value); }
+
         public string MainWindowTitle { get; }
 
         public void OnLoaded()
