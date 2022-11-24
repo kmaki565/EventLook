@@ -64,19 +64,19 @@
                 <ComboBox  
                       ItemsSource="{Binding Ranges}" SelectedItem="{Binding SelectedRange}"
                       DisplayMemberPath="Text" SelectedValuePath="Text"
-                      HorizontalAlignment="Left" Margin="10,0,0,0" Width="105" />
+                      HorizontalAlignment="Left" Margin="10,0,0,0" MinWidth="100" />
                 <TextBlock Text="From:" Margin="10,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-                <xctk:DateTimePicker Margin="8,0,0,0" Width="162"  
+                <xctk:DateTimePicker Margin="8,0,0,0" MinWidth="160" 
                                  AutoCloseCalendar="True" 
                                  IsReadOnly="{Binding SelectedRange.IsCustom, Converter={StaticResource InverseBooleanConverter}}"
                                  Value="{Binding FromDateTime, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" 
-                                 Format="Custom" FormatString="yyyy-MM-dd HH:mm zz"/>
+                                 Format="Custom" FormatString="yyyy-MM-dd HH:mm (z)"/>
                 <TextBlock Text="To:" Margin="8,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-                <xctk:DateTimePicker Margin="8,0,0,0" Width="162"
+                <xctk:DateTimePicker Margin="8,0,0,0" MinWidth="160"
                                  AutoCloseCalendar="True"
                                  IsReadOnly="{Binding SelectedRange.IsCustom, Converter={StaticResource InverseBooleanConverter}}"
                                  Value="{Binding ToDateTime, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" 
-                                 Format="Custom" FormatString="yyyy-MM-dd HH:mm zz"/>
+                                 Format="Custom" FormatString="yyyy-MM-dd HH:mm (z)"/>
                 <ComboBox
                     ItemsSource="{Binding TimeZones}" SelectedItem="{Binding SelectedTimeZone}"
                     DisplayMemberPath="DisplayName"
