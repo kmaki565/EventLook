@@ -29,6 +29,8 @@
                                      UnknownIconPath="/Asset/StatusHidden_16x.png"/>
         <v:ExpandedToGridLengthConverter x:Key="ExpandedToGridLengthConverter"/>
         <v:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+        <v:UtcToAnotherTimeZoneConverter x:Key="UtcToAnotherTimeZoneConverter"/>
+        <v:TimeZoneToOffsetTextConverter x:Key="TimeZoneToOffsetTextConverter"/>
         <!-- This next line instantiates a CollectionViewSource with the collection of Events as its collection of objects-->
         <CollectionViewSource Source="{Binding Events}" x:Key="X_CVS"/>
     </Window.Resources>
@@ -56,24 +58,29 @@
 
             <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,5">
                 <ComboBox  
-                  ItemsSource="{Binding LogSources}" SelectedItem="{Binding SelectedLogSource, Mode=TwoWay}"
+                  ItemsSource="{Binding LogSources}" SelectedItem="{Binding SelectedLogSource}"
                   DisplayMemberPath="Path" SelectedValuePath="Path" 
                   HorizontalAlignment="Left" Margin="10,0,0,0" Width="235" />
-
                 <ComboBox  
                       ItemsSource="{Binding Ranges}" SelectedItem="{Binding SelectedRange}"
                       DisplayMemberPath="Text" SelectedValuePath="Text"
-                      HorizontalAlignment="Left" Margin="10,0,0,0" Width="105" />
+                      HorizontalAlignment="Left" Margin="10,0,0,0" MinWidth="100" />
                 <TextBlock Text="From:" Margin="10,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-                <xctk:DateTimePicker Format="SortableDateTime" Margin="8,0,0,0" Width="160"  
+                <xctk:DateTimePicker Margin="8,0,0,0" MinWidth="160" 
                                  AutoCloseCalendar="True" 
                                  IsReadOnly="{Binding SelectedRange.IsCustom, Converter={StaticResource InverseBooleanConverter}}"
-                                 Value="{Binding FromDateTime, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
-                <TextBlock Text="To:" Margin="10,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-                <xctk:DateTimePicker Format="SortableDateTime" Margin="8,0,0,0" Width="160" 
+                                 Value="{Binding FromDateTime, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" 
+                                 Format="Custom" FormatString="yyyy-MM-dd HH:mm (z)"/>
+                <TextBlock Text="To:" Margin="8,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                <xctk:DateTimePicker Margin="8,0,0,0" MinWidth="160"
                                  AutoCloseCalendar="True"
                                  IsReadOnly="{Binding SelectedRange.IsCustom, Converter={StaticResource InverseBooleanConverter}}"
-                                 Value="{Binding ToDateTime, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" />
+                                 Value="{Binding ToDateTime, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" 
+                                 Format="Custom" FormatString="yyyy-MM-dd HH:mm (z)"/>
+                <ComboBox
+                    ItemsSource="{Binding TimeZones}" SelectedItem="{Binding SelectedTimeZone}"
+                    DisplayMemberPath="DisplayName"
+                    Margin="10,0,0,0" Width="93"/>
                 <Button Margin="15,0,0,0" Width="25" Height="25">
                     <Button.Style>
                         <Style TargetType="Button">
@@ -169,7 +176,19 @@
                     <KeyBinding Key="Enter" Command="{Binding OpenDetailsCommand}" />
                 </DataGrid.InputBindings>
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Time of event" Binding="{Binding TimeOfEvent, StringFormat=u}"/>
+                    <DataGridTextColumn SortMemberPath="TimeOfEvent">
+                        <DataGridTextColumn.Binding>
+                            <MultiBinding Converter="{StaticResource UtcToAnotherTimeZoneConverter}" StringFormat="yyyy-MM-dd HH:mm:ss">
+                                <Binding Path="TimeOfEvent"/>
+                                <Binding Path="DataContext.SelectedTimeZone" RelativeSource="{RelativeSource AncestorType=DataGrid}"/>
+                            </MultiBinding>
+                        </DataGridTextColumn.Binding>
+                        <DataGridTextColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DataContext.SelectedTimeZone, RelativeSource={RelativeSource AncestorType=DataGrid}, Converter={StaticResource TimeZoneToOffsetTextConverter}, StringFormat=Time of event ({0})}"/>
+                            </DataTemplate>
+                        </DataGridTextColumn.HeaderTemplate>
+                    </DataGridTextColumn>
                     <DataGridTextColumn Header="Source" Binding="{Binding Record.ProviderName}" Width="200">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">

@@ -40,6 +40,9 @@ namespace EventLook.ViewModel
 
             filters = new List<FilterBase> { sourceFilter, levelFilter, MsgFilter, IdFilter };
 
+            TimeZones = new ObservableCollection<TimeZoneInfo>(TimeZoneInfo.GetSystemTimeZones());
+            SelectedTimeZone = TimeZones.FirstOrDefault(x => x.Id == TimeZoneInfo.Local.Id);
+
             progress = new Progress<ProgressInfo>(ProgressCallback); // Needs to instantiate in UI thread
             stopwatch = new Stopwatch();
 
@@ -190,6 +193,11 @@ namespace EventLook.ViewModel
                 RaisePropertyChanged();
             }
         }
+
+        public ObservableCollection<TimeZoneInfo> TimeZones { get; private set; }
+        private TimeZoneInfo selectedTimeZone;
+        public TimeZoneInfo SelectedTimeZone { get => selectedTimeZone; set => Set(ref selectedTimeZone, value); }
+
         public string MainWindowTitle { get; }
 
         public void OnLoaded()

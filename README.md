@@ -17,10 +17,11 @@ The inbox Windows Event Viewer is a great app that provides comprehensive functi
 - Overview events with Event Log messages
 - Asynchronous event fetching for quick glance
 - Provides quicker sort, specifying time range, and filters
-- Quick access to your favorite Applications and Services Logs (coming soon) 
+- Quick access to your favorite Applications and Services Logs (Needs rebuild as of now) 
 - Supports .evtx file (open from Explorer or drag & drop .evtx file)
 - Double click to view event details in XML format
-- Right click to filter quickly
+- Right click to quickly filter events
+- Adjust time of events by time zone (Useful when you investigate .evtx file from different time zone)
 
 # Install
 Install from [Microsoft Store](https://www.microsoft.com/store/apps/9NJV5FQ089Z0).

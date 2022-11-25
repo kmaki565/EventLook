@@ -17,7 +17,7 @@ namespace EventLook.Model
         public EventItem(EventRecord eventRecord)
         {
             Record = eventRecord;
-            TimeOfEvent = eventRecord.TimeCreated ?? DateTime.MinValue;
+            TimeOfEvent = eventRecord.TimeCreated?.ToUniversalTime() ?? DateTime.MinValue.ToUniversalTime();
             try
             {
                 Message = eventRecord.FormatDescription();
