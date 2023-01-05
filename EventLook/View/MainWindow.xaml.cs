@@ -115,9 +115,13 @@ namespace EventLook
         private void OnRefreshed()
         {
             isRefreshing = false;
-            // After refresh, SelectedIndex is -1 unless you click the dataGrid during refresh.
-            if (dataGrid1.Items.Count > 0)
+            
+            // If the user is choosing the Event Log Source, we shouldn't interrupt.
+            if (!ComboBox_Source.IsDropDownOpen && dataGrid1.Items.Count > 0)
+            {
+                // After refresh, SelectedIndex is -1 unless you click the dataGrid during refresh.
                 SelectRow.SelectRowByIndex(dataGrid1, dataGrid1.SelectedIndex < 0 ? 0 : dataGrid1.SelectedIndex);
+            }
         }
 
         private void ScrollToTop()
