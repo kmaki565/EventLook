@@ -1,12 +1,11 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using EventLook.Model;
 using EventLook.View;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.CommandWpf;
-using GalaSoft.MvvmLight.Messaging;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.Eventing.Reader;
 using System.IO;
@@ -17,7 +16,7 @@ using System.Windows.Input;
 
 namespace EventLook.ViewModel
 {
-    public class MainViewModel : ViewModelBase
+    public class MainViewModel : ObservableRecipient
     {
         public MainViewModel(IDataService dataService)
         {
@@ -46,9 +45,9 @@ namespace EventLook.ViewModel
             progress = new Progress<ProgressInfo>(ProgressCallback); // Needs to instantiate in UI thread
             stopwatch = new Stopwatch();
 
-            Messenger.Default.Register<ViewCollectionViewSourceMessageToken>(this, Handle_ViewCollectionViewSourceMessageToken);
-            Messenger.Default.Register<FileToBeProcessedMessageToken>(this, Handle_FileToBeProcessedMessageToken);
-            Messenger.Default.Register<DetailWindowMessageToken>(this, Handle_DetailWindowMessageToken);
+            Messenger.Register<MainViewModel, ViewCollectionViewSourceMessageToken>(this, (r, m) => r.Handle_ViewCollectionViewSourceMessageToken(m));
+            Messenger.Register<MainViewModel, FileToBeProcessedMessageToken>(this, (r, m) => r.Handle_FileToBeProcessedMessageToken(m));
+            Messenger.Register<MainViewModel, DetailWindowMessageToken>(this, (r, m) => r.Handle_DetailWindowMessageToken(m));
         }
         private readonly LogSourceMgr logSourceMgr;
         private readonly RangeMgr rangeMgr;
@@ -66,7 +65,7 @@ namespace EventLook.ViewModel
         private int loadedEventCount = 0;
         private Task ongoingTask;
 
-        internal IDataService DataService { get; set; }
+        internal IDataService DataService { get; }
         private ShowWindowService<DetailWindow, DetailViewModel> showWindowService;
 
         private ObservableCollection<EventItem> _events;
@@ -79,7 +78,7 @@ namespace EventLook.ViewModel
                     return;
 
                 _events = value;
-                RaisePropertyChanged();
+                OnPropertyChanged();
             }
         }
         public EventItem SelectedEventItem { get; set; }
@@ -99,7 +98,7 @@ namespace EventLook.ViewModel
                     return;
 
                 selectedLogSource = value;
-                RaisePropertyChanged();
+                OnPropertyChanged();
 
                 if (isWindowLoaded)
                     Refresh();
@@ -121,7 +120,7 @@ namespace EventLook.ViewModel
                     return;
 
                 selectedRange = value;
-                RaisePropertyChanged();
+                OnPropertyChanged();
 
                 if (isWindowLoaded && !selectedRange.IsCustom)
                     Refresh();
@@ -147,11 +146,11 @@ namespace EventLook.ViewModel
                     return;
 
                 statusText = value;
-                RaisePropertyChanged();
+                OnPropertyChanged();
             }
         }
         private string filterInfoText;
-        public string FilterInfoText { get => filterInfoText; set => Set(ref filterInfoText, value); }
+        public string FilterInfoText { get => filterInfoText; set => SetProperty(ref filterInfoText, value); }
 
         private bool isUpdating = false;
         public bool IsUpdating
@@ -163,7 +162,7 @@ namespace EventLook.ViewModel
                     return;
 
                 isUpdating = value;
-                RaisePropertyChanged();
+                OnPropertyChanged();
             }
         }
 
@@ -177,7 +176,7 @@ namespace EventLook.ViewModel
                     return;
 
                 fromDateTime = value;
-                RaisePropertyChanged();
+                OnPropertyChanged();
             }
         }
         private DateTime toDateTime;
@@ -190,13 +189,13 @@ namespace EventLook.ViewModel
                     return;
 
                 toDateTime = value;
-                RaisePropertyChanged();
+                OnPropertyChanged();
             }
         }
 
         public ObservableCollection<TimeZoneInfo> TimeZones { get; private set; }
         private TimeZoneInfo selectedTimeZone;
-        public TimeZoneInfo SelectedTimeZone { get => selectedTimeZone; set => Set(ref selectedTimeZone, value); }
+        public TimeZoneInfo SelectedTimeZone { get => selectedTimeZone; set => SetProperty(ref selectedTimeZone, value); }
 
         public string MainWindowTitle { get; }
 
@@ -235,12 +234,7 @@ namespace EventLook.ViewModel
                 ongoingTask.Wait(); // Assumes the task will be cancelled quickly
             }
         }
-        public override void Cleanup()
-        {
-            Messenger.Default.Unregister<ViewCollectionViewSourceMessageToken>(this);
-            Messenger.Default.Unregister<FileToBeProcessedMessageToken>(this);
-            base.Cleanup();
-        }
+
         public void ResetFilters()
         {
             filters.ForEach(f => f.Reset());
@@ -367,15 +361,15 @@ namespace EventLook.ViewModel
         {
             RefreshCommand = new RelayCommand(Refresh, () => !IsUpdating);
             CancelCommand = new RelayCommand(Cancel, () => IsUpdating);
-            ResetFiltersCommand = new RelayCommand(ResetFilters, null);
-            ApplySourceFilterCommand = new RelayCommand(ApplySourceFilter, null);
-            ApplyLevelFilterCommand = new RelayCommand(ApplyLevelFilter, null);
-            OpenDetailsCommand = new RelayCommand(OpenDetails, null);
-            FilterToSelectedSourceCommand = new RelayCommand(FilterToSelectedSource, null);
-            ExcludeSelectedSourceCommand = new RelayCommand(ExcludeSelectedSource, null);
-            FilterToSelectedLevelCommand = new RelayCommand(FilterToSelectedLevel, null);
-            ExcludeSelectedLevelCommand = new RelayCommand(ExcludeSelectedLevel, null);
-            FilterToSelectedIdCommand = new RelayCommand(FilterToSelectedId, null);
+            ResetFiltersCommand = new RelayCommand(ResetFilters);
+            ApplySourceFilterCommand = new RelayCommand(ApplySourceFilter);
+            ApplyLevelFilterCommand = new RelayCommand(ApplyLevelFilter);
+            OpenDetailsCommand = new RelayCommand(OpenDetails);
+            FilterToSelectedSourceCommand = new RelayCommand(FilterToSelectedSource);
+            ExcludeSelectedSourceCommand = new RelayCommand(ExcludeSelectedSource);
+            FilterToSelectedLevelCommand = new RelayCommand(FilterToSelectedLevel);
+            ExcludeSelectedLevelCommand = new RelayCommand(ExcludeSelectedLevel);
+            FilterToSelectedIdCommand = new RelayCommand(FilterToSelectedId);
         }
         #endregion
 
@@ -399,8 +393,8 @@ namespace EventLook.ViewModel
             }
 
             // These seem necessary to ensure DateTimePicker be updated
-            RaisePropertyChanged("FromDateTime");
-            RaisePropertyChanged("ToDateTime");
+            OnPropertyChanged("FromDateTime");
+            OnPropertyChanged("ToDateTime");
         }
         private async Task LoadEvents()
         {
