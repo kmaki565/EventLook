@@ -30,7 +30,7 @@ namespace EventLook.ViewModel
             SelectedLogSource = LogSources.FirstOrDefault();
 
             rangeMgr = new RangeMgr();
-            SelectedRange = Ranges.FirstOrDefault(r => r.DaysFromNow == 3);
+            SelectedRange = Ranges.FirstOrDefault(r => r.DaysFromNow == 7);
 
             sourceFilter = new Model.SourceFilter();
             levelFilter = new LevelFilter();
