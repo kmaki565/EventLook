@@ -40,6 +40,8 @@ using System.Windows;
                                               // app, or any theme specific resource dictionaries)
 )]
 
+// To suppress warning CA1416: This call site is reachable on all platforms.
+[assembly: System.Runtime.Versioning.SupportedOSPlatformAttribute("windows")]
 
 // Version information for an assembly consists of the following four values:
 //
