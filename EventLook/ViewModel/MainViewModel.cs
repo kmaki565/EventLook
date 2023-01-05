@@ -105,13 +105,13 @@ namespace EventLook.ViewModel
             }
         }
 
-        public ObservableCollection<Range> Ranges
+        public ObservableCollection<Model.Range> Ranges
         {
             get { return rangeMgr.Ranges; }
         }
 
-        private Range selectedRange;
-        public Range SelectedRange
+        private Model.Range selectedRange;
+        public Model.Range SelectedRange
         {
             get { return selectedRange; }
             set
