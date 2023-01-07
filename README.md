@@ -5,7 +5,7 @@
 | :point_up: EventLook is now available in [Microsoft Store](https://www.microsoft.com/store/apps/9NJV5FQ089Z0)! |
 |-----|
 
-A fast & handy alternative to Windows Event Viewer built on WPF
+A fast & handy alternative to Windows Event Viewer built on WPF and .NET 6
 
 ![screenshot](/Screenshot-1.png)
 
@@ -29,7 +29,7 @@ You could also download the latest artifact from [Actions](https://github.com/km
 
 # Technologies
 - The basic structure for DataGrid with filters is based on an article in CodeProject: [Multi-filtered WPF DataGrid with MVVM](https://www.codeproject.com/Articles/442498/Multi-filtered-WPF-DataGrid-with-MVVM)
-- [MvvmLight](http://www.mvvmlight.net/)
+- [MVVM Toolkit](https://learn.microsoft.com/en-us/dotnet/communitytoolkit/mvvm/)
 - [Extended WPF Toolkit](https://github.com/xceedsoftware/wpftoolkit)
 - Reading event logs are done by APIs in [System.Diagnostics.Eventing.Reader](https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.eventing.reader?view=netframework-4.8) namespace. The API provides a unified access to logs both from the legacy [Event Logging](https://docs.microsoft.com/en-us/windows/win32/eventlog/event-logging) and the modern [Windows Event Log](https://docs.microsoft.com/en-us/windows/win32/wes/windows-event-log) infrastructure.
 
