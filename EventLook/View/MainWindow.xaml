@@ -5,9 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EventLook"
         xmlns:v="clr-namespace:EventLook.View"
-        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" xmlns:viewmodel="clr-namespace:EventLook.ViewModel" d:DataContext="{d:DesignInstance Type=viewmodel:MainViewModel}"
         mc:Ignorable="d"
-        DataContext="{Binding Source={StaticResource Locator}, Path=MainVm, Mode=OneWay}"
         ResizeMode="CanResizeWithGrip"
         PreviewKeyDown="Window_PreviewKeyDown">
     <Window.Title>

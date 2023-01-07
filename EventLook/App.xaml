@@ -7,7 +7,6 @@
              d1p1:Ignorable="d" 
              xmlns:d1p1="http://schemas.openxmlformats.org/markup-compatibility/2006">
     <Application.Resources>
-        <vm:ViewModelLocator x:Key="Locator" d:IsDataSource="True" xmlns:vm="clr-namespace:EventLook.ViewModel" />
         <FontFamily x:Key="WingDings3">./Font/WINGDNG3.TTF#Wingdings 3</FontFamily>
         <!-- This is the style used to display enabled or disabled button images for removing filters-->
         <Style x:Key="ImageStyleForButtons" TargetType="{x:Type Image}">

@@ -21,9 +21,14 @@ jobs:
     - uses: nuget/setup-nuget@v1
     - run: nuget restore ${{ env.PROJECT_NAME }}.sln
     - uses: microsoft/setup-msbuild@v1.0.2
-    - run: msbuild ${{ env.PROJECT_NAME }}.sln '/p:Configuration=Release;Platform="Any CPU"' /p:AppxPackageSigningEnabled=false
+    - run: msbuild ${{ env.PROJECT_NAME }}.sln '/p:Configuration=Release;Platform=x64;AppxBundle=Always;AppxBundlePlatforms=x64|x86|arm64;AppxPackageSigningEnabled=false'
+    - name: Delete large runtime folder and save x64 only to reduce size of artifact
+      run: |
+        Remove-Item -Recurse ${{ env.PROJECT_NAME }}\bin\ARM64
+        Remove-Item -Recurse ${{ env.PROJECT_NAME }}\bin\x86
+        Remove-Item -Recurse ${{ env.PROJECT_NAME }}\bin\x64\Release\net6.0-windows\win-x64
     # Save artifacts
     - uses: actions/upload-artifact@v2
       with:
         name: ${{ env.PROJECT_NAME }}-${{ github.sha }}
-        path: ${{ env.PROJECT_NAME }}\bin\Release
+        path: ${{ env.PROJECT_NAME }}\bin

@@ -1,6 +1,7 @@
-﻿using EventLook.View;
+﻿using CommunityToolkit.Mvvm.DependencyInjection;
+using CommunityToolkit.Mvvm.Messaging;
+using EventLook.View;
 using EventLook.ViewModel;
-using GalaSoft.MvvmLight.Messaging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,10 +13,6 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace EventLook
 {
@@ -27,13 +24,14 @@ namespace EventLook
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = Ioc.Default.GetRequiredService<MainViewModel>();
 
             // Here we send a message which is caught by the view model.  The message contains a reference
             // to the CollectionViewSource which is instantiated when the view is instantiated (before the view model).
-            Messenger.Default.Send(new ViewCollectionViewSourceMessageToken() { CVS = (CollectionViewSource)(this.Resources["X_CVS"]) });
+            WeakReferenceMessenger.Default.Send(new ViewCollectionViewSourceMessageToken() { CVS = (CollectionViewSource)(this.Resources["X_CVS"]) });
             
             var showWindowService = new ShowWindowService<DetailWindow, DetailViewModel>(){ Owner = this };
-            Messenger.Default.Send(new DetailWindowMessageToken() { ShowWindowService = showWindowService });
+            WeakReferenceMessenger.Default.Send(new ShowWindowServiceMessageToken() { ShowWindowService = showWindowService });
 
             ContentRendered += (s, e) => { ((MainViewModel)DataContext).OnLoaded(); };
             ((MainViewModel)DataContext).Refreshing += OnRefreshing;
@@ -53,7 +51,7 @@ namespace EventLook
                     var extension = System.IO.Path.GetExtension(fileName);
                     if (extension == ".evtx")
                     {
-                        Messenger.Default.Send(new FileToBeProcessedMessageToken() { FilePath = fileName });
+                        WeakReferenceMessenger.Default.Send(new FileToBeProcessedMessageToken() { FilePath = fileName });
                     }
                 }
             }
@@ -72,7 +70,7 @@ namespace EventLook
                 foreach (string uriString in files)
                 {
                     // Pass the file name to the MainViewModel
-                    Messenger.Default.Send(new FileToBeProcessedMessageToken() { FilePath = uriString });
+                    WeakReferenceMessenger.Default.Send(new FileToBeProcessedMessageToken() { FilePath = uriString });
                 }
             }
         }
