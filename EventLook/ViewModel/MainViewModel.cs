@@ -47,7 +47,7 @@ namespace EventLook.ViewModel
 
             Messenger.Register<MainViewModel, ViewCollectionViewSourceMessageToken>(this, (r, m) => r.Handle_ViewCollectionViewSourceMessageToken(m));
             Messenger.Register<MainViewModel, FileToBeProcessedMessageToken>(this, (r, m) => r.Handle_FileToBeProcessedMessageToken(m));
-            Messenger.Register<MainViewModel, DetailWindowMessageToken>(this, (r, m) => r.Handle_DetailWindowMessageToken(m));
+            Messenger.Register<MainViewModel, ShowWindowServiceMessageToken>(this, (r, m) => r.Handle_ShowWindowServiceMessageToken(m));
         }
         private readonly LogSourceMgr logSourceMgr;
         private readonly RangeMgr rangeMgr;
@@ -65,8 +65,9 @@ namespace EventLook.ViewModel
         private int loadedEventCount = 0;
         private Task ongoingTask;
 
-        internal IDataService DataService { get; }
-        private ShowWindowService<DetailWindow, DetailViewModel> showWindowService;
+        // Services to be injected.
+        private readonly IDataService DataService;
+        private IShowWindowService<DetailViewModel> ShowWindowService;
 
         private ObservableCollection<EventItem> _events;
         public ObservableCollection<EventItem> Events
@@ -253,7 +254,7 @@ namespace EventLook.ViewModel
         private void OpenDetails()
         {
             var detailVm = new DetailViewModel(SelectedEventItem);
-            showWindowService.Show(detailVm);
+            ShowWindowService.Show(detailVm);
         }
         private void FilterToSelectedSource()
         {
@@ -472,9 +473,9 @@ namespace EventLook.ViewModel
             SelectedLogSource = logSourceMgr.AddEvtx(token.FilePath);
         }
 
-        private void Handle_DetailWindowMessageToken(DetailWindowMessageToken token)
+        private void Handle_ShowWindowServiceMessageToken(ShowWindowServiceMessageToken token)
         {
-            showWindowService = token.ShowWindowService;
+            ShowWindowService = token.ShowWindowService;
         }
     }
 }

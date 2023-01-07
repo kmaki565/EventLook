@@ -18,7 +18,7 @@ namespace EventLook.ViewModel
     {
         public string FilePath { get; set; }
     }
-    public class DetailWindowMessageToken
+    public class ShowWindowServiceMessageToken
     {
         public ShowWindowService<DetailWindow, DetailViewModel> ShowWindowService { get; set; }
     }

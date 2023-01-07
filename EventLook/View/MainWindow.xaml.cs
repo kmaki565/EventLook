@@ -31,7 +31,7 @@ namespace EventLook
             WeakReferenceMessenger.Default.Send(new ViewCollectionViewSourceMessageToken() { CVS = (CollectionViewSource)(this.Resources["X_CVS"]) });
             
             var showWindowService = new ShowWindowService<DetailWindow, DetailViewModel>(){ Owner = this };
-            WeakReferenceMessenger.Default.Send(new DetailWindowMessageToken() { ShowWindowService = showWindowService });
+            WeakReferenceMessenger.Default.Send(new ShowWindowServiceMessageToken() { ShowWindowService = showWindowService });
 
             ContentRendered += (s, e) => { ((MainViewModel)DataContext).OnLoaded(); };
             ((MainViewModel)DataContext).Refreshing += OnRefreshing;

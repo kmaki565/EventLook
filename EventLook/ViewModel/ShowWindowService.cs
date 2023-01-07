@@ -11,6 +11,7 @@ namespace EventLook.View
     interface IShowWindowService<TViewModel>
     {
         bool? ShowDialog(TViewModel context);
+        void Show(TViewModel context);
     }
     public class ShowWindowService<TWindow, TViewModel> : IShowWindowService<TViewModel>
          where TWindow : Window, new()
