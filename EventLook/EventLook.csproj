@@ -45,10 +45,4 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Windows.Compatibility" Version="7.0.0" />
   </ItemGroup>
-  <ItemGroup>
-    <EditorConfigFiles Remove="C:\Code\GitHub\EventLook\EventLook\.editorconfig" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="C:\Code\GitHub\EventLook\EventLook\.editorconfig" />
-  </ItemGroup>
 </Project>
