@@ -7,82 +7,81 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace EventLook.Model
+namespace EventLook.Model;
+
+public interface IDataService
 {
-    public interface IDataService
-    {
-        Task<int> ReadEvents(LogSource eventSource, DateTime fromTime, DateTime toTime, IProgress<ProgressInfo> progress);
+    Task<int> ReadEvents(LogSource eventSource, DateTime fromTime, DateTime toTime, IProgress<ProgressInfo> progress);
 
-        void Cancel();
-    }
-    public class DataService : IDataService
+    void Cancel();
+}
+public class DataService : IDataService
+{
+    private CancellationTokenSource cts;
+    public async Task<int> ReadEvents(LogSource eventSource, DateTime fromTime, DateTime toTime, IProgress<ProgressInfo> progress)
     {
-        private CancellationTokenSource cts;
-        public async Task<int> ReadEvents(LogSource eventSource, DateTime fromTime, DateTime toTime, IProgress<ProgressInfo> progress)
+        using (cts = new CancellationTokenSource())
         {
-            using (cts = new CancellationTokenSource())
+            // Event records to be sent to the ViewModel
+            var eventRecords = new List<EventRecord>();
+            string errMsg = "";
+            int count = 0;
+            bool isFirst = true;
+            try
             {
-                // Event records to be sent to the ViewModel
-                var eventRecords = new List<EventRecord>();
-                string errMsg = "";
-                int count = 0;
-                bool isFirst = true;
-                try
-                {
-                    string sQuery = string.Format(" *[System[TimeCreated[@SystemTime > '{0}' and @SystemTime <= '{1}']]]",
-                        fromTime.ToUniversalTime().ToString("s"),
-                        toTime.ToUniversalTime().ToString("s"));
+                string sQuery = string.Format(" *[System[TimeCreated[@SystemTime > '{0}' and @SystemTime <= '{1}']]]",
+                    fromTime.ToUniversalTime().ToString("s"),
+                    toTime.ToUniversalTime().ToString("s"));
 
-                    var elQuery = new EventLogQuery(eventSource.Path, eventSource.PathType, sQuery)
+                var elQuery = new EventLogQuery(eventSource.Path, eventSource.PathType, sQuery)
+                {
+                    ReverseDirection = true
+                };
+                var reader = new System.Diagnostics.Eventing.Reader.EventLogReader(elQuery);
+                var eventRecord = reader.ReadEvent();
+                Debug.WriteLine("Begin Reading");
+                await Task.Run(() =>
+                {
+                    for (; eventRecord != null; eventRecord = reader.ReadEvent())
                     {
-                        ReverseDirection = true
-                    };
-                    var reader = new System.Diagnostics.Eventing.Reader.EventLogReader(elQuery);
-                    var eventRecord = reader.ReadEvent();
-                    Debug.WriteLine("Begin Reading");
-                    await Task.Run(() =>
-                    {
-                        for (; eventRecord != null; eventRecord = reader.ReadEvent())
+                        cts.Token.ThrowIfCancellationRequested();
+
+                        eventRecords.Add(eventRecord);
+                        ++count;
+                        if (count % 100 == 0)
                         {
+                            var info = new ProgressInfo(eventRecords.ConvertAll(e => new EventItem(e)), false, isFirst);
                             cts.Token.ThrowIfCancellationRequested();
-
-                            eventRecords.Add(eventRecord);
-                            ++count;
-                            if (count % 100 == 0)
-                            {
-                                var info = new ProgressInfo(eventRecords.ConvertAll(e => new EventItem(e)), false, isFirst);
-                                cts.Token.ThrowIfCancellationRequested();
-                                progress.Report(info);
-                                isFirst = false;
-                                eventRecords.Clear();
-                            }
+                            progress.Report(info);
+                            isFirst = false;
+                            eventRecords.Clear();
                         }
-                    });
-                }
-                catch (OperationCanceledException ex)
-                {
-                    errMsg = ex.Message;
-                }
-                catch (EventLogNotFoundException ex)
-                {
-                    errMsg = ex.Message;
-                }
-                catch (UnauthorizedAccessException)
-                {
-                    errMsg = "Unauthorized access to the channel. Try Run as Administrator.";
-                }
-                finally
-                {
-                    var info_comp = new ProgressInfo(eventRecords.ConvertAll(e => new EventItem(e)), true, isFirst, errMsg);
-                    progress.Report(info_comp);
-                    Debug.WriteLine("End Reading");
-                }
-                return count;
+                    }
+                });
             }
+            catch (OperationCanceledException ex)
+            {
+                errMsg = ex.Message;
+            }
+            catch (EventLogNotFoundException ex)
+            {
+                errMsg = ex.Message;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                errMsg = "Unauthorized access to the channel. Try Run as Administrator.";
+            }
+            finally
+            {
+                var info_comp = new ProgressInfo(eventRecords.ConvertAll(e => new EventItem(e)), true, isFirst, errMsg);
+                progress.Report(info_comp);
+                Debug.WriteLine("End Reading");
+            }
+            return count;
         }
-        public void Cancel()
-        {
-            cts.Cancel();
-        }
+    }
+    public void Cancel()
+    {
+        cts.Cancel();
     }
 }

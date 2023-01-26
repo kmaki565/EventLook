@@ -5,18 +5,17 @@ using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EventLook.Model
+namespace EventLook.Model;
+
+class ProcessHelper
 {
-    class ProcessHelper
+    // https://stackoverflow.com/a/31856353/5461938
+    public static bool IsElevated
     {
-        // https://stackoverflow.com/a/31856353/5461938
-        public static bool IsElevated
+        get
         {
-            get
-            {
-                return WindowsIdentity.GetCurrent().Owner
-                  .IsWellKnown(WellKnownSidType.BuiltinAdministratorsSid);
-            }
+            return WindowsIdentity.GetCurrent().Owner
+              .IsWellKnown(WellKnownSidType.BuiltinAdministratorsSid);
         }
     }
 }

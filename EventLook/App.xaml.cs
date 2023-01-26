@@ -4,20 +4,19 @@ using EventLook.ViewModel;
 using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
 
-namespace EventLook
+namespace EventLook;
+
+/// <summary>
+/// Interaction logic for App.xaml
+/// </summary>
+public partial class App : Application
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
-    public partial class App : Application
+    public App()
     {
-        public App()
-        {
-            Ioc.Default.ConfigureServices(
-               new ServiceCollection()
-               .AddSingleton<IDataService, DataService>()
-               .AddTransient<MainViewModel>()
-               .BuildServiceProvider());
-        }
+        Ioc.Default.ConfigureServices(
+           new ServiceCollection()
+           .AddSingleton<IDataService, DataService>()
+           .AddTransient<MainViewModel>()
+           .BuildServiceProvider());
     }
 }
