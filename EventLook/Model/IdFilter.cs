@@ -6,46 +6,45 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
 
-namespace EventLook.Model
+namespace EventLook.Model;
+
+public class IdFilter : FilterBase
 {
-    public class IdFilter : FilterBase
+    public IdFilter()
     {
-        public IdFilter()
+        IdFilterNum = null;
+    }
+
+    //TODO: May want to support comma-separated multiple IDs in the input
+    private int? idFilterNum;
+    public int? IdFilterNum
+    {
+        get { return idFilterNum; }
+        set
         {
-            IdFilterNum = null;
-        }
+            if (value == idFilterNum)
+                return;
 
-        //TODO: May want to support comma-separated multiple IDs in the input
-        private int? idFilterNum;
-        public int? IdFilterNum
-        {
-            get { return idFilterNum; }
-            set
-            {
-                if (value == idFilterNum)
-                    return;
+            idFilterNum = value;
+            NotifyPropertyChanged();
 
-                idFilterNum = value;
-                NotifyPropertyChanged();
-
-                if (value == null)
-                    RemoveFilter();
-                else
-                    Apply();
-            }
-        }
-
-        public override void Reset()
-        {
-            IdFilterNum = null;
-        }
-
-        protected override bool IsFilterMatched(EventItem evt)
-        {
-            if (idFilterNum.HasValue)
-                return evt.Record.Id == IdFilterNum.Value;
+            if (value == null)
+                RemoveFilter();
             else
-                return true;    // Shouldn't come here - null means no filter specified.
+                Apply();
         }
+    }
+
+    public override void Reset()
+    {
+        IdFilterNum = null;
+    }
+
+    protected override bool IsFilterMatched(EventItem evt)
+    {
+        if (idFilterNum.HasValue)
+            return evt.Record.Id == IdFilterNum.Value;
+        else
+            return true;    // Shouldn't come here - null means no filter specified.
     }
 }
