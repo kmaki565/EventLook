@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Messaging;
 using EventLook.View;
 using EventLook.ViewModel;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -127,5 +128,17 @@ public partial class MainWindow : Window
         dataGrid1.SelectedIndex = 0;
         if (dataGrid1.SelectedItem != null)
             dataGrid1.ScrollIntoView(dataGrid1.SelectedItem);
+    }
+
+    private void MenuItem_FileOpen_Click(object sender, RoutedEventArgs e)
+    {
+        OpenFileDialog openFileDialog = new()
+        {
+            Filter = "Event Log files (*.evtx)|*.evtx"
+        };
+        if (openFileDialog.ShowDialog() == true)
+        {
+            WeakReferenceMessenger.Default.Send(new FileToBeProcessedMessageToken() { FilePath = openFileDialog.FileName });
+        }
     }
 }

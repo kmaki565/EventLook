@@ -11,6 +11,7 @@ using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 
@@ -213,7 +214,7 @@ public class MainViewModel : ObservableRecipient
 
     public event Action Refreshing;
     public event Action Refreshed;
-    public async void Refresh()
+    private async void Refresh()
     {
         if (Refreshing != null)
             Refreshing();
@@ -227,7 +228,7 @@ public class MainViewModel : ObservableRecipient
         if (Refreshed != null)
             Refreshed();
     }
-    public void Cancel()
+    private void Cancel()
     {
         if (IsUpdating)
         {
@@ -235,8 +236,11 @@ public class MainViewModel : ObservableRecipient
             ongoingTask.Wait(); // Assumes the task will be cancelled quickly
         }
     }
-
-    public void ResetFilters()
+    private void Exit()
+    {
+        Application.Current.MainWindow.Close();
+    }
+    private void ResetFilters()
     {
         filters.ForEach(f => f.Reset());
     }
@@ -302,66 +306,24 @@ public class MainViewModel : ObservableRecipient
     }
 
     #region commands
-    public ICommand RefreshCommand
-    {
-        get;
-        private set;
-    }
-    public ICommand CancelCommand
-    {
-        get;
-        private set;
-    }
-    public ICommand ApplySourceFilterCommand
-    {
-        get;
-        private set;
-    }
-    public ICommand ApplyLevelFilterCommand
-    {
-        get;
-        private set;
-    }
-    public ICommand ResetFiltersCommand
-    {
-        get;
-        private set;
-    }
-    public ICommand OpenDetailsCommand
-    {
-        get;
-        private set;
-    }
-    public ICommand FilterToSelectedSourceCommand
-    {
-        get;
-        private set;
-    }
-    public ICommand ExcludeSelectedSourceCommand
-    {
-        get;
-        private set;
-    }
-    public ICommand FilterToSelectedLevelCommand
-    {
-        get;
-        private set;
-    }
-    public ICommand ExcludeSelectedLevelCommand
-    {
-        get;
-        private set;
-    }
-    public ICommand FilterToSelectedIdCommand
-    {
-        get;
-        private set;
-    }
+    public ICommand RefreshCommand { get; private set; }
+    public ICommand CancelCommand { get; private set; }
+    public ICommand ExitCommand { get; private set; }
+    public ICommand ApplySourceFilterCommand { get; private set; }
+    public ICommand ApplyLevelFilterCommand { get; private set; }
+    public ICommand ResetFiltersCommand { get; private set; }
+    public ICommand OpenDetailsCommand { get; private set; }
+    public ICommand FilterToSelectedSourceCommand { get; private set; }
+    public ICommand ExcludeSelectedSourceCommand { get; private set; }
+    public ICommand FilterToSelectedLevelCommand { get; private set; }
+    public ICommand ExcludeSelectedLevelCommand { get; private set; }
+    public ICommand FilterToSelectedIdCommand { get; private set; }
 
     private void InitializeCommands()
     {
         RefreshCommand = new RelayCommand(Refresh, () => !IsUpdating);
         CancelCommand = new RelayCommand(Cancel, () => IsUpdating);
+        ExitCommand = new RelayCommand(Exit); 
         ResetFiltersCommand = new RelayCommand(ResetFilters);
         ApplySourceFilterCommand = new RelayCommand(ApplySourceFilter);
         ApplyLevelFilterCommand = new RelayCommand(ApplyLevelFilter);

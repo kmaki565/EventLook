@@ -39,6 +39,13 @@
     </Window.InputBindings>
     
     <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Open evtx file" Click="MenuItem_FileOpen_Click"/>
+                <Separator />
+                <MenuItem Header="E_xit" Command="{Binding ExitCommand}" />
+            </MenuItem>
+        </Menu>
         <StatusBar DockPanel.Dock="Bottom" >
             <StatusBarItem>
                 <StackPanel Orientation="Horizontal">
@@ -50,12 +57,12 @@
 
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="30"/>
+                <RowDefinition Height="35"/>
                 <RowDefinition Height="{Binding ElementName=Ex1, Path=IsExpanded, Converter={StaticResource ExpandedToGridLengthConverter}, ConverterParameter=25}" />
                 <RowDefinition/>
             </Grid.RowDefinitions>
 
-            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,5">
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,5,0,5">
                 <ComboBox  
                   x:Name="ComboBox_Source" ItemsSource="{Binding LogSources}" SelectedItem="{Binding SelectedLogSource}"
                   DisplayMemberPath="Path" SelectedValuePath="Path" 
