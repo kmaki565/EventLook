@@ -19,16 +19,26 @@ public class LogSource
         FileWriteTime = DateTime.Now;
         if (type == PathType.FilePath)
         {
+            DisplayName = System.IO.Path.GetFileName(Path);
+            string computerName = DataService.GetComputerNameFromEvtx(path);
+            if (!string.IsNullOrEmpty(computerName))
+                DisplayName += $" ({computerName})";
+
             try
             {
                 FileWriteTime = File.GetLastWriteTime(path);
             }
             catch (Exception) { }
         }
+        else if (type == PathType.LogName)
+        {
+            DisplayName = $"{path} (local)";
+        }
     }
 
     public string Path { get; }
     public PathType PathType { get; }
+    public string DisplayName { get; }
     /// <summary>
     /// If the source is a .evtx file, represents the file's last write time.
     /// </summary>

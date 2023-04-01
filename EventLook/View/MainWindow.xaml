@@ -65,7 +65,7 @@
             <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,5,0,5">
                 <ComboBox  
                   x:Name="ComboBox_Source" ItemsSource="{Binding LogSources}" SelectedItem="{Binding SelectedLogSource}"
-                  DisplayMemberPath="Path" SelectedValuePath="Path" 
+                  DisplayMemberPath="DisplayName" SelectedValuePath="Path" 
                   HorizontalAlignment="Left" Margin="10,0,0,0" Width="235" />
                 <ComboBox  
                       ItemsSource="{Binding Ranges}" SelectedItem="{Binding SelectedRange}"
