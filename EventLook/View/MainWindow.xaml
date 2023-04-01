@@ -66,7 +66,7 @@
                 <ComboBox  
                   x:Name="ComboBox_Source" ItemsSource="{Binding LogSources}" SelectedItem="{Binding SelectedLogSource}"
                   DisplayMemberPath="DisplayName" SelectedValuePath="Path" 
-                  HorizontalAlignment="Left" Margin="10,0,0,0" Width="235" />
+                  HorizontalAlignment="Left" Margin="10,0,0,0" Width="250" />
                 <ComboBox  
                       ItemsSource="{Binding Ranges}" SelectedItem="{Binding SelectedRange}"
                       DisplayMemberPath="Text" SelectedValuePath="Text"
@@ -107,10 +107,10 @@
                         </Style>
                     </Button.Style>
                 </Button>
-                <CheckBox Content="Truncate long text" Margin="20,0,0,0" VerticalAlignment="Center" x:Name="CheckTruncate" IsChecked="True" Click="CheckTruncate_Click"/>
+                <CheckBox Content="_Truncate long text" Margin="20,0,0,0" VerticalAlignment="Center" x:Name="CheckTruncate" IsChecked="True" Click="CheckTruncate_Click"/>
             </StackPanel>
 
-            <Expander x:Name="Ex1" Header="Filters" Grid.Row="1" Margin="10,0,0,0" ExpandDirection="Down">
+            <Expander x:Name="Ex1" Header="F_ilters" Grid.Row="1" Margin="10,0,0,0" ExpandDirection="Down">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Source: " Margin="5,0,0,0" VerticalAlignment="Center"/>
                     <xctk:CheckComboBox Width="220" 
