@@ -39,14 +39,14 @@
     </Window.InputBindings>
     
     <DockPanel>
-        <Menu DockPanel.Dock="Top">
+        <Menu DockPanel.Dock="Top" Background="White">
             <MenuItem Header="_File">
                 <MenuItem Header="_Open evtx file" Click="MenuItem_FileOpen_Click"/>
                 <Separator />
                 <MenuItem Header="E_xit" Command="{Binding ExitCommand}" />
             </MenuItem>
         </Menu>
-        <StatusBar DockPanel.Dock="Bottom" >
+        <StatusBar DockPanel.Dock="Bottom" Background="WhiteSmoke">
             <StatusBarItem>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="{Binding StatusText}" />
