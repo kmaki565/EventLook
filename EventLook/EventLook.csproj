@@ -45,4 +45,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Windows.Compatibility" Version="7.0.0" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AboutBoxWpf\AboutBoxWpf.csproj" />
+  </ItemGroup>
 </Project>
