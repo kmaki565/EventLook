@@ -1,7 +1,9 @@
-﻿using CommunityToolkit.Mvvm.DependencyInjection;
+﻿using AboutBoxWpf;
+using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Messaging;
 using EventLook.View;
 using EventLook.ViewModel;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,6 +15,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
 
 namespace EventLook;
 
@@ -127,5 +130,31 @@ public partial class MainWindow : Window
         dataGrid1.SelectedIndex = 0;
         if (dataGrid1.SelectedItem != null)
             dataGrid1.ScrollIntoView(dataGrid1.SelectedItem);
+    }
+
+    private void MenuItem_FileOpen_Click(object sender, RoutedEventArgs e)
+    {
+        OpenFileDialog openFileDialog = new()
+        {
+            Filter = "Event Log files (*.evtx)|*.evtx"
+        };
+        if (openFileDialog.ShowDialog() == true)
+        {
+            WeakReferenceMessenger.Default.Send(new FileToBeProcessedMessageToken() { FilePath = openFileDialog.FileName });
+        }
+    }
+    private void MenuItem_About_Click(object sender, RoutedEventArgs e)
+    {
+        AboutControlView about = new();
+        AboutControlViewModel vm = (AboutControlViewModel)about.FindResource("ViewModel");
+        vm.IsSemanticVersioning = true;
+        vm.ApplicationLogo = new BitmapImage(new Uri("pack://application:,,,/Asset/favicon.ico"));
+        vm.PublisherLogo = new BitmapImage(new Uri("pack://application:,,,/Asset/favicon.ico"));
+        vm.HyperlinkText = "https://github.com/kmaki565/EventLook";
+        vm.Title = "EventLook";
+        vm.AdditionalNotes = "A fast & handy Event Viewer";
+
+        vm.Window.Content = about;
+        vm.Window.ShowDialog();
     }
 }

@@ -84,4 +84,31 @@ public class DataService : IDataService
     {
         cts.Cancel();
     }
+
+    /// <summary>
+    /// Gets computer name from the latest log of the supplied evtx file.
+    /// If there is no event record, returns an empty string.
+    /// </summary>
+    /// <param name="filePath"></param>
+    /// <returns></returns>
+    public static string GetComputerNameFromEvtx(string filePath)
+    {
+        string computerName = "";
+        try
+        {
+            var elQuery = new EventLogQuery(filePath, PathType.FilePath, query: "*")
+            {
+                ReverseDirection = true
+            };
+            var reader = new EventLogReader(elQuery);
+            var eventRecord = reader.ReadEvent();
+            if (eventRecord != null)
+            {
+                computerName = eventRecord.MachineName;
+            }
+        }
+        catch (Exception) { }
+
+        return computerName;
+    }
 }

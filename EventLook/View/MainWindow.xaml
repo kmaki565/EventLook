@@ -39,7 +39,15 @@
     </Window.InputBindings>
     
     <DockPanel>
-        <StatusBar DockPanel.Dock="Bottom" >
+        <Menu DockPanel.Dock="Top" Background="White">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Open evtx file" Click="MenuItem_FileOpen_Click"/>
+                <Separator />
+                <MenuItem Header="E_xit" Command="{Binding ExitCommand}" />
+            </MenuItem>
+            <MenuItem Header="_About" Click="MenuItem_About_Click"/>
+        </Menu>
+        <StatusBar DockPanel.Dock="Bottom" Background="WhiteSmoke">
             <StatusBarItem>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="{Binding StatusText}" />
@@ -50,16 +58,16 @@
 
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="30"/>
+                <RowDefinition Height="35"/>
                 <RowDefinition Height="{Binding ElementName=Ex1, Path=IsExpanded, Converter={StaticResource ExpandedToGridLengthConverter}, ConverterParameter=25}" />
                 <RowDefinition/>
             </Grid.RowDefinitions>
 
-            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,5">
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,5,0,5">
                 <ComboBox  
                   x:Name="ComboBox_Source" ItemsSource="{Binding LogSources}" SelectedItem="{Binding SelectedLogSource}"
-                  DisplayMemberPath="Path" SelectedValuePath="Path" 
-                  HorizontalAlignment="Left" Margin="10,0,0,0" Width="235" />
+                  DisplayMemberPath="DisplayName" SelectedValuePath="Path" 
+                  HorizontalAlignment="Left" Margin="10,0,0,0" Width="250" />
                 <ComboBox  
                       ItemsSource="{Binding Ranges}" SelectedItem="{Binding SelectedRange}"
                       DisplayMemberPath="Text" SelectedValuePath="Text"
@@ -100,10 +108,10 @@
                         </Style>
                     </Button.Style>
                 </Button>
-                <CheckBox Content="Truncate long text" Margin="20,0,0,0" VerticalAlignment="Center" x:Name="CheckTruncate" IsChecked="True" Click="CheckTruncate_Click"/>
+                <CheckBox Content="_Truncate long text" Margin="20,0,0,0" VerticalAlignment="Center" x:Name="CheckTruncate" IsChecked="True" Click="CheckTruncate_Click"/>
             </StackPanel>
 
-            <Expander x:Name="Ex1" Header="Filters" Grid.Row="1" Margin="10,0,0,0" ExpandDirection="Down">
+            <Expander x:Name="Ex1" Header="F_ilters" Grid.Row="1" Margin="10,0,0,0" ExpandDirection="Down">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Source: " Margin="5,0,0,0" VerticalAlignment="Center"/>
                     <xctk:CheckComboBox Width="220" 
