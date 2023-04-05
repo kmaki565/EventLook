@@ -318,6 +318,8 @@ public class MainViewModel : ObservableRecipient
     public ICommand FilterToSelectedLevelCommand { get; private set; }
     public ICommand ExcludeSelectedLevelCommand { get; private set; }
     public ICommand FilterToSelectedIdCommand { get; private set; }
+    public ICommand LaunchEventViewerCommand { get; private set; }
+
 
     private void InitializeCommands()
     {
@@ -333,6 +335,7 @@ public class MainViewModel : ObservableRecipient
         FilterToSelectedLevelCommand = new RelayCommand(FilterToSelectedLevel);
         ExcludeSelectedLevelCommand = new RelayCommand(ExcludeSelectedLevel);
         FilterToSelectedIdCommand = new RelayCommand(FilterToSelectedId);
+        LaunchEventViewerCommand = new RelayCommand(LaunchEventViewer);
     }
     #endregion
 
@@ -438,5 +441,21 @@ public class MainViewModel : ObservableRecipient
     private void Handle_ShowWindowServiceMessageToken(ShowWindowServiceMessageToken token)
     {
         ShowWindowService = token.ShowWindowService;
+    }
+
+    private void LaunchEventViewer()
+    {
+        string arg = "";
+        if (SelectedLogSource?.PathType == PathType.FilePath)
+            arg = $"/l:\"{selectedLogSource.Path}\"";
+        else if (selectedLogSource?.PathType == PathType.LogName)
+            arg = $"/c:\"{selectedLogSource.Path}\"";
+
+        Process.Start(new ProcessStartInfo
+        {
+            UseShellExecute = true,
+            FileName = "eventvwr.msc",
+            Arguments = arg,
+        });
     }
 }
