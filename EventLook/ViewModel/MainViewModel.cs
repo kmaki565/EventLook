@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using EventLook.Model;
 using EventLook.View;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -318,8 +319,8 @@ public class MainViewModel : ObservableRecipient
     public ICommand FilterToSelectedLevelCommand { get; private set; }
     public ICommand ExcludeSelectedLevelCommand { get; private set; }
     public ICommand FilterToSelectedIdCommand { get; private set; }
+    public ICommand OpenFileCommand { get; private set; }
     public ICommand LaunchEventViewerCommand { get; private set; }
-
 
     private void InitializeCommands()
     {
@@ -335,6 +336,7 @@ public class MainViewModel : ObservableRecipient
         FilterToSelectedLevelCommand = new RelayCommand(FilterToSelectedLevel);
         ExcludeSelectedLevelCommand = new RelayCommand(ExcludeSelectedLevel);
         FilterToSelectedIdCommand = new RelayCommand(FilterToSelectedId);
+        OpenFileCommand = new RelayCommand(OpenFile);
         LaunchEventViewerCommand = new RelayCommand(LaunchEventViewer);
     }
     #endregion
@@ -443,6 +445,17 @@ public class MainViewModel : ObservableRecipient
         ShowWindowService = token.ShowWindowService;
     }
 
+    private void OpenFile()
+    {
+        OpenFileDialog openFileDialog = new()
+        {
+            Filter = "Event Log files (*.evtx)|*.evtx"
+        };
+        if (openFileDialog.ShowDialog() == true)
+        {
+            SelectedLogSource = logSourceMgr.AddEvtx(openFileDialog.FileName);
+        }
+    }
     private void LaunchEventViewer()
     {
         string arg = "";
