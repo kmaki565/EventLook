@@ -321,6 +321,7 @@ public class MainViewModel : ObservableRecipient
     public ICommand FilterToSelectedIdCommand { get; private set; }
     public ICommand OpenFileCommand { get; private set; }
     public ICommand LaunchEventViewerCommand { get; private set; }
+    public ICommand CopyMessageTextCommand { get; private set; }
 
     private void InitializeCommands()
     {
@@ -338,6 +339,7 @@ public class MainViewModel : ObservableRecipient
         FilterToSelectedIdCommand = new RelayCommand(FilterToSelectedId);
         OpenFileCommand = new RelayCommand(OpenFile);
         LaunchEventViewerCommand = new RelayCommand(LaunchEventViewer);
+        CopyMessageTextCommand = new RelayCommand(CopyMessageText);
     }
     #endregion
 
@@ -470,5 +472,19 @@ public class MainViewModel : ObservableRecipient
             FileName = "eventvwr.msc",
             Arguments = arg,
         });
+    }
+    /// <summary>
+    /// Copies Message text of the selected log to clipboard.
+    /// </summary>
+    private void CopyMessageText()
+    {
+        if (SelectedEventItem == null)
+            return;
+
+        try
+        {
+            Clipboard.SetText(SelectedEventItem.Message);
+        }
+        catch (Exception) { }    // Ignore OpenClipboard exception}
     }
 }

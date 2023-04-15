@@ -166,6 +166,8 @@
                                       Command="{Binding DataContext.FilterToSelectedIdCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"/>
                             <Separator/>
                             <MenuItem Header="Reset filters" Command="{Binding DataContext.ResetFiltersCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"/>
+                            <Separator/>
+                            <MenuItem Header="Copy Message text" Command="{Binding DataContext.CopyMessageTextCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"/>
                         </ContextMenu.Items>
                     </ContextMenu>
                 </DataGrid.Resources>
