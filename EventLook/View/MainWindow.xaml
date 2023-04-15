@@ -36,13 +36,15 @@
     <Window.InputBindings>
         <KeyBinding Key="F5" Command="{Binding RefreshCommand}"/>
         <KeyBinding Key="F5" Modifiers="Shift" Command="{Binding CancelCommand}"/>
+        <KeyBinding Key="O" Modifiers="Ctrl" Command="{Binding OpenFileCommand}"/>
     </Window.InputBindings>
     
     <DockPanel>
         <Menu DockPanel.Dock="Top" Background="White">
             <MenuItem Header="_File">
-                <MenuItem Header="_Open evtx file" Click="MenuItem_FileOpen_Click"/>
+                <MenuItem Header="_Open evtx file" InputGestureText="Ctrl+O" Command="{Binding OpenFileCommand}"/>
                 <Separator />
+                <MenuItem Header="_Launch Windows Event Viewer" Command="{Binding LaunchEventViewerCommand}"/>
                 <MenuItem Header="E_xit" Command="{Binding ExitCommand}" />
             </MenuItem>
             <MenuItem Header="_About" Click="MenuItem_About_Click"/>
@@ -164,6 +166,8 @@
                                       Command="{Binding DataContext.FilterToSelectedIdCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"/>
                             <Separator/>
                             <MenuItem Header="Reset filters" Command="{Binding DataContext.ResetFiltersCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"/>
+                            <Separator/>
+                            <MenuItem Header="Copy Message text" Command="{Binding DataContext.CopyMessageTextCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"/>
                         </ContextMenu.Items>
                     </ContextMenu>
                 </DataGrid.Resources>

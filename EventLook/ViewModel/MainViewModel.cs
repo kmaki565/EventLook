@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using EventLook.Model;
 using EventLook.View;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -318,6 +319,9 @@ public class MainViewModel : ObservableRecipient
     public ICommand FilterToSelectedLevelCommand { get; private set; }
     public ICommand ExcludeSelectedLevelCommand { get; private set; }
     public ICommand FilterToSelectedIdCommand { get; private set; }
+    public ICommand OpenFileCommand { get; private set; }
+    public ICommand LaunchEventViewerCommand { get; private set; }
+    public ICommand CopyMessageTextCommand { get; private set; }
 
     private void InitializeCommands()
     {
@@ -333,6 +337,9 @@ public class MainViewModel : ObservableRecipient
         FilterToSelectedLevelCommand = new RelayCommand(FilterToSelectedLevel);
         ExcludeSelectedLevelCommand = new RelayCommand(ExcludeSelectedLevel);
         FilterToSelectedIdCommand = new RelayCommand(FilterToSelectedId);
+        OpenFileCommand = new RelayCommand(OpenFile);
+        LaunchEventViewerCommand = new RelayCommand(LaunchEventViewer);
+        CopyMessageTextCommand = new RelayCommand(CopyMessageText);
     }
     #endregion
 
@@ -438,5 +445,46 @@ public class MainViewModel : ObservableRecipient
     private void Handle_ShowWindowServiceMessageToken(ShowWindowServiceMessageToken token)
     {
         ShowWindowService = token.ShowWindowService;
+    }
+
+    private void OpenFile()
+    {
+        OpenFileDialog openFileDialog = new()
+        {
+            Filter = "Event Log files (*.evtx)|*.evtx"
+        };
+        if (openFileDialog.ShowDialog() == true)
+        {
+            SelectedLogSource = logSourceMgr.AddEvtx(openFileDialog.FileName);
+        }
+    }
+    private void LaunchEventViewer()
+    {
+        string arg = "";
+        if (SelectedLogSource?.PathType == PathType.FilePath)
+            arg = $"/l:\"{selectedLogSource.Path}\"";
+        else if (selectedLogSource?.PathType == PathType.LogName)
+            arg = $"/c:\"{selectedLogSource.Path}\"";
+
+        Process.Start(new ProcessStartInfo
+        {
+            UseShellExecute = true,
+            FileName = "eventvwr.msc",
+            Arguments = arg,
+        });
+    }
+    /// <summary>
+    /// Copies Message text of the selected log to clipboard.
+    /// </summary>
+    private void CopyMessageText()
+    {
+        if (SelectedEventItem == null)
+            return;
+
+        try
+        {
+            Clipboard.SetText(SelectedEventItem.Message);
+        }
+        catch (Exception) { }    // Ignore OpenClipboard exception}
     }
 }

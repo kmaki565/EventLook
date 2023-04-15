@@ -132,17 +132,6 @@ public partial class MainWindow : Window
             dataGrid1.ScrollIntoView(dataGrid1.SelectedItem);
     }
 
-    private void MenuItem_FileOpen_Click(object sender, RoutedEventArgs e)
-    {
-        OpenFileDialog openFileDialog = new()
-        {
-            Filter = "Event Log files (*.evtx)|*.evtx"
-        };
-        if (openFileDialog.ShowDialog() == true)
-        {
-            WeakReferenceMessenger.Default.Send(new FileToBeProcessedMessageToken() { FilePath = openFileDialog.FileName });
-        }
-    }
     private void MenuItem_About_Click(object sender, RoutedEventArgs e)
     {
         AboutControlView about = new();
