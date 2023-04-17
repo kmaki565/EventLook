@@ -121,7 +121,8 @@ public partial class MainWindow : Window
         // Focus will be somehow on DataGridCell when user clicks a row in DataGrid during refresh.
 
         IInputElement focusedElement = FocusManager.GetFocusedElement(this);
-        if ((focusedElement == null || focusedElement == this.refreshButton || focusedElement is DataGridCell)
+        if ((focusedElement is DataGridCell && Keyboard.FocusedElement is not MenuItem 
+            || focusedElement == null && Keyboard.FocusedElement == this)
             && dataGrid1.Items.Count > 0)
         {
             // After refresh, SelectedIndex is -1 unless you click the dataGrid during refresh.
