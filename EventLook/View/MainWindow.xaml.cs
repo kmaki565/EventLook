@@ -116,9 +116,13 @@ public partial class MainWindow : Window
     private void OnRefreshed()
     {
         isRefreshing = false;
-        
-        // If the user is choosing the Event Log Source, we shouldn't interrupt.
-        if (!ComboBox_Source.IsDropDownOpen && dataGrid1.Items.Count > 0)
+
+        // If focus within MainWindow is on these elements (or no focus), set focus to the DataGrid.
+        // Focus will be somehow on DataGridCell when user clicks a row in DataGrid during refresh.
+
+        IInputElement focusedElement = FocusManager.GetFocusedElement(this);
+        if ((focusedElement == null || focusedElement == this.refreshButton || focusedElement is DataGridCell)
+            && dataGrid1.Items.Count > 0)
         {
             // After refresh, SelectedIndex is -1 unless you click the dataGrid during refresh.
             SelectRow.SelectRowByIndex(dataGrid1, dataGrid1.SelectedIndex < 0 ? 0 : dataGrid1.SelectedIndex);

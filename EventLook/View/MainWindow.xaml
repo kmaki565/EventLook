@@ -90,7 +90,7 @@
                     ItemsSource="{Binding TimeZones}" SelectedItem="{Binding SelectedTimeZone}"
                     DisplayMemberPath="DisplayName"
                     Margin="10,0,0,0" Width="93"/>
-                <Button Margin="15,0,0,0" Width="25" Height="25">
+                <Button x:Name="refreshButton" Margin="15,0,0,0" Width="25" Height="25">
                     <Button.Style>
                         <Style TargetType="Button">
                             <Style.Triggers>
