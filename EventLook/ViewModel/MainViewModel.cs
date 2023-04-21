@@ -320,6 +320,7 @@ public class MainViewModel : ObservableRecipient
     public ICommand ExcludeSelectedLevelCommand { get; private set; }
     public ICommand FilterToSelectedIdCommand { get; private set; }
     public ICommand OpenFileCommand { get; private set; }
+    public ICommand OpenLocalCommand { get; private set; }
     public ICommand LaunchEventViewerCommand { get; private set; }
     public ICommand CopyMessageTextCommand { get; private set; }
 
@@ -338,6 +339,7 @@ public class MainViewModel : ObservableRecipient
         ExcludeSelectedLevelCommand = new RelayCommand(ExcludeSelectedLevel);
         FilterToSelectedIdCommand = new RelayCommand(FilterToSelectedId);
         OpenFileCommand = new RelayCommand(OpenFile);
+        OpenLocalCommand = new RelayCommand(OpenLocalLog);
         LaunchEventViewerCommand = new RelayCommand(LaunchEventViewer);
         CopyMessageTextCommand = new RelayCommand(CopyMessageText);
     }
@@ -439,7 +441,7 @@ public class MainViewModel : ObservableRecipient
     /// </summary>
     private void Handle_FileToBeProcessedMessageToken(FileToBeProcessedMessageToken token)
     {
-        SelectedLogSource = logSourceMgr.AddEvtx(token.FilePath);
+        SelectedLogSource = logSourceMgr.AddLogSource(token.FilePath, PathType.FilePath);
     }
 
     private void Handle_ShowWindowServiceMessageToken(ShowWindowServiceMessageToken token)
@@ -455,8 +457,16 @@ public class MainViewModel : ObservableRecipient
         };
         if (openFileDialog.ShowDialog() == true)
         {
-            SelectedLogSource = logSourceMgr.AddEvtx(openFileDialog.FileName);
+            SelectedLogSource = logSourceMgr.AddLogSource(openFileDialog.FileName, PathType.FilePath);
         }
+    }
+    /// <summary>
+    /// Opens a modal window to choose an Event Log channel to be added to the log source.
+    /// </summary>
+    private void OpenLocalLog()
+    {
+        //TODO
+        SelectedLogSource = logSourceMgr.AddLogSource("Microsoft-Windows-Biometrics/Operational", PathType.LogName);
     }
     private void LaunchEventViewer()
     {

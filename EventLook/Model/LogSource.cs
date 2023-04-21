@@ -64,21 +64,22 @@ public class LogSourceMgr
     public ObservableCollection<LogSource> LogSources { get; set; }
 
     /// <summary>
-    /// Adds an evtx file to the log source list. 
+    /// Adds an evtx file or a local Event Log channel to the log source list. 
     /// By default, it will be added to the beginning of the list.
     /// </summary>
     /// <returns>the added log source</returns>
-    public LogSource AddEvtx(string filePath, bool addToBottom = false)
+    public LogSource AddLogSource(string path, PathType type, bool addToBottom = false)
     {
-        LogSource logSource = null;
-        if (Path.GetExtension(filePath).Equals(".evtx", StringComparison.OrdinalIgnoreCase))
-        {
-            logSource = new LogSource(filePath, PathType.FilePath);
-            if (addToBottom)
-                LogSources.Add(logSource);
-            else
-                LogSources.Insert(0, logSource);
-        }
+        if (!DataService.IsValidEventLog(path, type))
+            return null;
+
+        var logSource = new LogSource(path, type);
+
+        if (addToBottom)
+            LogSources.Add(logSource);
+        else
+            LogSources.Insert(0, logSource);
+
         return logSource;
     }
 }
