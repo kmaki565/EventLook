@@ -33,8 +33,10 @@ public partial class MainWindow : Window
         // to the CollectionViewSource which is instantiated when the view is instantiated (before the view model).
         WeakReferenceMessenger.Default.Send(new ViewCollectionViewSourceMessageToken() { CVS = (CollectionViewSource)(this.Resources["X_CVS"]) });
         
-        var showWindowService = new ShowWindowService<DetailWindow, DetailViewModel>(){ Owner = this };
-        WeakReferenceMessenger.Default.Send(new ShowWindowServiceMessageToken() { ShowWindowService = showWindowService });
+        var detailWindowService = new ShowWindowService<DetailWindow, DetailViewModel>(){ Owner = this };
+        WeakReferenceMessenger.Default.Send(new DetailWindowServiceMessageToken() { DetailWindowService = detailWindowService });
+        var openLocalLogService = new ShowWindowService<OpenLocalLogWindow, OpenLocalLogViewModel>() { Owner = this };
+        WeakReferenceMessenger.Default.Send(new OpenLocalLogServiceMessageToken() { OpenLocalLogService = openLocalLogService });
 
         ContentRendered += (s, e) => { ((MainViewModel)DataContext).OnLoaded(); };
         ((MainViewModel)DataContext).Refreshing += OnRefreshing;

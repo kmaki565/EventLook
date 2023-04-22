@@ -49,7 +49,8 @@ public class MainViewModel : ObservableRecipient
 
         Messenger.Register<MainViewModel, ViewCollectionViewSourceMessageToken>(this, (r, m) => r.Handle_ViewCollectionViewSourceMessageToken(m));
         Messenger.Register<MainViewModel, FileToBeProcessedMessageToken>(this, (r, m) => r.Handle_FileToBeProcessedMessageToken(m));
-        Messenger.Register<MainViewModel, ShowWindowServiceMessageToken>(this, (r, m) => r.Handle_ShowWindowServiceMessageToken(m));
+        Messenger.Register<MainViewModel, DetailWindowServiceMessageToken>(this, (r, m) => r.Handle_DetailWindowServiceMessageToken(m));
+        Messenger.Register<MainViewModel, OpenLocalLogServiceMessageToken>(this, (r, m) => r.Handle_OpenLocalLogServiceMessageToken(m));
     }
     private readonly LogSourceMgr logSourceMgr;
     private readonly RangeMgr rangeMgr;
@@ -69,7 +70,8 @@ public class MainViewModel : ObservableRecipient
 
     // Services to be injected.
     private readonly IDataService DataService;
-    private IShowWindowService<DetailViewModel> ShowWindowService;
+    private IShowWindowService<DetailViewModel> DetailWindowService;
+    private IShowWindowService<OpenLocalLogViewModel> OpenLocalLogService;
 
     private ObservableCollection<EventItem> _events;
     public ObservableCollection<EventItem> Events
@@ -259,7 +261,7 @@ public class MainViewModel : ObservableRecipient
     private void OpenDetails()
     {
         var detailVm = new DetailViewModel(SelectedEventItem);
-        ShowWindowService.Show(detailVm);
+        DetailWindowService.Show(detailVm);
     }
     private void FilterToSelectedSource()
     {
@@ -443,10 +445,13 @@ public class MainViewModel : ObservableRecipient
     {
         SelectedLogSource = logSourceMgr.AddLogSource(token.FilePath, PathType.FilePath);
     }
-
-    private void Handle_ShowWindowServiceMessageToken(ShowWindowServiceMessageToken token)
+    private void Handle_DetailWindowServiceMessageToken(DetailWindowServiceMessageToken token)
     {
-        ShowWindowService = token.ShowWindowService;
+        DetailWindowService = token.DetailWindowService;
+    }
+    private void Handle_OpenLocalLogServiceMessageToken(OpenLocalLogServiceMessageToken token)
+    {
+        OpenLocalLogService = token.OpenLocalLogService;
     }
 
     private void OpenFile()
@@ -465,8 +470,12 @@ public class MainViewModel : ObservableRecipient
     /// </summary>
     private void OpenLocalLog()
     {
-        //TODO
-        SelectedLogSource = logSourceMgr.AddLogSource("Microsoft-Windows-Biometrics/Operational", PathType.LogName);
+        var openLogVm = new OpenLocalLogViewModel();
+        bool? ret = OpenLocalLogService.ShowDialog(openLogVm);
+        if (ret == true && !string.IsNullOrEmpty(openLogVm.SelectedChannel?.Path))
+        {
+            SelectedLogSource = logSourceMgr.AddLogSource(openLogVm.SelectedChannel.Path, PathType.LogName);
+        }
     }
     private void LaunchEventViewer()
     {
