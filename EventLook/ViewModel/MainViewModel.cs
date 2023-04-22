@@ -106,7 +106,10 @@ public class MainViewModel : ObservableRecipient
             OnPropertyChanged();
 
             if (isWindowLoaded)
+            {
+                ResetFilters();
                 Refresh();
+            }
         }
     }
 
@@ -367,8 +370,8 @@ public class MainViewModel : ObservableRecipient
         }
 
         // These seem necessary to ensure DateTimePicker be updated
-        OnPropertyChanged("FromDateTime");
-        OnPropertyChanged("ToDateTime");
+        OnPropertyChanged(nameof(FromDateTime));
+        OnPropertyChanged(nameof(ToDateTime));
     }
     private async Task LoadEvents()
     {
@@ -458,7 +461,8 @@ public class MainViewModel : ObservableRecipient
     {
         OpenFileDialog openFileDialog = new()
         {
-            Filter = "Event Log files (*.evtx)|*.evtx"
+            Filter = "Event Log files (*.evtx)|*.evtx",
+            Title = "Open .evtx file"
         };
         if (openFileDialog.ShowDialog() == true)
         {
