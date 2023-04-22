@@ -22,7 +22,7 @@ public class DetailWindowServiceMessageToken
 {
     public ShowWindowService<DetailWindow, DetailViewModel> DetailWindowService { get; set; }
 }
-public class OpenLocalLogServiceMessageToken
+public class LogPickerWindowServiceMessageToken
 {
-    public ShowWindowService<OpenLocalLogWindow, OpenLocalLogViewModel> OpenLocalLogService { get; set; }
+    public ShowWindowService<LogPickerWindow, LogPickerViewModel> LogPickerWindowService { get; set; }
 }

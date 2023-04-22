@@ -67,6 +67,10 @@ public class DataService : IDataService
             {
                 errMsg = ex.Message;
             }
+            catch (EventLogException ex)
+            {
+                errMsg = ex.Message;
+            }
             catch (UnauthorizedAccessException)
             {
                 errMsg = "Unauthorized access to the channel. Try Run as Administrator.";

@@ -50,7 +50,7 @@ public class MainViewModel : ObservableRecipient
         Messenger.Register<MainViewModel, ViewCollectionViewSourceMessageToken>(this, (r, m) => r.Handle_ViewCollectionViewSourceMessageToken(m));
         Messenger.Register<MainViewModel, FileToBeProcessedMessageToken>(this, (r, m) => r.Handle_FileToBeProcessedMessageToken(m));
         Messenger.Register<MainViewModel, DetailWindowServiceMessageToken>(this, (r, m) => r.Handle_DetailWindowServiceMessageToken(m));
-        Messenger.Register<MainViewModel, OpenLocalLogServiceMessageToken>(this, (r, m) => r.Handle_OpenLocalLogServiceMessageToken(m));
+        Messenger.Register<MainViewModel, LogPickerWindowServiceMessageToken>(this, (r, m) => r.Handle_LogPickerWindowServiceMessageToken(m));
     }
     private readonly LogSourceMgr logSourceMgr;
     private readonly RangeMgr rangeMgr;
@@ -71,7 +71,7 @@ public class MainViewModel : ObservableRecipient
     // Services to be injected.
     private readonly IDataService DataService;
     private IShowWindowService<DetailViewModel> DetailWindowService;
-    private IShowWindowService<OpenLocalLogViewModel> OpenLocalLogService;
+    private IShowWindowService<LogPickerViewModel> LogPickerWindowService;
 
     private ObservableCollection<EventItem> _events;
     public ObservableCollection<EventItem> Events
@@ -322,7 +322,7 @@ public class MainViewModel : ObservableRecipient
     public ICommand ExcludeSelectedLevelCommand { get; private set; }
     public ICommand FilterToSelectedIdCommand { get; private set; }
     public ICommand OpenFileCommand { get; private set; }
-    public ICommand OpenLocalCommand { get; private set; }
+    public ICommand OpenLogPickerCommand { get; private set; }
     public ICommand LaunchEventViewerCommand { get; private set; }
     public ICommand CopyMessageTextCommand { get; private set; }
 
@@ -341,7 +341,7 @@ public class MainViewModel : ObservableRecipient
         ExcludeSelectedLevelCommand = new RelayCommand(ExcludeSelectedLevel);
         FilterToSelectedIdCommand = new RelayCommand(FilterToSelectedId);
         OpenFileCommand = new RelayCommand(OpenFile);
-        OpenLocalCommand = new RelayCommand(OpenLocalLog);
+        OpenLogPickerCommand = new RelayCommand(OpenLogPicker);
         LaunchEventViewerCommand = new RelayCommand(LaunchEventViewer);
         CopyMessageTextCommand = new RelayCommand(CopyMessageText);
     }
@@ -449,9 +449,9 @@ public class MainViewModel : ObservableRecipient
     {
         DetailWindowService = token.DetailWindowService;
     }
-    private void Handle_OpenLocalLogServiceMessageToken(OpenLocalLogServiceMessageToken token)
+    private void Handle_LogPickerWindowServiceMessageToken(LogPickerWindowServiceMessageToken token)
     {
-        OpenLocalLogService = token.OpenLocalLogService;
+        LogPickerWindowService = token.LogPickerWindowService;
     }
 
     private void OpenFile()
@@ -468,10 +468,10 @@ public class MainViewModel : ObservableRecipient
     /// <summary>
     /// Opens a modal window to choose an Event Log channel to be added to the log source.
     /// </summary>
-    private void OpenLocalLog()
+    private void OpenLogPicker()
     {
-        var openLogVm = new OpenLocalLogViewModel();
-        bool? ret = OpenLocalLogService.ShowDialog(openLogVm);
+        var openLogVm = new LogPickerViewModel();
+        bool? ret = LogPickerWindowService.ShowDialog(openLogVm);
         if (ret == true && !string.IsNullOrEmpty(openLogVm.SelectedChannel?.Path))
         {
             SelectedLogSource = logSourceMgr.AddLogSource(openLogVm.SelectedChannel.Path, PathType.LogName);

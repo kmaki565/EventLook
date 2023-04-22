@@ -35,8 +35,8 @@ public partial class MainWindow : Window
         
         var detailWindowService = new ShowWindowService<DetailWindow, DetailViewModel>(){ Owner = this };
         WeakReferenceMessenger.Default.Send(new DetailWindowServiceMessageToken() { DetailWindowService = detailWindowService });
-        var openLocalLogService = new ShowWindowService<OpenLocalLogWindow, OpenLocalLogViewModel>() { Owner = this };
-        WeakReferenceMessenger.Default.Send(new OpenLocalLogServiceMessageToken() { OpenLocalLogService = openLocalLogService });
+        var logPickerWindowService = new ShowWindowService<LogPickerWindow, LogPickerViewModel>() { Owner = this };
+        WeakReferenceMessenger.Default.Send(new LogPickerWindowServiceMessageToken() { LogPickerWindowService = logPickerWindowService });
 
         ContentRendered += (s, e) => { ((MainViewModel)DataContext).OnLoaded(); };
         ((MainViewModel)DataContext).Refreshing += OnRefreshing;
