@@ -74,36 +74,16 @@ public class MainViewModel : ObservableRecipient
     private IShowWindowService<LogPickerViewModel> LogPickerWindowService;
 
     private ObservableCollection<EventItem> _events;
-    public ObservableCollection<EventItem> Events
-    {
-        get { return _events; }
-        set
-        {
-            if (_events == value)
-                return;
-
-            _events = value;
-            OnPropertyChanged();
-        }
-    }
+    public ObservableCollection<EventItem> Events { get => _events; set => SetProperty(ref _events, value); }
     public EventItem SelectedEventItem { get; set; }
-
-    public ObservableCollection<LogSource> LogSources
-    {
-        get { return logSourceMgr.LogSources; }
-    }
-
+    public ObservableCollection<LogSource> LogSources { get => logSourceMgr.LogSources; }
     private LogSource selectedLogSource;
     public LogSource SelectedLogSource
     {
-        get { return selectedLogSource; }
+        get => selectedLogSource;
         set
         {
-            if (value == selectedLogSource)
-                return;
-
-            selectedLogSource = value;
-            OnPropertyChanged();
+            SetProperty(ref selectedLogSource, value);
 
             if (isWindowLoaded)
             {
@@ -112,94 +92,31 @@ public class MainViewModel : ObservableRecipient
             }
         }
     }
-
-    public ObservableCollection<Model.Range> Ranges
-    {
-        get { return rangeMgr.Ranges; }
-    }
-
+    public ObservableCollection<Model.Range> Ranges { get => rangeMgr.Ranges; }
     private Model.Range selectedRange;
     public Model.Range SelectedRange
     {
-        get { return selectedRange; }
+        get => selectedRange;
         set
         {
-            if (value == selectedRange)
-                return;
-
-            selectedRange = value;
-            OnPropertyChanged();
+            SetProperty(ref selectedRange, value);
 
             if (isWindowLoaded && !selectedRange.IsCustom)
                 Refresh();
         }
     }
-
-    public ReadOnlyObservableCollection<SourceFilterItem> SourceFilters
-    {
-        get { return sourceFilter.SourceFilters; }
-    }
-    public ReadOnlyObservableCollection<LevelFilterItem> LevelFilters
-    {
-        get { return levelFilter.LevelFilters; }
-    }
-
+    public ReadOnlyObservableCollection<SourceFilterItem> SourceFilters { get => sourceFilter.SourceFilters; }
+    public ReadOnlyObservableCollection<LevelFilterItem> LevelFilters { get => levelFilter.LevelFilters; }
     private string statusText;
-    public string StatusText
-    {
-        get { return statusText; }
-        private set
-        {
-            if (value == statusText)
-                return;
-
-            statusText = value;
-            OnPropertyChanged();
-        }
-    }
+    public string StatusText { get => statusText; set => SetProperty(ref statusText, value); }
     private string filterInfoText;
     public string FilterInfoText { get => filterInfoText; set => SetProperty(ref filterInfoText, value); }
-
     private bool isUpdating = false;
-    public bool IsUpdating
-    {
-        get { return isUpdating; }
-        private set
-        {
-            if (value == isUpdating)
-                return;
-
-            isUpdating = value;
-            OnPropertyChanged();
-        }
-    }
-
+    public bool IsUpdating { get => isUpdating; set => SetProperty(ref isUpdating, value); }
     private DateTime fromDateTime;
-    public DateTime FromDateTime
-    {
-        get { return fromDateTime; }
-        set
-        {
-            if (value == fromDateTime)
-                return;
-
-            fromDateTime = value;
-            OnPropertyChanged();
-        }
-    }
+    public DateTime FromDateTime { get => fromDateTime; set => SetProperty(ref fromDateTime, value); }
     private DateTime toDateTime;
-    public DateTime ToDateTime
-    {
-        get { return toDateTime; }
-        set
-        {
-            if (value == toDateTime)
-                return;
-
-            toDateTime = value;
-            OnPropertyChanged();
-        }
-    }
+    public DateTime ToDateTime { get => toDateTime; set => SetProperty(ref toDateTime, value); }
 
     public ObservableCollection<TimeZoneInfo> TimeZones { get; private set; }
     private TimeZoneInfo selectedTimeZone;
