@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using EventLook.ViewModel;
+using System.Windows;
 using System.Windows.Input;
 
 namespace EventLook.View;
@@ -11,6 +12,7 @@ public partial class LogPickerWindow : Window
     public LogPickerWindow()
     {
         InitializeComponent();
+        ContentRendered += (s, e) => { ((LogPickerViewModel)DataContext).OnLoaded(); };
     }
 
     private void OkButton_Click(object sender, RoutedEventArgs e)
