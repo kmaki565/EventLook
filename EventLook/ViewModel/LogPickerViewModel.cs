@@ -1,29 +1,68 @@
-﻿using EventLook.Model;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using EventLook.Model;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Data;
+using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
 namespace EventLook.ViewModel;
 
-public class LogPickerViewModel
+public class LogPickerViewModel : ObservableObject
 {
     private readonly EventLogSession elSession;
     public LogPickerViewModel()
     {
         elSession = new EventLogSession();
         LogChannels= new ObservableCollection<LogChannel>();
+        LogsView = CollectionViewSource.GetDefaultView(LogChannels);
+        LogsView.Filter = OnFilterTriggered;
     }
 
+    public ICollectionView LogsView { get; private set; }
     public ObservableCollection<LogChannel> LogChannels { get; set; }
     public LogChannel SelectedChannel { get; set; }
+
+    private bool showsEmptyLogs = true;
+    public bool ShowsEmptyLogs
+    {
+        get => showsEmptyLogs;
+        set
+        {
+            SetProperty(ref showsEmptyLogs, value);
+            LogsView.Refresh();
+        }
+    }
+
+    private string filterText = "";
+    public string FilterText
+    { 
+        get => filterText;
+        set 
+        {
+            SetProperty(ref filterText, value);
+            LogsView.Refresh();
+        }
+    }
 
     public void OnLoaded()
     {
         InitializeChannels();
+    }
+
+    private bool OnFilterTriggered(object item)
+    {
+        if (item is LogChannel channel)
+        {
+            if (ShowsEmptyLogs || channel.RecordCount.HasValue && channel.RecordCount.Value > 0)
+                return string.IsNullOrEmpty(FilterText) || channel.Path.Contains(FilterText, StringComparison.OrdinalIgnoreCase);
+        }
+        return false;
     }
 
     private void InitializeChannels()
