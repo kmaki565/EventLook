@@ -24,7 +24,7 @@ public class MainViewModel : ObservableRecipient
     {
         InitializeCommands();
 
-        MainWindowTitle = "EventLook" + (ProcessHelper.IsElevated ? " (Administrator)" : "");
+        isRunAsAdmin = ProcessHelper.IsElevated;
         DataService = dataService;
         Events = new ObservableCollection<EventItem>();
 
@@ -122,7 +122,8 @@ public class MainViewModel : ObservableRecipient
     private TimeZoneInfo selectedTimeZone;
     public TimeZoneInfo SelectedTimeZone { get => selectedTimeZone; set => SetProperty(ref selectedTimeZone, value); }
 
-    public string MainWindowTitle { get; }
+    private readonly bool isRunAsAdmin;
+    public bool IsRunAsAdmin { get => isRunAsAdmin; }
 
     public void OnLoaded()
     {

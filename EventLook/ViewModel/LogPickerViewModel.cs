@@ -22,6 +22,7 @@ public class LogPickerViewModel : ObservableObject
         LogChannels= new ObservableCollection<LogChannel>();
         LogsView = CollectionViewSource.GetDefaultView(LogChannels);
         LogsView.Filter = OnFilterTriggered;
+        isRunAsAdmin = ProcessHelper.IsElevated;
     }
 
     public ICollectionView LogsView { get; private set; }
@@ -49,6 +50,8 @@ public class LogPickerViewModel : ObservableObject
             LogsView.Refresh();
         }
     }
+    private readonly bool isRunAsAdmin;
+    public bool IsRunAsAdmin { get => isRunAsAdmin; }
 
     public void OnLoaded()
     {

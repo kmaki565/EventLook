@@ -29,8 +29,20 @@
                          Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged, Delay=300}"
                          local:TextBoxBehavior.EscapeClearsText="True"/>
             </DockPanel>
-            <CheckBox Content="Show empty logs (try run as admin to view logs with blank record count)" Margin="7"
-                      IsChecked="{Binding ShowsEmptyLogs}"/>
+            <CheckBox Margin="7" IsChecked="{Binding ShowsEmptyLogs}">
+                <CheckBox.Style>
+                    <Style TargetType="CheckBox">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsRunAsAdmin}" Value="False">
+                                <Setter Property="Content" Value="Show empty logs (try run as admin to view logs with blank record count)"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsRunAsAdmin}" Value="True">
+                                <Setter Property="Content" Value="Show empty logs"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </CheckBox.Style>
+            </CheckBox>
         </StackPanel>
         <DataGrid x:Name="dataGrid1" Grid.Row="1" AutoGenerateColumns="False"
                       ItemsSource="{Binding LogsView, Mode=OneWay}"

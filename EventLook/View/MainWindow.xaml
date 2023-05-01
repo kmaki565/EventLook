@@ -9,12 +9,18 @@
         mc:Ignorable="d"
         ResizeMode="CanResizeWithGrip"
         PreviewKeyDown="Window_PreviewKeyDown">
-    <Window.Title>
-        <MultiBinding StringFormat="{}{0} - {1}">
-            <Binding Path="SelectedLogSource.Path"/>
-            <Binding Path="MainWindowTitle"/>
-        </MultiBinding>
-    </Window.Title>
+    <Window.Style>
+        <Style TargetType="Window">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsRunAsAdmin}" Value="False">
+                    <Setter Property="Title" Value="{Binding SelectedLogSource.Path, StringFormat={}{0} - EvetLook}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsRunAsAdmin}" Value="True">
+                    <Setter Property="Title" Value="{Binding SelectedLogSource.Path, StringFormat={}{0} - EventLook (Administrator)}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Style>
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <v:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
