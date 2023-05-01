@@ -7,7 +7,7 @@
         xmlns:viewmodel="clr-namespace:EventLook.ViewModel"
         d:DataContext="{d:DesignInstance Type=viewmodel:LogPickerViewModel}"
         mc:Ignorable="d"
-        Title="Open Event Log" Height="450" Width="800">
+        Title="Open Event Log" Height="500" Width="550">
     <Grid>
         <Grid.Resources>
             <Style TargetType="{x:Type Button}">
@@ -17,16 +17,28 @@
             </Style>
         </Grid.Resources>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <StackPanel Orientation="Vertical" Grid.Row="0">
-            <ListBox x:Name="listBox1" SelectionMode="Single" MaxHeight="370"
-                     ItemsSource="{Binding LogChannels, Mode=OneWay}" DisplayMemberPath="Path"
-                     SelectedItem="{Binding SelectedChannel}"
-                     MouseDoubleClick="ListBox_MouseDoubleClick"/>
+        <StackPanel Grid.Row="0" Orientation="Vertical">
+            <DockPanel>
+                <Label Content="Filter: "/>
+                <TextBox Margin="0,2,6,2" />
+            </DockPanel>
+            <CheckBox Content="Show empty logs (try run as admin to view logs with blank record count)" Margin="7"/>
         </StackPanel>
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10,10">
+        <DataGrid x:Name="dataGrid1" Grid.Row="1" AutoGenerateColumns="False"
+                      ItemsSource="{Binding LogChannels, Mode=OneWay}"
+                      SelectedItem="{Binding SelectedChannel}"
+                      IsReadOnly="True"
+                      MouseDoubleClick="dataGrid1_MouseDoubleClick">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Path" Binding="{Binding Path}" Width="*"/>
+                <DataGridTextColumn Header="Record count" Binding="{Binding RecordCount, TargetNullValue=''}" />
+            </DataGrid.Columns>
+        </DataGrid>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10,10">
             <Button Content="OK" Margin="10,0" Click="OkButton_Click" IsDefault="True"/>
             <Button Content="Cancel" Margin="10,0" IsCancel="True"/>
         </StackPanel>

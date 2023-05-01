@@ -10,6 +10,5 @@ namespace EventLook.Model;
 public class LogChannel
 {
     public string Path { get; set; }
-    public bool HasEvent { get; set; } = true;
-    public EventLogConfiguration Config { get; set; }
+    public long? RecordCount { get; set; } = null;
 }

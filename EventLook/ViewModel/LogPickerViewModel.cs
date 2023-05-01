@@ -37,19 +37,18 @@ public class LogPickerViewModel
             }
             catch (Exception) { continue; }
 
-            if (config.IsEnabled)
-            {
-                bool hasEvent = false;
-                try
-                {
-                    var info = elSession.GetLogInformation(config.LogName, PathType.LogName);
-                    hasEvent = info.RecordCount.HasValue && info.RecordCount > 0;
-                }
-                catch (Exception) { continue; }
+            if (!config.IsEnabled)
+                continue;
 
-                if (hasEvent)
-                    LogChannels.Add(new LogChannel { Path = channelName, Config = config, HasEvent = hasEvent });
+            long? recordCount = null;
+            try
+            {
+                EventLogInformation info = elSession.GetLogInformation(config.LogName, PathType.LogName);
+                recordCount = info.RecordCount;
             }
+            catch (Exception) { }
+
+            LogChannels.Add(new LogChannel { Path = channelName, RecordCount = recordCount });
         }
     }
 }

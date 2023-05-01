@@ -17,11 +17,11 @@ public partial class LogPickerWindow : Window
 
     private void OkButton_Click(object sender, RoutedEventArgs e)
     {
-        DialogResult = listBox1.SelectedItem != null;
+        DialogResult = dataGrid1.SelectedItem != null;
         Close();
     }
 
-    private void ListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    private void dataGrid1_MouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
         OkButton_Click(sender, e);
     }
