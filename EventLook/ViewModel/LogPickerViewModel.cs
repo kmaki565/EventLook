@@ -29,13 +29,13 @@ public class LogPickerViewModel : ObservableObject
     public ObservableCollection<LogChannel> LogChannels { get; set; }
     public LogChannel SelectedChannel { get; set; }
 
-    private bool showsEmptyLogs = true;
-    public bool ShowsEmptyLogs
+    private bool hidesEmptyLogs = false;
+    public bool HidesEmptyLogs
     {
-        get => showsEmptyLogs;
+        get => hidesEmptyLogs;
         set
         {
-            SetProperty(ref showsEmptyLogs, value);
+            SetProperty(ref hidesEmptyLogs, value);
             LogsView.Refresh();
         }
     }
@@ -62,7 +62,7 @@ public class LogPickerViewModel : ObservableObject
     {
         if (item is LogChannel channel)
         {
-            if (ShowsEmptyLogs || channel.RecordCount.HasValue && channel.RecordCount.Value > 0)
+            if (!HidesEmptyLogs || channel.RecordCount.HasValue && channel.RecordCount.Value > 0)
                 return string.IsNullOrEmpty(FilterText) || channel.Path.Contains(FilterText, StringComparison.OrdinalIgnoreCase);
         }
         return false;
