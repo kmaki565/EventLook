@@ -67,6 +67,10 @@ public class DataService : IDataService
             {
                 errMsg = ex.Message;
             }
+            catch (EventLogException ex)
+            {
+                errMsg = ex.Message;
+            }
             catch (UnauthorizedAccessException)
             {
                 errMsg = "Unauthorized access to the channel. Try Run as Administrator.";
@@ -110,5 +114,34 @@ public class DataService : IDataService
         catch (Exception) { }
 
         return computerName;
+    }
+
+    public static bool IsValidEventLog(string path, PathType type)
+    {
+        if (type == PathType.LogName)
+        {
+            try
+            {
+                var ei = new EventLogConfiguration(path);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            return true;
+        }
+        else // PathType.FilePath
+        {
+            var session = new EventLogSession();
+            try
+            {
+                EventLogInformation logInformation = session.GetLogInformation(path, PathType.FilePath);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
     }
 }

@@ -9,12 +9,18 @@
         mc:Ignorable="d"
         ResizeMode="CanResizeWithGrip"
         PreviewKeyDown="Window_PreviewKeyDown">
-    <Window.Title>
-        <MultiBinding StringFormat="{}{0} - {1}">
-            <Binding Path="SelectedLogSource.Path"/>
-            <Binding Path="MainWindowTitle"/>
-        </MultiBinding>
-    </Window.Title>
+    <Window.Style>
+        <Style TargetType="Window">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsRunAsAdmin}" Value="False">
+                    <Setter Property="Title" Value="{Binding SelectedLogSource.Path, StringFormat={}{0} - EvetLook}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsRunAsAdmin}" Value="True">
+                    <Setter Property="Title" Value="{Binding SelectedLogSource.Path, StringFormat={}{0} - EventLook (Administrator)}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Style>
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <v:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
@@ -36,13 +42,15 @@
     <Window.InputBindings>
         <KeyBinding Key="F5" Command="{Binding RefreshCommand}"/>
         <KeyBinding Key="F5" Modifiers="Shift" Command="{Binding CancelCommand}"/>
+        <KeyBinding Key="L" Modifiers="Ctrl" Command="{Binding OpenLogPickerCommand}"/>
         <KeyBinding Key="O" Modifiers="Ctrl" Command="{Binding OpenFileCommand}"/>
     </Window.InputBindings>
     
     <DockPanel>
         <Menu DockPanel.Dock="Top" Background="White">
             <MenuItem Header="_File">
-                <MenuItem Header="_Open evtx file" InputGestureText="Ctrl+O" Command="{Binding OpenFileCommand}"/>
+                <MenuItem Header="Open Event _Log" InputGestureText="Ctrl+L" Command="{Binding OpenLogPickerCommand}"/>
+                <MenuItem Header="_Open .evtx File" InputGestureText="Ctrl+O" Command="{Binding OpenFileCommand}"/>
                 <Separator />
                 <MenuItem Header="_Launch Windows Event Viewer" Command="{Binding LaunchEventViewerCommand}"/>
                 <MenuItem Header="E_xit" Command="{Binding ExitCommand}" />

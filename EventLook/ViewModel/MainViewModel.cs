@@ -24,7 +24,7 @@ public class MainViewModel : ObservableRecipient
     {
         InitializeCommands();
 
-        MainWindowTitle = "EventLook" + (ProcessHelper.IsElevated ? " (Administrator)" : "");
+        isRunAsAdmin = ProcessHelper.IsElevated;
         DataService = dataService;
         Events = new ObservableCollection<EventItem>();
 
@@ -49,7 +49,8 @@ public class MainViewModel : ObservableRecipient
 
         Messenger.Register<MainViewModel, ViewCollectionViewSourceMessageToken>(this, (r, m) => r.Handle_ViewCollectionViewSourceMessageToken(m));
         Messenger.Register<MainViewModel, FileToBeProcessedMessageToken>(this, (r, m) => r.Handle_FileToBeProcessedMessageToken(m));
-        Messenger.Register<MainViewModel, ShowWindowServiceMessageToken>(this, (r, m) => r.Handle_ShowWindowServiceMessageToken(m));
+        Messenger.Register<MainViewModel, DetailWindowServiceMessageToken>(this, (r, m) => r.Handle_DetailWindowServiceMessageToken(m));
+        Messenger.Register<MainViewModel, LogPickerWindowServiceMessageToken>(this, (r, m) => r.Handle_LogPickerWindowServiceMessageToken(m));
     }
     private readonly LogSourceMgr logSourceMgr;
     private readonly RangeMgr rangeMgr;
@@ -69,138 +70,60 @@ public class MainViewModel : ObservableRecipient
 
     // Services to be injected.
     private readonly IDataService DataService;
-    private IShowWindowService<DetailViewModel> ShowWindowService;
+    private IShowWindowService<DetailViewModel> DetailWindowService;
+    private IShowWindowService<LogPickerViewModel> LogPickerWindowService;
 
     private ObservableCollection<EventItem> _events;
-    public ObservableCollection<EventItem> Events
-    {
-        get { return _events; }
-        set
-        {
-            if (_events == value)
-                return;
-
-            _events = value;
-            OnPropertyChanged();
-        }
-    }
+    public ObservableCollection<EventItem> Events { get => _events; set => SetProperty(ref _events, value); }
     public EventItem SelectedEventItem { get; set; }
-
-    public ObservableCollection<LogSource> LogSources
-    {
-        get { return logSourceMgr.LogSources; }
-    }
-
+    public ObservableCollection<LogSource> LogSources { get => logSourceMgr.LogSources; }
     private LogSource selectedLogSource;
     public LogSource SelectedLogSource
     {
-        get { return selectedLogSource; }
+        get => selectedLogSource;
         set
         {
-            if (value == selectedLogSource)
-                return;
-
-            selectedLogSource = value;
-            OnPropertyChanged();
+            SetProperty(ref selectedLogSource, value);
 
             if (isWindowLoaded)
+            {
+                ResetFilters();
                 Refresh();
+            }
         }
     }
-
-    public ObservableCollection<Model.Range> Ranges
-    {
-        get { return rangeMgr.Ranges; }
-    }
-
+    public ObservableCollection<Model.Range> Ranges { get => rangeMgr.Ranges; }
     private Model.Range selectedRange;
     public Model.Range SelectedRange
     {
-        get { return selectedRange; }
+        get => selectedRange;
         set
         {
-            if (value == selectedRange)
-                return;
-
-            selectedRange = value;
-            OnPropertyChanged();
+            SetProperty(ref selectedRange, value);
 
             if (isWindowLoaded && !selectedRange.IsCustom)
                 Refresh();
         }
     }
-
-    public ReadOnlyObservableCollection<SourceFilterItem> SourceFilters
-    {
-        get { return sourceFilter.SourceFilters; }
-    }
-    public ReadOnlyObservableCollection<LevelFilterItem> LevelFilters
-    {
-        get { return levelFilter.LevelFilters; }
-    }
-
+    public ReadOnlyObservableCollection<SourceFilterItem> SourceFilters { get => sourceFilter.SourceFilters; }
+    public ReadOnlyObservableCollection<LevelFilterItem> LevelFilters { get => levelFilter.LevelFilters; }
     private string statusText;
-    public string StatusText
-    {
-        get { return statusText; }
-        private set
-        {
-            if (value == statusText)
-                return;
-
-            statusText = value;
-            OnPropertyChanged();
-        }
-    }
+    public string StatusText { get => statusText; set => SetProperty(ref statusText, value); }
     private string filterInfoText;
     public string FilterInfoText { get => filterInfoText; set => SetProperty(ref filterInfoText, value); }
-
     private bool isUpdating = false;
-    public bool IsUpdating
-    {
-        get { return isUpdating; }
-        private set
-        {
-            if (value == isUpdating)
-                return;
-
-            isUpdating = value;
-            OnPropertyChanged();
-        }
-    }
-
+    public bool IsUpdating { get => isUpdating; set => SetProperty(ref isUpdating, value); }
     private DateTime fromDateTime;
-    public DateTime FromDateTime
-    {
-        get { return fromDateTime; }
-        set
-        {
-            if (value == fromDateTime)
-                return;
-
-            fromDateTime = value;
-            OnPropertyChanged();
-        }
-    }
+    public DateTime FromDateTime { get => fromDateTime; set => SetProperty(ref fromDateTime, value); }
     private DateTime toDateTime;
-    public DateTime ToDateTime
-    {
-        get { return toDateTime; }
-        set
-        {
-            if (value == toDateTime)
-                return;
-
-            toDateTime = value;
-            OnPropertyChanged();
-        }
-    }
+    public DateTime ToDateTime { get => toDateTime; set => SetProperty(ref toDateTime, value); }
 
     public ObservableCollection<TimeZoneInfo> TimeZones { get; private set; }
     private TimeZoneInfo selectedTimeZone;
     public TimeZoneInfo SelectedTimeZone { get => selectedTimeZone; set => SetProperty(ref selectedTimeZone, value); }
 
-    public string MainWindowTitle { get; }
+    private readonly bool isRunAsAdmin;
+    public bool IsRunAsAdmin { get => isRunAsAdmin; }
 
     public void OnLoaded()
     {
@@ -259,7 +182,7 @@ public class MainViewModel : ObservableRecipient
     private void OpenDetails()
     {
         var detailVm = new DetailViewModel(SelectedEventItem);
-        ShowWindowService.Show(detailVm);
+        DetailWindowService.Show(detailVm);
     }
     private void FilterToSelectedSource()
     {
@@ -320,6 +243,7 @@ public class MainViewModel : ObservableRecipient
     public ICommand ExcludeSelectedLevelCommand { get; private set; }
     public ICommand FilterToSelectedIdCommand { get; private set; }
     public ICommand OpenFileCommand { get; private set; }
+    public ICommand OpenLogPickerCommand { get; private set; }
     public ICommand LaunchEventViewerCommand { get; private set; }
     public ICommand CopyMessageTextCommand { get; private set; }
 
@@ -338,6 +262,7 @@ public class MainViewModel : ObservableRecipient
         ExcludeSelectedLevelCommand = new RelayCommand(ExcludeSelectedLevel);
         FilterToSelectedIdCommand = new RelayCommand(FilterToSelectedId);
         OpenFileCommand = new RelayCommand(OpenFile);
+        OpenLogPickerCommand = new RelayCommand(OpenLogPicker);
         LaunchEventViewerCommand = new RelayCommand(LaunchEventViewer);
         CopyMessageTextCommand = new RelayCommand(CopyMessageText);
     }
@@ -363,8 +288,8 @@ public class MainViewModel : ObservableRecipient
         }
 
         // These seem necessary to ensure DateTimePicker be updated
-        OnPropertyChanged("FromDateTime");
-        OnPropertyChanged("ToDateTime");
+        OnPropertyChanged(nameof(FromDateTime));
+        OnPropertyChanged(nameof(ToDateTime));
     }
     private async Task LoadEvents()
     {
@@ -439,23 +364,39 @@ public class MainViewModel : ObservableRecipient
     /// </summary>
     private void Handle_FileToBeProcessedMessageToken(FileToBeProcessedMessageToken token)
     {
-        SelectedLogSource = logSourceMgr.AddEvtx(token.FilePath);
+        SelectedLogSource = logSourceMgr.AddLogSource(token.FilePath, PathType.FilePath);
     }
-
-    private void Handle_ShowWindowServiceMessageToken(ShowWindowServiceMessageToken token)
+    private void Handle_DetailWindowServiceMessageToken(DetailWindowServiceMessageToken token)
     {
-        ShowWindowService = token.ShowWindowService;
+        DetailWindowService = token.DetailWindowService;
+    }
+    private void Handle_LogPickerWindowServiceMessageToken(LogPickerWindowServiceMessageToken token)
+    {
+        LogPickerWindowService = token.LogPickerWindowService;
     }
 
     private void OpenFile()
     {
         OpenFileDialog openFileDialog = new()
         {
-            Filter = "Event Log files (*.evtx)|*.evtx"
+            Filter = "Event Log files (*.evtx)|*.evtx",
+            Title = "Open .evtx file"
         };
         if (openFileDialog.ShowDialog() == true)
         {
-            SelectedLogSource = logSourceMgr.AddEvtx(openFileDialog.FileName);
+            SelectedLogSource = logSourceMgr.AddLogSource(openFileDialog.FileName, PathType.FilePath);
+        }
+    }
+    /// <summary>
+    /// Opens a modal window to choose an Event Log channel to be added to the log source.
+    /// </summary>
+    private void OpenLogPicker()
+    {
+        var openLogVm = new LogPickerViewModel();
+        bool? ret = LogPickerWindowService.ShowDialog(openLogVm);
+        if (ret == true && !string.IsNullOrEmpty(openLogVm.SelectedChannel?.Path))
+        {
+            SelectedLogSource = logSourceMgr.AddLogSource(openLogVm.SelectedChannel.Path, PathType.LogName);
         }
     }
     private void LaunchEventViewer()

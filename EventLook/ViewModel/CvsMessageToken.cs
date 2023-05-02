@@ -18,7 +18,11 @@ public class FileToBeProcessedMessageToken
 {
     public string FilePath { get; set; }
 }
-public class ShowWindowServiceMessageToken
+public class DetailWindowServiceMessageToken
 {
-    public ShowWindowService<DetailWindow, DetailViewModel> ShowWindowService { get; set; }
+    public ShowWindowService<DetailWindow, DetailViewModel> DetailWindowService { get; set; }
+}
+public class LogPickerWindowServiceMessageToken
+{
+    public ShowWindowService<LogPickerWindow, LogPickerViewModel> LogPickerWindowService { get; set; }
 }
