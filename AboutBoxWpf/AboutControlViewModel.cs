@@ -26,7 +26,7 @@ public class AboutControlViewModel : INotifyPropertyChanged
         Window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
         Window.SizeToContent = SizeToContent.WidthAndHeight;
         Window.ResizeMode = ResizeMode.NoResize;
-        Window.WindowStyle = WindowStyle.ToolWindow;
+        Window.WindowStyle = WindowStyle.SingleBorderWindow;
 
         Window.ShowInTaskbar = false;
         Window.Title = "About ";
