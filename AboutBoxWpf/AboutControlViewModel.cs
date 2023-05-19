@@ -157,6 +157,23 @@ public class AboutControlViewModel : INotifyPropertyChanged
         }
     }
 
+    private string _VersionAppendix = "";
+    public string VersionAppendix 
+    {
+        get 
+        {
+            return _VersionAppendix;
+        }
+        set 
+        {
+            if (_VersionAppendix != value) 
+            {
+                _VersionAppendix = value;
+                OnPropertyChanged("VersionAppendix");
+            }
+        }
+    }
+
     /// <summary>
     /// Gets or sets the publisher logo.
     /// </summary>

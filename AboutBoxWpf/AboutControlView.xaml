@@ -63,10 +63,10 @@
 					   Grid.Row="0"
                        Margin="5"
 					   Text="Version: " />
-            <Label x:Name="Version"
-				   Content="{Binding Version}"
-				   Grid.Column="1"
-				   Grid.Row="0" />
+            <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="0">
+                <Label x:Name="Version" Content="{Binding Version}"/>
+                <Label Content="{Binding VersionAppendix}"/>
+            </StackPanel>
         </Grid>
 
         <!-- Publisher -->
