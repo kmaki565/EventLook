@@ -13,7 +13,7 @@
         <Style TargetType="Window">
             <Style.Triggers>
                 <DataTrigger Binding="{Binding IsRunAsAdmin}" Value="False">
-                    <Setter Property="Title" Value="{Binding SelectedLogSource.Path, StringFormat={}{0} - EvetLook}"/>
+                    <Setter Property="Title" Value="{Binding SelectedLogSource.Path, StringFormat={}{0} - EventLook}"/>
                 </DataTrigger>
                 <DataTrigger Binding="{Binding IsRunAsAdmin}" Value="True">
                     <Setter Property="Title" Value="{Binding SelectedLogSource.Path, StringFormat={}{0} - EventLook (Administrator)}"/>
