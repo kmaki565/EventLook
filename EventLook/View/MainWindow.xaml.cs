@@ -1,6 +1,7 @@
 ﻿using AboutBoxWpf;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Messaging;
+using EventLook.Model;
 using EventLook.View;
 using EventLook.ViewModel;
 using Microsoft.Win32;
@@ -144,11 +145,19 @@ public partial class MainWindow : Window
         AboutControlView about = new();
         AboutControlViewModel vm = (AboutControlViewModel)about.FindResource("ViewModel");
         vm.IsSemanticVersioning = true;
+        vm.VersionAppendix = $"({BuildInfo.GetBuildDate().ToString("d")})";
+
+        var packageType = BuildInfo.GetPackageType();
+        vm.PackageInfoText =
+            packageType == BuildInfo.PackageType.Store ? "For Microsoft Store" :
+            packageType == BuildInfo.PackageType.DevPackage ? "Developer package" :
+            "Unpackaged app";
+
         vm.ApplicationLogo = new BitmapImage(new Uri("pack://application:,,,/Asset/favicon.ico"));
         vm.PublisherLogo = new BitmapImage(new Uri("pack://application:,,,/Asset/favicon.ico"));
         vm.HyperlinkText = "https://github.com/kmaki565/EventLook";
         vm.Title = "EventLook";
-        vm.AdditionalNotes = "A fast & handy Event Viewer";
+        vm.Description = "A fast & handy Event Viewer";
 
         vm.Window.Content = about;
         vm.Window.ShowDialog();

@@ -26,7 +26,7 @@ public class AboutControlViewModel : INotifyPropertyChanged
         Window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
         Window.SizeToContent = SizeToContent.WidthAndHeight;
         Window.ResizeMode = ResizeMode.NoResize;
-        Window.WindowStyle = WindowStyle.ToolWindow;
+        Window.WindowStyle = WindowStyle.SingleBorderWindow;
 
         Window.ShowInTaskbar = false;
         Window.Title = "About ";
@@ -153,6 +153,40 @@ public class AboutControlViewModel : INotifyPropertyChanged
             {
                 _Version = value;
                 OnPropertyChanged("Version");
+            }
+        }
+    }
+
+    private string _VersionAppendix = "";
+    public string VersionAppendix 
+    {
+        get 
+        {
+            return _VersionAppendix;
+        }
+        set 
+        {
+            if (_VersionAppendix != value) 
+            {
+                _VersionAppendix = value;
+                OnPropertyChanged("VersionAppendix");
+            }
+        }
+    }
+
+    private string _PackageInfoText = "";
+    public string PackageInfoText
+    {
+        get
+        {
+            return _PackageInfoText;
+        }
+        set
+        {
+            if (_PackageInfoText != value)
+            {
+                _PackageInfoText = value;
+                OnPropertyChanged("PackageInfoText");
             }
         }
     }
