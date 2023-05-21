@@ -174,6 +174,23 @@ public class AboutControlViewModel : INotifyPropertyChanged
         }
     }
 
+    private string _PackageInfoText = "";
+    public string PackageInfoText
+    {
+        get
+        {
+            return _PackageInfoText;
+        }
+        set
+        {
+            if (_PackageInfoText != value)
+            {
+                _PackageInfoText = value;
+                OnPropertyChanged("PackageInfoText");
+            }
+        }
+    }
+
     /// <summary>
     /// Gets or sets the publisher logo.
     /// </summary>
