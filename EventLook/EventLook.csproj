@@ -15,9 +15,13 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="BuildDate.txt" />
+  </ItemGroup>
+  <ItemGroup>
     <Resource Include="Asset\1385_Disable_16x16_72.png" />
     <Resource Include="Asset\1385_Disable_16x16_72_disabled.png" />
     <Resource Include="Asset\favicon.ico" />
+    <Resource Include="BuildDate.txt" />
     <Resource Include="Font\WINGDNG3.TTF" />
   </ItemGroup>
   <ItemGroup>
@@ -48,4 +52,7 @@
   <ItemGroup>
     <ProjectReference Include="..\AboutBoxWpf\AboutBoxWpf.csproj" />
   </ItemGroup>
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="powershell -Command &quot;(Get-Date).ToString(\&quot;o\&quot;) | Out-File 'BuildDate.txt'&quot;" />
+  </Target>
 </Project>
