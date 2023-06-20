@@ -31,22 +31,14 @@ public class AboutControlViewModel : INotifyPropertyChanged
         Window.ShowInTaskbar = false;
         Window.Title = "About ";
 
-        Assembly assembly = Assembly.GetEntryAssembly();
-        Version = assembly.GetName().Version.ToString();
-        Title = assembly.GetName().Name;
+        var assembly = Assembly.GetEntryAssembly();
+        var assemblyName = assembly?.GetName();
+        Version = assemblyName?.Version?.ToString() ?? "";
+        Title = assembly?.GetCustomAttribute<AssemblyProductAttribute>()?.Product ?? assemblyName?.Name ?? "";
 
-#if NET35 || NET40
-			AssemblyCopyrightAttribute copyright = Attribute.GetCustomAttribute(assembly, typeof(AssemblyCopyrightAttribute)) as AssemblyCopyrightAttribute;
-			AssemblyDescriptionAttribute description = Attribute.GetCustomAttribute(assembly, typeof(AssemblyDescriptionAttribute)) as AssemblyDescriptionAttribute;
-			AssemblyCompanyAttribute company = Attribute.GetCustomAttribute(assembly, typeof(AssemblyCompanyAttribute)) as AssemblyCompanyAttribute;
-#else
-        AssemblyCopyrightAttribute copyright = assembly.GetCustomAttribute<AssemblyCopyrightAttribute>();
-        AssemblyDescriptionAttribute description = assembly.GetCustomAttribute<AssemblyDescriptionAttribute>();
-        AssemblyCompanyAttribute company = assembly.GetCustomAttribute<AssemblyCompanyAttribute>();
-#endif
-        Copyright = copyright.Copyright;
-        Description = description.Description;
-        Publisher = company.Company;
+        Copyright = assembly?.GetCustomAttribute<AssemblyCopyrightAttribute>()?.Copyright ?? "";
+        Description = assembly?.GetCustomAttribute<AssemblyDescriptionAttribute>()?.Description ?? "";
+        Publisher = assembly?.GetCustomAttribute<AssemblyCompanyAttribute>()?.Company ?? "";
 
         AdditionalNotes = "Further information about ... InformationInformationInformationInformationInformationInformationInformationInformation";
     }
