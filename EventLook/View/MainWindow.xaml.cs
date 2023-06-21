@@ -145,7 +145,7 @@ public partial class MainWindow : Window
         AboutControlView about = new();
         AboutControlViewModel vm = (AboutControlViewModel)about.FindResource("ViewModel");
         vm.IsSemanticVersioning = true;
-        vm.VersionAppendix = $"({BuildInfo.GetBuildDate().ToString("d")})";
+        vm.VersionAppendix = $"({BuildInfo.GetBuildDate():d})";
 
         var packageType = BuildInfo.GetPackageType();
         vm.PackageInfoText =
@@ -156,8 +156,6 @@ public partial class MainWindow : Window
         vm.ApplicationLogo = new BitmapImage(new Uri("pack://application:,,,/Asset/favicon.ico"));
         vm.PublisherLogo = new BitmapImage(new Uri("pack://application:,,,/Asset/favicon.ico"));
         vm.HyperlinkText = "https://github.com/kmaki565/EventLook";
-        vm.Title = "EventLook";
-        vm.Description = "A fast & handy Event Viewer";
 
         vm.Window.Content = about;
         vm.Window.ShowDialog();

@@ -2,11 +2,17 @@
   <PropertyGroup>
     <TargetFramework>net6.0-windows10.0.17763.0</TargetFramework>
     <OutputType>WinExe</OutputType>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <UseWPF>true</UseWPF>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
     <Platforms>AnyCPU;x64;ARM64;ARM32;x86</Platforms>
     <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyTitle>A fast &amp; handy Event Viewer</AssemblyTitle>
+    <AssemblyVersion>1.1.1.0</AssemblyVersion>
+    <Description>$(AssemblyTitle)</Description>
+    <Copyright>Copyright (C) K. Maki</Copyright>
+    <Product>EventLook</Product>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>Asset\favicon.ico</ApplicationIcon>
@@ -14,6 +20,22 @@
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Windows.ThemeInfoAttribute">
+      <_Parameter1>System.Windows.ResourceDictionaryLocation.None</_Parameter1>
+      <_Parameter1_IsLiteral>true</_Parameter1_IsLiteral>
+      <_Parameter2>System.Windows.ResourceDictionaryLocation.SourceAssembly</_Parameter2>
+      <_Parameter2_IsLiteral>true</_Parameter2_IsLiteral>
+    </AssemblyAttribute>
+  </ItemGroup>
+  <ItemGroup>
+    <AssemblyMetadata Include="BuildDate" Condition="$(Configuration) == 'Debug'">
+      <Value>$([System.DateTime]::Today.ToString("O"))</Value>
+    </AssemblyMetadata>
+    <AssemblyMetadata Include="BuildDate" Condition="$(Configuration) != 'Debug'">
+      <Value>$([System.DateTime]::Now.ToString("O"))</Value>
+    </AssemblyMetadata>
+  </ItemGroup>
   <ItemGroup>
     <Resource Include="Asset\1385_Disable_16x16_72.png" />
     <Resource Include="Asset\1385_Disable_16x16_72_disabled.png" />
