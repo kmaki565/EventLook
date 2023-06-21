@@ -26,7 +26,6 @@ public class EventItem
             if (Message == null) 
             {
                 var sb = new StringBuilder();
-                sb.Append("");
                 for (int i = 0; i < eventRecord.Properties.Count; i++)
                 {
                     if (i > 0) sb.Append("\r\n");
