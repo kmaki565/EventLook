@@ -1,20 +1,14 @@
 ﻿using AboutBoxWpf;
-using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Messaging;
 using EventLook.Model;
 using EventLook.View;
 using EventLook.ViewModel;
-using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 
@@ -28,7 +22,8 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        DataContext = Ioc.Default.GetRequiredService<MainViewModel>();
+        var mainViewModel = new MainViewModel(new DataService());
+        DataContext = mainViewModel;
 
         // Here we send a message which is caught by the view model.  The message contains a reference
         // to the CollectionViewSource which is instantiated when the view is instantiated (before the view model).
@@ -39,9 +34,9 @@ public partial class MainWindow : Window
         var logPickerWindowService = new ShowWindowService<LogPickerWindow, LogPickerViewModel>() { Owner = this };
         WeakReferenceMessenger.Default.Send(new LogPickerWindowServiceMessageToken() { LogPickerWindowService = logPickerWindowService });
 
-        ContentRendered += (s, e) => { ((MainViewModel)DataContext).OnLoaded(); };
-        ((MainViewModel)DataContext).Refreshing += OnRefreshing;
-        ((MainViewModel)DataContext).Refreshed += OnRefreshed;
+        ContentRendered += (_, _) => { mainViewModel.OnLoaded(); };
+        mainViewModel.Refreshing += OnRefreshing;
+        mainViewModel.Refreshed += OnRefreshed;
 
         ProcessCommandLine();
     }
