@@ -22,13 +22,33 @@ public class EventItem
         {
             Message = eventRecord.FormatDescription();
 
-            //TODO: Align to Event Viewer (e.g. Event ID 27 of e1dexpress)
-            if (Message == null)
-                Message = "(EventLook) The description for the event cannot be found.";
+            // Formatting event message failed. Try to display information in EventData.
+            if (Message == null) 
+            {
+                var sb = new StringBuilder("(EventLook - dump of EventData)\r\n");
+                for (int i = 0; i < eventRecord.Properties.Count; i++)
+                {
+                    if (i > 0) sb.Append("\r\n");
+
+                    var property = eventRecord.Properties[i];
+                    if (property.Value is string str)
+                    {
+                        sb.Append(str);
+                    }
+                    else if (property.Value is byte[] bytes)
+                    {
+                        foreach (var bin in bytes)
+                        {
+                            sb.Append(string.Format("{0:X2}", bin));
+                        }    
+                    }
+                }
+                Message = sb.ToString();
+            }
         }
         catch (Exception ex)
         {
-            Message = "(EventLook) Exception occurred while reading the description:\n" + ex.Message;
+            Message = "(EventLook) Exception occurred while reading the description:\r\n" + ex.Message;
         }
     }
     #region Properties
