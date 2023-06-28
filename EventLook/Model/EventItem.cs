@@ -22,10 +22,10 @@ public class EventItem
         {
             Message = eventRecord.FormatDescription();
 
-            //TODO: This behavior is not aligned to Event Viewer. We may want to add a setting to opt-in this behavior.
+            // Formatting event message failed. Try to display information in EventData.
             if (Message == null) 
             {
-                var sb = new StringBuilder();
+                var sb = new StringBuilder("(EventLook - dump of EventData)\r\n");
                 for (int i = 0; i < eventRecord.Properties.Count; i++)
                 {
                     if (i > 0) sb.Append("\r\n");
