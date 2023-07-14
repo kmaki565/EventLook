@@ -25,10 +25,13 @@ public class LevelFilter : FilterBase
         private set;
     }
 
-    public override void Refresh(IEnumerable<EventItem> events)
+    public override void Refresh(IEnumerable<EventItem> events, bool carryOver)
     {
         // Make a copy before clearing
-        var prevFilters = levelFilters.Select(f => new LevelFilterItem { Level = f.Level, Selected = f.Selected }).ToList();
+        var prevFilters = carryOver ?
+            levelFilters.Select(f => new LevelFilterItem { Level = f.Level, Selected = f.Selected }).ToList() :
+            new List<LevelFilterItem>();
+
         levelFilters.Clear();
 
         var distinctLevels = events.Select(e => e.Record.Level).Distinct().OrderBy(lv => lv);

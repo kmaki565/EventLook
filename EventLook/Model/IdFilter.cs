@@ -35,6 +35,11 @@ public class IdFilter : FilterBase
         }
     }
 
+    public override void Refresh(IEnumerable<EventItem> events, bool carryOver)
+    {
+        if (!carryOver)
+            Reset();
+    }
     public override void Reset()
     {
         IdFilterNum = null;

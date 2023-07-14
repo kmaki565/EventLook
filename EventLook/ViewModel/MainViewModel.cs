@@ -87,8 +87,7 @@ public class MainViewModel : ObservableRecipient
 
             if (isWindowLoaded)
             {
-                ResetFilters();
-                Refresh();
+                Refresh(carryOver: false);
             }
         }
     }
@@ -102,7 +101,7 @@ public class MainViewModel : ObservableRecipient
             SetProperty(ref selectedRange, value);
 
             if (isWindowLoaded && !selectedRange.IsCustom)
-                Refresh();
+                Refresh(carryOver: true);
         }
     }
     public ReadOnlyObservableCollection<SourceFilterItem> SourceFilters { get => sourceFilter.SourceFilters; }
@@ -132,25 +131,28 @@ public class MainViewModel : ObservableRecipient
             f.FilterUpdated += OnFilterUpdated;
         });
 
-        Refresh();
+        Refresh(carryOver: false);
         isWindowLoaded = true;
     }
 
     public event Action Refreshing;
     public event Action Refreshed;
-    private async void Refresh()
+    private void RefreshForCommand()
     {
-        if (Refreshing != null)
-            Refreshing();
+        Refresh(carryOver: true);
+    }
+    private async void Refresh(bool carryOver)
+    {
+        Refreshing?.Invoke();
 
         UpdateDateTimes();
 
         await Task.Run(() => LoadEvents());
 
-        filters.ForEach(f => f.Refresh(Events));
+        //TODO: It's ideal if we refresh filters while loading events.
+        filters.ForEach(f => f.Refresh(Events, carryOver));
 
-        if (Refreshed != null)
-            Refreshed();
+        Refreshed?.Invoke();
     }
     private void Cancel()
     {
@@ -249,7 +251,7 @@ public class MainViewModel : ObservableRecipient
 
     private void InitializeCommands()
     {
-        RefreshCommand = new RelayCommand(Refresh, () => !IsUpdating);
+        RefreshCommand = new RelayCommand(RefreshForCommand, () => !IsUpdating);
         CancelCommand = new RelayCommand(Cancel, () => IsUpdating);
         ExitCommand = new RelayCommand(Exit); 
         ResetFiltersCommand = new RelayCommand(ResetFilters);
