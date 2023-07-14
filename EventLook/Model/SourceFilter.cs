@@ -27,10 +27,11 @@ public class SourceFilter : FilterBase
         private set; 
     }
 
-    public override void Refresh(IEnumerable<EventItem> events)
+    public override void Refresh(IEnumerable<EventItem> events, bool carryOver)
     {
-        // Make a copy before clearing
-        var prevFilters = sourceFilters.Select(f => new SourceFilterItem { Name = f.Name, Selected = f.Selected }).ToList();
+        // Remember filters and their selections before clearing (needs ToList)
+        var prevFilters = carryOver ? sourceFilters.Select(f => new { f.Name, f.Selected }).ToList() : null;
+
         sourceFilters.Clear();
 
         var distinctSources = events.Select(e => e.Record.ProviderName).Distinct().OrderBy(s => s);
@@ -39,7 +40,7 @@ public class SourceFilter : FilterBase
             sourceFilters.Add(new SourceFilterItem
             {
                 Name = s,
-                Selected = prevFilters.FirstOrDefault(f => f.Name == s)?.Selected ?? true
+                Selected = prevFilters?.FirstOrDefault(f => f.Name == s)?.Selected ?? true
             });
         }
 

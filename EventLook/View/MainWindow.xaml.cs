@@ -34,7 +34,13 @@ public partial class MainWindow : Window
         var logPickerWindowService = new ShowWindowService<LogPickerWindow, LogPickerViewModel>() { Owner = this };
         WeakReferenceMessenger.Default.Send(new LogPickerWindowServiceMessageToken() { LogPickerWindowService = logPickerWindowService });
 
-        ContentRendered += (_, _) => { mainViewModel.OnLoaded(); };
+        // It looks like the expander needs expanded once to check "Select All" even if all other checkboxes are checked.
+        Ex1.IsExpanded = true;
+        ContentRendered += (_, _) =>
+        {
+            Ex1.IsExpanded = false;
+            mainViewModel.OnLoaded();
+        };
         mainViewModel.Refreshing += OnRefreshing;
         mainViewModel.Refreshed += OnRefreshed;
 

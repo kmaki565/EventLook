@@ -20,13 +20,14 @@ public abstract class FilterBase : Monitorable
     }
     /// <summary>
     /// Refreshes filter UI (e.g. populate filter items in a drop down) by loaded events,
-    /// trying to carry over filters user specified.
+    /// If carryOver is true, it'll try to carry over filters user specified (except newly populated checkboxes).
+    /// Otherwise all filters will be cleared (e.g. checkboxes all checked).
     /// </summary>
     /// <param name="events">Loaded event items</param>
-    public virtual void Refresh(IEnumerable<EventItem> events) { }
+    public virtual void Refresh(IEnumerable<EventItem> events, bool carryOver) { }
 
     /// <summary>
-    /// Removes filter and restores the default UI for the Reset button.
+    /// Removes filter and restores the default UI (to be called by "Reset filter" button).
     /// </summary>
     public abstract void Reset();
 

@@ -34,6 +34,11 @@ public class MessageFilter : FilterBase
         }
     }
 
+    public override void Refresh(IEnumerable<EventItem> events, bool carryOver)
+    {
+        if (!carryOver)
+            Reset();
+    }
     public override void Reset()
     {
         MessageFilterText = "";
