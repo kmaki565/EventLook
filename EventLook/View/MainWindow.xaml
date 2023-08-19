@@ -77,7 +77,7 @@
                 <ComboBox  
                   x:Name="ComboBox_Source" ItemsSource="{Binding LogSources}" SelectedItem="{Binding SelectedLogSource}"
                   DisplayMemberPath="DisplayName" SelectedValuePath="Path" 
-                  HorizontalAlignment="Left" Margin="10,0,0,0" Width="250" />
+                  HorizontalAlignment="Left" Margin="10,0,0,0" MinWidth="250" />
                 <ComboBox  
                       ItemsSource="{Binding Ranges}" SelectedItem="{Binding SelectedRange}"
                       DisplayMemberPath="Text" SelectedValuePath="Text"
