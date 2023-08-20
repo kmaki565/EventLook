@@ -49,7 +49,7 @@
     <DockPanel>
         <Menu DockPanel.Dock="Top" Background="White">
             <MenuItem Header="_File">
-                <MenuItem Header="Open Event _Log" InputGestureText="Ctrl+L" Command="{Binding OpenLogPickerCommand}"/>
+                <MenuItem Header="Open Event _Log on local computer" InputGestureText="Ctrl+L" Command="{Binding OpenLogPickerCommand}"/>
                 <MenuItem Header="_Open .evtx File" InputGestureText="Ctrl+O" Command="{Binding OpenFileCommand}"/>
                 <Separator />
                 <MenuItem Header="_Launch Windows Event Viewer" Command="{Binding LaunchEventViewerCommand}"/>
