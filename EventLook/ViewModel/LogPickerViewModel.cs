@@ -53,9 +53,9 @@ public class LogPickerViewModel : ObservableObject
     private readonly bool isRunAsAdmin;
     public bool IsRunAsAdmin { get => isRunAsAdmin; }
 
-    public void OnLoaded()
+    public async void OnLoaded()
     {
-        InitializeChannels();
+        await InitializeChannels();
     }
 
     private bool OnFilterTriggered(object item)
@@ -68,9 +68,9 @@ public class LogPickerViewModel : ObservableObject
         return false;
     }
 
-    private void InitializeChannels()
+    private async Task InitializeChannels()
     {
-        foreach (var channelName in elSession.GetLogNames())
+        foreach (string channelName in await Task.Run(() => elSession.GetLogNames()))
         {
             EventLogConfiguration config;
             try
@@ -85,7 +85,7 @@ public class LogPickerViewModel : ObservableObject
             long? recordCount = null;
             try
             {
-                EventLogInformation info = elSession.GetLogInformation(config.LogName, PathType.LogName);
+                EventLogInformation info = await Task.Run(() => elSession.GetLogInformation(config.LogName, PathType.LogName));
                 recordCount = info.RecordCount;
             }
             catch (Exception) { }
