@@ -51,8 +51,9 @@ public class LogSourceMgr
     /// Initializes the log source list that will be shown in the combobox.
     /// </summary>
     /// <param name="logNames"></param>
-    public LogSourceMgr(IEnumerable<string> logNames)
+    public LogSourceMgr()
     {
+        IEnumerable<string> logNames = Properties.Settings.Default.StartupLogSources;
         if (logNames == null || !logNames.Any())
         {
             logNames = defaultLogSources;

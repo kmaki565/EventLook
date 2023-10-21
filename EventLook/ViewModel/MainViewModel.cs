@@ -28,7 +28,7 @@ public class MainViewModel : ObservableRecipient
         DataService = dataService;
         Events = new ObservableCollection<EventItem>();
 
-        logSourceMgr = new LogSourceMgr(Properties.Settings.Default.StartupLogSources);
+        logSourceMgr = new LogSourceMgr();
         SelectedLogSource = LogSources.FirstOrDefault();
 
         rangeMgr = new RangeMgr();
