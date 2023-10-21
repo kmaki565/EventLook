@@ -47,19 +47,19 @@ public class LogSource
 }
 public class LogSourceMgr
 {
-    public LogSourceMgr()
+    /// <summary>
+    /// Initializes the log source list that will be shown in the combobox.
+    /// </summary>
+    /// <param name="logNames"></param>
+    public LogSourceMgr(IEnumerable<string> logNames)
     {
-        LogSources = new ObservableCollection<LogSource>
+        if (logNames == null || !logNames.Any())
         {
-            new LogSource("System"),
-            new LogSource("Application"),
-            new LogSource("Lenovo-Power-BaseModule/Operational"),
-            new LogSource("Lenovo-Power-SmartStandby/Operational"),
-            new LogSource("Lenovo-Sif-Core/Operational"), // This channel requires admin privilege to read.
-            new LogSource("Microsoft-Windows-TaskScheduler/Operational"),
-            new LogSource("Microsoft-Windows-WindowsUpdateClient/Operational"),
-            new LogSource("Microsoft-Windows-Windows Defender/Operational")
-        };
+            logNames = defaultLogSources;
+            Properties.Settings.Default.StartupLogSources = logNames.ToList();
+            Properties.Settings.Default.Save();
+        }
+        LogSources = new ObservableCollection<LogSource>(logNames.Select(x => new LogSource(x)));
     }
     public ObservableCollection<LogSource> LogSources { get; set; }
 
@@ -82,4 +82,6 @@ public class LogSourceMgr
 
         return logSource;
     }
+
+    private readonly IEnumerable<string> defaultLogSources = new[] {"System", "Application"};
 }
