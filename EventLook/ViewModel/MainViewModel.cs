@@ -51,6 +51,7 @@ public class MainViewModel : ObservableRecipient
         Messenger.Register<MainViewModel, FileToBeProcessedMessageToken>(this, (r, m) => r.Handle_FileToBeProcessedMessageToken(m));
         Messenger.Register<MainViewModel, DetailWindowServiceMessageToken>(this, (r, m) => r.Handle_DetailWindowServiceMessageToken(m));
         Messenger.Register<MainViewModel, LogPickerWindowServiceMessageToken>(this, (r, m) => r.Handle_LogPickerWindowServiceMessageToken(m));
+        Messenger.Register<MainViewModel, SettingsWindowServiceMessageToken>(this, (r, m) => r.Handle_SettingsWindowServiceMessageToken(m));
     }
     private readonly LogSourceMgr logSourceMgr;
     private readonly RangeMgr rangeMgr;
@@ -72,6 +73,7 @@ public class MainViewModel : ObservableRecipient
     private readonly IDataService DataService;
     private IShowWindowService<DetailViewModel> DetailWindowService;
     private IShowWindowService<LogPickerViewModel> LogPickerWindowService;
+    private IShowWindowService<SettingsViewModel> SettingsWindowService;
 
     private ObservableCollection<EventItem> _events;
     public ObservableCollection<EventItem> Events { get => _events; set => SetProperty(ref _events, value); }
@@ -246,6 +248,7 @@ public class MainViewModel : ObservableRecipient
     public ICommand FilterToSelectedIdCommand { get; private set; }
     public ICommand OpenFileCommand { get; private set; }
     public ICommand OpenLogPickerCommand { get; private set; }
+    public ICommand OpenSettingsCommand { get; private set; }
     public ICommand LaunchEventViewerCommand { get; private set; }
     public ICommand CopyMessageTextCommand { get; private set; }
 
@@ -265,6 +268,7 @@ public class MainViewModel : ObservableRecipient
         FilterToSelectedIdCommand = new RelayCommand(FilterToSelectedId);
         OpenFileCommand = new RelayCommand(OpenFile);
         OpenLogPickerCommand = new RelayCommand(OpenLogPicker);
+        OpenSettingsCommand = new RelayCommand(OpenSettings);
         LaunchEventViewerCommand = new RelayCommand(LaunchEventViewer);
         CopyMessageTextCommand = new RelayCommand(CopyMessageText);
     }
@@ -376,6 +380,10 @@ public class MainViewModel : ObservableRecipient
     {
         LogPickerWindowService = token.LogPickerWindowService;
     }
+    private void Handle_SettingsWindowServiceMessageToken(SettingsWindowServiceMessageToken token)
+    {
+        SettingsWindowService = token.SettingsWindowService;
+    }
 
     private void OpenFile()
     {
@@ -400,6 +408,15 @@ public class MainViewModel : ObservableRecipient
         {
             SelectedLogSource = logSourceMgr.AddLogSource(openLogVm.SelectedChannel.Path, PathType.LogName);
         }
+    }
+    /// <summary>
+    /// Opens a modal window for Settings.
+    /// </summary>
+    private void OpenSettings()
+    {
+        var openSettingsVm = new SettingsViewModel(LogPickerWindowService);
+        bool? ret = SettingsWindowService.ShowDialog(openSettingsVm);
+        //TODO: Apply to current selections
     }
     private void LaunchEventViewer()
     {

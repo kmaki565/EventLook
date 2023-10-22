@@ -8,7 +8,7 @@ using System.Windows;
 namespace EventLook.View;
 
 // Taken from http://sourcechord.hatenablog.com/entry/2019/06/09/230316
-interface IShowWindowService<TViewModel>
+public interface IShowWindowService<TViewModel>
 {
     bool? ShowDialog(TViewModel context);
     void Show(TViewModel context);
