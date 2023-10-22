@@ -21,8 +21,11 @@ public class SettingsViewModel : ObservableObject
         _logPickerWindowService = logPickerWindowService;
         StartupLogSources = new ObservableCollection<string>(Properties.Settings.Default.StartupLogSources);
 
-        AddCommand = new RelayCommand(AddLogSources);
-        RemoveCommand = new RelayCommand(RemoveLogSources);
+        AddCommand = new RelayCommand(AddLogSource);
+        RemoveCommand = new RelayCommand(RemoveLogSource);
+        UpCommand = new RelayCommand(MoveUpLogSource);
+        DownCommand = new RelayCommand(MoveDownLogSource);
+        RestoreDefaultCommand = new RelayCommand(RestoreDefaultLogSources);
         ApplyCommand = new RelayCommand(Apply);
     }
 
@@ -31,9 +34,12 @@ public class SettingsViewModel : ObservableObject
 
     public ICommand AddCommand { get; private set; }
     public ICommand RemoveCommand { get; private set; }
+    public ICommand UpCommand { get; private set; }
+    public ICommand DownCommand { get; private set; }
+    public ICommand RestoreDefaultCommand { get; private set; }
     public ICommand ApplyCommand { get; private set; }
 
-    private void AddLogSources()
+    private void AddLogSource()
     {
         var openLogVm = new LogPickerViewModel();
         bool? ret = _logPickerWindowService.ShowDialog(openLogVm);
@@ -42,11 +48,41 @@ public class SettingsViewModel : ObservableObject
             StartupLogSources.Add(openLogVm.SelectedChannel.Path);
         }
     }
-    private void RemoveLogSources()
+    private void RemoveLogSource()
     {
         if (SelectedLogName != null)
         {
             StartupLogSources.Remove(SelectedLogName);
+        }
+    }
+    private void MoveUpLogSource()
+    {
+        if (SelectedLogName != null)
+        {
+            int index = StartupLogSources.IndexOf(SelectedLogName);
+            if (index > 0)
+            {
+                StartupLogSources.Move(index, index - 1);
+            }
+        }
+    }
+    private void MoveDownLogSource()
+    {
+        if (SelectedLogName != null)
+        {
+            int index = StartupLogSources.IndexOf(SelectedLogName);
+            if (index < StartupLogSources.Count - 1)
+            {
+                StartupLogSources.Move(index, index + 1);
+            }
+        }
+    }
+    private void RestoreDefaultLogSources()
+    {
+        StartupLogSources.Clear();
+        foreach (string log in LogSourceMgr.defaultLogSources)
+        {
+            StartupLogSources.Add(log);
         }
     }
     private void Apply()

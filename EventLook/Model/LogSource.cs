@@ -63,6 +63,7 @@ public class LogSourceMgr
         LogSources = new ObservableCollection<LogSource>(logNames.Select(x => new LogSource(x)));
     }
     public ObservableCollection<LogSource> LogSources { get; set; }
+    public static readonly IEnumerable<string> defaultLogSources = new[] { "System", "Application" };
 
     /// <summary>
     /// Adds an evtx file or a local Event Log channel to the log source list. 
@@ -83,6 +84,4 @@ public class LogSourceMgr
 
         return logSource;
     }
-
-    private readonly IEnumerable<string> defaultLogSources = new[] {"System", "Application"};
 }
