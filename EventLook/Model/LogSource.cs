@@ -53,10 +53,10 @@ public class LogSourceMgr
     /// <param name="logNames"></param>
     public LogSourceMgr(IEnumerable<string> logNames)
     {
-        if (!logNames.Any())
+        if (logNames == null || !logNames.Any())
         {
             logNames = defaultLogSources;
-            Properties.Settings.Default.StartupLogSources = logNames.ToList();
+            Properties.Settings.Default.StartupLogNames = logNames.ToList();
             Properties.Settings.Default.Save();
         }
 

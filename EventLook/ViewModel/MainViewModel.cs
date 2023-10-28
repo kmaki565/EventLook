@@ -28,7 +28,7 @@ public class MainViewModel : ObservableRecipient
         DataService = dataService;
         Events = new ObservableCollection<EventItem>();
 
-        logSourceMgr = new LogSourceMgr(Properties.Settings.Default.StartupLogSources);
+        logSourceMgr = new LogSourceMgr(Properties.Settings.Default.StartupLogNames);
         SelectedLogSource = LogSources.FirstOrDefault();
 
         rangeMgr = new RangeMgr();
@@ -425,7 +425,7 @@ public class MainViewModel : ObservableRecipient
         // Reflect the new settings to UI.
         if (ret == true && openSettingsVm.StartupLogSources.Any())
         {
-            Properties.Settings.Default.StartupLogSources = openSettingsVm.StartupLogSources.ToList();
+            Properties.Settings.Default.StartupLogNames = openSettingsVm.StartupLogSources.ToList();
             Properties.Settings.Default.Save();
 
             // Replace non-file logs with the new ones.

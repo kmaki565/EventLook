@@ -25,12 +25,12 @@ namespace EventLook.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.Generic.List<System.String> StartupLogSources {
+        public global::System.Collections.Generic.List<System.String> StartupLogNames {
             get {
-                return ((global::System.Collections.Generic.List<System.String>)(this["StartupLogSources"]));
+                return ((global::System.Collections.Generic.List<System.String>)(this["StartupLogNames"]));
             }
             set {
-                this["StartupLogSources"] = value;
+                this["StartupLogNames"] = value;
             }
         }
     }
