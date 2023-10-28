@@ -25,6 +25,11 @@ public partial class SettingsWindow : Window
 
     private void OkButton_Click(object sender, RoutedEventArgs e)
     {
+        if (listBox1.Items.Count == 0)
+        {
+            MessageBox.Show("Please select at least one log.", "EventLook", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
         DialogResult = true;
         Close();
     }

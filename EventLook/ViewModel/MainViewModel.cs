@@ -28,7 +28,7 @@ public class MainViewModel : ObservableRecipient
         DataService = dataService;
         Events = new ObservableCollection<EventItem>();
 
-        logSourceMgr = new LogSourceMgr();
+        logSourceMgr = new LogSourceMgr(Properties.Settings.Default.StartupLogSources);
         SelectedLogSource = LogSources.FirstOrDefault();
 
         rangeMgr = new RangeMgr();
@@ -417,14 +417,32 @@ public class MainViewModel : ObservableRecipient
     /// </summary>
     private void OpenSettings()
     {
-        var openSettingsVm = new SettingsViewModel(LogPickerWindowService);
+        var openSettingsVm = new SettingsViewModel(LogPickerWindowService, LogSourceMgr.LogChannelNamesInLogSources(LogSources));
+        string previousLogPath = SelectedLogSource?.Path;
+
         bool? ret = SettingsWindowService.ShowDialog(openSettingsVm);
         
         // Reflect the new settings to UI.
         if (ret == true && openSettingsVm.StartupLogSources.Any())
         {
-            logSourceMgr.RenewLogSources(openSettingsVm.StartupLogSources);
-            SelectedLogSource = LogSources.FirstOrDefault();
+            Properties.Settings.Default.StartupLogSources = openSettingsVm.StartupLogSources.ToList();
+            Properties.Settings.Default.Save();
+
+            // Replace non-file logs with the new ones.
+            for (int i = 0; i < LogSources.Count; i++)
+            {
+                if (LogSources[i].PathType == PathType.LogName)
+                    LogSources.RemoveAt(i--);
+            }
+            foreach (var logName in openSettingsVm.StartupLogSources)
+            {
+                logSourceMgr.AddLogSource(logName, PathType.LogName, addToBottom: true);
+            }
+
+            if (LogSources.Any(x => x.Path == previousLogPath))
+                SelectedLogSource = LogSources.First(x => x.Path == previousLogPath);
+            else 
+                SelectedLogSource = LogSources.FirstOrDefault();
         }
     }
     private void LaunchEventViewer()

@@ -51,15 +51,15 @@ public class LogSourceMgr
     /// Initializes the log source list that will be shown in the combobox.
     /// </summary>
     /// <param name="logNames"></param>
-    public LogSourceMgr()
+    public LogSourceMgr(IEnumerable<string> logNames)
     {
-        IEnumerable<string> logNames = Properties.Settings.Default.StartupLogSources;
-        if (logNames == null || !logNames.Any())
+        if (!logNames.Any())
         {
             logNames = defaultLogSources;
             Properties.Settings.Default.StartupLogSources = logNames.ToList();
             Properties.Settings.Default.Save();
         }
+
         LogSources = new ObservableCollection<LogSource>(logNames.Select(x => new LogSource(x)));
     }
     public ObservableCollection<LogSource> LogSources { get; set; }
@@ -84,12 +84,14 @@ public class LogSourceMgr
 
         return logSource;
     }
-    public void RenewLogSources(IEnumerable<string> logNames)
+
+    /// <summary>
+    /// Picks up non-file log sources from the given log source list and returns the names.
+    /// </summary>
+    /// <param name="logSources"></param>
+    /// <returns></returns>
+    public static List<string> LogChannelNamesInLogSources(IEnumerable<LogSource> logSources)
     {
-        LogSources.Clear();
-        foreach (string logName in logNames)
-        {
-            LogSources.Add(new LogSource(logName));
-        }
+          return logSources.Where(x => x.PathType == PathType.LogName).Select(x => x.Path).ToList();
     }
 }

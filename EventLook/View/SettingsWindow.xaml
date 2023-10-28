@@ -23,7 +23,7 @@
         </Grid.RowDefinitions>
         <TextBlock Grid.Row="0" Text="Log sources" Margin="20,20,0,5" />
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="20,0">
-            <ListBox Width="300" ItemsSource="{Binding StartupLogSources}" SelectedItem="{Binding SelectedLogName}"/>
+            <ListBox Width="300" x:Name="listBox1" ItemsSource="{Binding StartupLogSources}" SelectedItem="{Binding SelectedLogName}"/>
             <StackPanel Orientation="Vertical" Margin="20">
                 <Button Content="Add" Command="{Binding AddCommand}" Width="90" Margin="0,5"/>
                 <Button Content="Remove" Command="{Binding RemoveCommand}" Width="90" Margin="0,5"/>
@@ -33,7 +33,7 @@
             </StackPanel>
         </StackPanel>
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10,10">
-            <Button Content="OK" Margin="10,0" IsDefault="True" Click="OkButton_Click" Command="{Binding ApplyCommand}"/>
+            <Button Content="OK" Margin="10,0" IsDefault="True" Click="OkButton_Click"/>
             <Button Content="Cancel" Margin="10,0" IsCancel="True"/>
         </StackPanel>
     </Grid>

@@ -16,17 +16,16 @@ public class SettingsViewModel : ObservableObject
 {
     private readonly IShowWindowService<LogPickerViewModel> _logPickerWindowService;
 
-    public SettingsViewModel(IShowWindowService<LogPickerViewModel> logPickerWindowService)
+    public SettingsViewModel(IShowWindowService<LogPickerViewModel> logPickerWindowService, IEnumerable<string> logNames)
     {
         _logPickerWindowService = logPickerWindowService;
-        StartupLogSources = new ObservableCollection<string>(Properties.Settings.Default.StartupLogSources);
+        StartupLogSources = new ObservableCollection<string>(logNames);
 
         AddCommand = new RelayCommand(AddLogSource);
         RemoveCommand = new RelayCommand(RemoveLogSource);
         UpCommand = new RelayCommand(MoveUpLogSource);
         DownCommand = new RelayCommand(MoveDownLogSource);
         RestoreDefaultCommand = new RelayCommand(RestoreDefaultLogSources);
-        ApplyCommand = new RelayCommand(Apply);
     }
 
     public ObservableCollection<string> StartupLogSources { get; set; }
@@ -84,10 +83,5 @@ public class SettingsViewModel : ObservableObject
         {
             StartupLogSources.Add(log);
         }
-    }
-    private void Apply()
-    {
-        Properties.Settings.Default.StartupLogSources = StartupLogSources.ToList();
-        Properties.Settings.Default.Save();
     }
 }
