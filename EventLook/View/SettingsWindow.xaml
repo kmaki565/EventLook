@@ -21,7 +21,7 @@
             <RowDefinition />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <TextBlock Grid.Row="0" Text="Log sources (change will be applied after app restart)" Margin="20,20,0,5" />
+        <TextBlock Grid.Row="0" Text="Log sources" Margin="20,20,0,5" />
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="20,0">
             <ListBox Width="300" ItemsSource="{Binding StartupLogSources}" SelectedItem="{Binding SelectedLogName}"/>
             <StackPanel Orientation="Vertical" Margin="20">

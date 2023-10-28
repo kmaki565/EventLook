@@ -85,6 +85,9 @@ public class MainViewModel : ObservableRecipient
         get => selectedLogSource;
         set
         {
+            if (value == null)
+                return;
+
             SetProperty(ref selectedLogSource, value);
 
             if (isWindowLoaded)
@@ -416,7 +419,13 @@ public class MainViewModel : ObservableRecipient
     {
         var openSettingsVm = new SettingsViewModel(LogPickerWindowService);
         bool? ret = SettingsWindowService.ShowDialog(openSettingsVm);
-        //TODO: Apply to current selections
+        
+        // Reflect the new settings to UI.
+        if (ret == true && openSettingsVm.StartupLogSources.Any())
+        {
+            logSourceMgr.RenewLogSources(openSettingsVm.StartupLogSources);
+            SelectedLogSource = LogSources.FirstOrDefault();
+        }
     }
     private void LaunchEventViewer()
     {

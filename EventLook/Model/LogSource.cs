@@ -84,4 +84,12 @@ public class LogSourceMgr
 
         return logSource;
     }
+    public void RenewLogSources(IEnumerable<string> logNames)
+    {
+        LogSources.Clear();
+        foreach (string logName in logNames)
+        {
+            LogSources.Add(new LogSource(logName));
+        }
+    }
 }
