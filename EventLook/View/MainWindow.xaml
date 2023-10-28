@@ -55,7 +55,7 @@
                 <MenuItem Header="_Launch Windows Event Viewer" Command="{Binding LaunchEventViewerCommand}"/>
                 <MenuItem Header="E_xit" Command="{Binding ExitCommand}" />
             </MenuItem>
-            <MenuItem Header="_Settings" Command="{Binding OpenSettingsCommand}" />
+            <MenuItem Header="_Options" Command="{Binding OpenSettingsCommand}" />
             <MenuItem Header="_About" Click="MenuItem_About_Click"/>
         </Menu>
         <StatusBar DockPanel.Dock="Bottom" Background="WhiteSmoke">
