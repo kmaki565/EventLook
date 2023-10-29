@@ -5,7 +5,6 @@ using EventLook.View;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,10 +15,12 @@ public class SettingsViewModel : ObservableObject
 {
     private readonly IShowWindowService<LogPickerViewModel> _logPickerWindowService;
 
-    public SettingsViewModel(IShowWindowService<LogPickerViewModel> logPickerWindowService, IEnumerable<string> logNames)
+    public SettingsViewModel(IShowWindowService<LogPickerViewModel> logPickerWindowService, IEnumerable<string> logNames, IEnumerable<Model.Range> ranges, string selectedRangeText)
     {
         _logPickerWindowService = logPickerWindowService;
         StartupLogSources = new ObservableCollection<string>(logNames);
+        Ranges = new List<Model.Range>(ranges);
+        selectedRange = Ranges.FirstOrDefault(r => r.Text == selectedRangeText);
 
         AddCommand = new RelayCommand(AddLogSource);
         RemoveCommand = new RelayCommand(RemoveLogSource);
@@ -29,6 +30,9 @@ public class SettingsViewModel : ObservableObject
     }
 
     public ObservableCollection<string> StartupLogSources { get; set; }
+    public IReadOnlyCollection<Model.Range> Ranges { get; set; }
+    private Model.Range selectedRange;
+    public Model.Range SelectedRange { get => selectedRange; set => SetProperty(ref selectedRange, value); }
     public string SelectedLogName { get; set; }
 
     public ICommand AddCommand { get; private set; }

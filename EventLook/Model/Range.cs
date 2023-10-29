@@ -29,4 +29,12 @@ public class RangeMgr
         };
     }
     public ObservableCollection<Range> Ranges { get; set; }
+
+    public Range GetStartupRange()
+    {
+        // Default is "Any time".
+        // Note that user's choice "Custom range" is handled as "Any time" at startup as we don't save IsCustom property.
+        return Ranges.FirstOrDefault(x => x.DaysFromNow == Properties.Settings.Default.StartupRangeDays) ??
+            Ranges.First(x => x.DaysFromNow == 0 && x.IsCustom == false);
+    }
 }

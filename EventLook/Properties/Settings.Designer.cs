@@ -33,5 +33,17 @@ namespace EventLook.Properties {
                 this["StartupLogNames"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int StartupRangeDays {
+            get {
+                return ((int)(this["StartupRangeDays"]));
+            }
+            set {
+                this["StartupRangeDays"] = value;
+            }
+        }
     }
 }
