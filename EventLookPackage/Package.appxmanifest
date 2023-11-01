@@ -9,7 +9,7 @@
   <Identity
     Name="64247kmaki565.323654BB1C7D"
     Publisher="CN=B5234934-E68F-4911-8E10-60FECC338A02"
-    Version="1.1.5.0" />
+    Version="1.2.0.0" />
 
   <Properties>
     <DisplayName>EventLook</DisplayName>
