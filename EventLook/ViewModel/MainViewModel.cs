@@ -417,38 +417,45 @@ public class MainViewModel : ObservableRecipient
     /// </summary>
     private void OpenSettings()
     {
-        var openSettingsVm = new SettingsViewModel(LogPickerWindowService, LogSourceMgr.LogChannelNamesInLogSources(LogSources), Ranges, selectedRange.Text);
+        var originalSettings = new SettingsData
+        {
+            LogSources = LogSources.ToList(),
+            Ranges = Ranges.ToList(),
+            SelectedRange = rangeMgr.GetStartupRange(),
+        };
+        var openSettingsVm = new SettingsViewModel(LogPickerWindowService, originalSettings);
         string previousLogPath = SelectedLogSource?.Path;
 
         bool? ret = SettingsWindowService.ShowDialog(openSettingsVm);
         
+        if (ret != true)    // Cancel
+            return;
+
         // Reflect the new settings to UI.
-        if (ret == true && openSettingsVm.StartupLogSources.Any())
+        SettingsData newSettings = openSettingsVm.GetSettingsInfo();
+        Properties.Settings.Default.StartupLogNames = newSettings.LogSources.Select(x => x.Path).ToList();
+        Properties.Settings.Default.StartupRangeDays = newSettings.SelectedRange.DaysFromNow;
+        Properties.Settings.Default.Save();
+
+        // Replace non-file logs with the new ones.
+        readyToRefresh = false; // Avoid Refresh being called multiple times.
+        for (int i = 0; i < LogSources.Count; i++)
         {
-            Properties.Settings.Default.StartupLogNames = openSettingsVm.StartupLogSources.ToList();
-            Properties.Settings.Default.StartupRangeDays = openSettingsVm.SelectedRange.DaysFromNow;
-            Properties.Settings.Default.Save();
-
-            // Replace non-file logs with the new ones.
-            readyToRefresh = false; // Avoid Refresh being called multiple times.
-            for (int i = 0; i < LogSources.Count; i++)
-            {
-                if (LogSources[i].PathType == PathType.LogName)
-                    LogSources.RemoveAt(i--);
-            }
-            foreach (var logName in openSettingsVm.StartupLogSources)
-            {
-                logSourceMgr.AddLogSource(logName, PathType.LogName, addToBottom: true);
-            }
-
-            if (LogSources.Any(x => x.Path == previousLogPath))
-                SelectedLogSource = LogSources.First(x => x.Path == previousLogPath);
-            else 
-                SelectedLogSource = LogSources.FirstOrDefault();
-
-            readyToRefresh = true;
-            SelectedRange = openSettingsVm.SelectedRange;   // Fire Refresh
+            if (LogSources[i].PathType == PathType.LogName)
+                LogSources.RemoveAt(i--);
         }
+        foreach (var logSource in newSettings.LogSources)
+        {
+            logSourceMgr.AddLogSource(logSource.Path, PathType.LogName, addToBottom: true);
+        }
+
+        if (LogSources.Any(x => x.Path == previousLogPath))
+            SelectedLogSource = LogSources.First(x => x.Path == previousLogPath);
+        else
+            SelectedLogSource = LogSources.FirstOrDefault();
+
+        readyToRefresh = true;
+        SelectedRange = Ranges.FirstOrDefault(r => r.Text == newSettings.SelectedRange.Text);   // Fire Refresh
     }
     private void LaunchEventViewer()
     {

@@ -84,14 +84,4 @@ public class LogSourceMgr
 
         return logSource;
     }
-
-    /// <summary>
-    /// Picks up non-file log sources from the given log source list and returns the names.
-    /// </summary>
-    /// <param name="logSources"></param>
-    /// <returns></returns>
-    public static List<string> LogChannelNamesInLogSources(IEnumerable<LogSource> logSources)
-    {
-          return logSources.Where(x => x.PathType == PathType.LogName).Select(x => x.Path).ToList();
-    }
 }

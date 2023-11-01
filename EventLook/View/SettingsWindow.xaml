@@ -27,7 +27,9 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
-                    <ListBox Grid.Column="0" Width="290" Margin="10" x:Name="listBox1" ItemsSource="{Binding StartupLogSources}" SelectedItem="{Binding SelectedLogName}"/>
+                    <ListBox Grid.Column="0" Width="290" Margin="10" x:Name="listBox1" 
+                             ItemsSource="{Binding LogSources}" SelectedItem="{Binding SelectedLogSource}"
+                             DisplayMemberPath="Path" SelectedValuePath="Path" />
                     <StackPanel Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Center" Margin="10,10,12,10">
                         <Button Content="Add" Command="{Binding AddCommand}" Width="90" Margin="0,5"/>
                         <Button Content="Remove" Command="{Binding RemoveCommand}" Width="90" Margin="0,5"/>
