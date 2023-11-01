@@ -26,3 +26,7 @@ public class LogPickerWindowServiceMessageToken
 {
     public ShowWindowService<LogPickerWindow, LogPickerViewModel> LogPickerWindowService { get; set; }
 }
+public class SettingsWindowServiceMessageToken
+{
+    public ShowWindowService<SettingsWindow, SettingsViewModel> SettingsWindowService { get; set; }
+}

@@ -33,6 +33,8 @@ public partial class MainWindow : Window
         WeakReferenceMessenger.Default.Send(new DetailWindowServiceMessageToken() { DetailWindowService = detailWindowService });
         var logPickerWindowService = new ShowWindowService<LogPickerWindow, LogPickerViewModel>() { Owner = this };
         WeakReferenceMessenger.Default.Send(new LogPickerWindowServiceMessageToken() { LogPickerWindowService = logPickerWindowService });
+        var settingsWindowService = new ShowWindowService<SettingsWindow, SettingsViewModel>() { Owner = this };
+        WeakReferenceMessenger.Default.Send(new SettingsWindowServiceMessageToken() { SettingsWindowService = settingsWindowService });
 
         // It looks like the expander needs expanded once to check "Select All" even if all other checkboxes are checked.
         Ex1.IsExpanded = true;

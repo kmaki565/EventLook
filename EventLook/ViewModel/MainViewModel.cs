@@ -28,11 +28,11 @@ public class MainViewModel : ObservableRecipient
         DataService = dataService;
         Events = new ObservableCollection<EventItem>();
 
-        logSourceMgr = new LogSourceMgr();
+        logSourceMgr = new LogSourceMgr(Properties.Settings.Default.StartupLogNames);
         SelectedLogSource = LogSources.FirstOrDefault();
 
         rangeMgr = new RangeMgr();
-        SelectedRange = Ranges.FirstOrDefault(r => r.DaysFromNow == 7);
+        SelectedRange = rangeMgr.GetStartupRange();
 
         sourceFilter = new Model.SourceFilter();
         levelFilter = new LevelFilter();
@@ -51,6 +51,7 @@ public class MainViewModel : ObservableRecipient
         Messenger.Register<MainViewModel, FileToBeProcessedMessageToken>(this, (r, m) => r.Handle_FileToBeProcessedMessageToken(m));
         Messenger.Register<MainViewModel, DetailWindowServiceMessageToken>(this, (r, m) => r.Handle_DetailWindowServiceMessageToken(m));
         Messenger.Register<MainViewModel, LogPickerWindowServiceMessageToken>(this, (r, m) => r.Handle_LogPickerWindowServiceMessageToken(m));
+        Messenger.Register<MainViewModel, SettingsWindowServiceMessageToken>(this, (r, m) => r.Handle_SettingsWindowServiceMessageToken(m));
     }
     private readonly LogSourceMgr logSourceMgr;
     private readonly RangeMgr rangeMgr;
@@ -64,7 +65,7 @@ public class MainViewModel : ObservableRecipient
     private readonly List<FilterBase> filters;
     private readonly Progress<ProgressInfo> progress;
     private readonly Stopwatch stopwatch;
-    private bool isWindowLoaded = false;
+    private bool readyToRefresh = false;
     private int loadedEventCount = 0;
     private Task ongoingTask;
 
@@ -72,6 +73,7 @@ public class MainViewModel : ObservableRecipient
     private readonly IDataService DataService;
     private IShowWindowService<DetailViewModel> DetailWindowService;
     private IShowWindowService<LogPickerViewModel> LogPickerWindowService;
+    private IShowWindowService<SettingsViewModel> SettingsWindowService;
 
     private ObservableCollection<EventItem> _events;
     public ObservableCollection<EventItem> Events { get => _events; set => SetProperty(ref _events, value); }
@@ -83,9 +85,12 @@ public class MainViewModel : ObservableRecipient
         get => selectedLogSource;
         set
         {
+            if (value == null)
+                return;
+
             SetProperty(ref selectedLogSource, value);
 
-            if (isWindowLoaded)
+            if (readyToRefresh)
             {
                 Refresh(carryOver: false);
             }
@@ -100,7 +105,7 @@ public class MainViewModel : ObservableRecipient
         {
             SetProperty(ref selectedRange, value);
 
-            if (isWindowLoaded && !selectedRange.IsCustom)
+            if (readyToRefresh && !selectedRange.IsCustom)
                 Refresh(carryOver: true);
         }
     }
@@ -132,7 +137,7 @@ public class MainViewModel : ObservableRecipient
         });
 
         Refresh(carryOver: false);
-        isWindowLoaded = true;
+        readyToRefresh = true;
     }
 
     public event Action Refreshing;
@@ -246,6 +251,7 @@ public class MainViewModel : ObservableRecipient
     public ICommand FilterToSelectedIdCommand { get; private set; }
     public ICommand OpenFileCommand { get; private set; }
     public ICommand OpenLogPickerCommand { get; private set; }
+    public ICommand OpenSettingsCommand { get; private set; }
     public ICommand LaunchEventViewerCommand { get; private set; }
     public ICommand CopyMessageTextCommand { get; private set; }
 
@@ -265,6 +271,7 @@ public class MainViewModel : ObservableRecipient
         FilterToSelectedIdCommand = new RelayCommand(FilterToSelectedId);
         OpenFileCommand = new RelayCommand(OpenFile);
         OpenLogPickerCommand = new RelayCommand(OpenLogPicker);
+        OpenSettingsCommand = new RelayCommand(OpenSettings);
         LaunchEventViewerCommand = new RelayCommand(LaunchEventViewer);
         CopyMessageTextCommand = new RelayCommand(CopyMessageText);
     }
@@ -376,6 +383,10 @@ public class MainViewModel : ObservableRecipient
     {
         LogPickerWindowService = token.LogPickerWindowService;
     }
+    private void Handle_SettingsWindowServiceMessageToken(SettingsWindowServiceMessageToken token)
+    {
+        SettingsWindowService = token.SettingsWindowService;
+    }
 
     private void OpenFile()
     {
@@ -400,6 +411,51 @@ public class MainViewModel : ObservableRecipient
         {
             SelectedLogSource = logSourceMgr.AddLogSource(openLogVm.SelectedChannel.Path, PathType.LogName);
         }
+    }
+    /// <summary>
+    /// Opens a modal window for Settings ("Options").
+    /// </summary>
+    private void OpenSettings()
+    {
+        var originalSettings = new SettingsData
+        {
+            LogSources = LogSources.ToList(),
+            Ranges = Ranges.ToList(),
+            SelectedRange = rangeMgr.GetStartupRange(),
+        };
+        var openSettingsVm = new SettingsViewModel(LogPickerWindowService, originalSettings);
+        string previousLogPath = SelectedLogSource?.Path;
+
+        bool? ret = SettingsWindowService.ShowDialog(openSettingsVm);
+        
+        if (ret != true)    // Cancel
+            return;
+
+        // Reflect the new settings to UI.
+        SettingsData newSettings = openSettingsVm.GetSettingsInfo();
+        Properties.Settings.Default.StartupLogNames = newSettings.LogSources.Select(x => x.Path).ToList();
+        Properties.Settings.Default.StartupRangeDays = newSettings.SelectedRange.DaysFromNow;
+        Properties.Settings.Default.Save();
+
+        // Replace non-file logs with the new ones.
+        readyToRefresh = false; // Avoid Refresh being called multiple times.
+        for (int i = 0; i < LogSources.Count; i++)
+        {
+            if (LogSources[i].PathType == PathType.LogName)
+                LogSources.RemoveAt(i--);
+        }
+        foreach (var logSource in newSettings.LogSources)
+        {
+            logSourceMgr.AddLogSource(logSource.Path, PathType.LogName, addToBottom: true);
+        }
+
+        if (LogSources.Any(x => x.Path == previousLogPath))
+            SelectedLogSource = LogSources.First(x => x.Path == previousLogPath);
+        else
+            SelectedLogSource = LogSources.FirstOrDefault();
+
+        readyToRefresh = true;
+        SelectedRange = Ranges.FirstOrDefault(r => r.Text == newSettings.SelectedRange.Text);   // Fire Refresh
     }
     private void LaunchEventViewer()
     {
