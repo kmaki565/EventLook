@@ -49,13 +49,15 @@
                       SelectedItem="{Binding SelectedChannel}"
                       IsReadOnly="True"
                       BorderBrush="LightSteelBlue" HorizontalGridLinesBrush="LightSteelBlue" VerticalGridLinesBrush="LightSteelBlue" 
-                      MouseDoubleClick="dataGrid1_MouseDoubleClick"
                       PreviewKeyDown="dataGrid1_PreviewKeyDown">
             <DataGrid.Resources>
                 <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightSkyBlue"/>
                 <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey }" Color="Black"/>
                 <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="LightSteelBlue"/>
                 <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey }" Color="Black"/>
+                <Style TargetType="DataGridRow">
+                    <EventSetter Event="MouseDoubleClick" Handler="DataGridRow_MouseDoubleClick" />
+                </Style>
             </DataGrid.Resources>
             <DataGrid.CellStyle>
                 <Style TargetType="DataGridCell">

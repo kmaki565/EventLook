@@ -28,7 +28,7 @@ public partial class LogPickerWindow : Window
         DialogResult = false;
         Close();
     }
-    private void dataGrid1_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    private void DataGridRow_MouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
         OkButton_Click(sender, e);
     }
