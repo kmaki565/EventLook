@@ -37,8 +37,6 @@
     </AssemblyMetadata>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Asset\1385_Disable_16x16_72.png" />
-    <Resource Include="Asset\1385_Disable_16x16_72_disabled.png" />
     <Resource Include="Asset\favicon.ico" />
     <Resource Include="Font\WINGDNG3.TTF" />
   </ItemGroup>
