@@ -8,16 +8,21 @@
              xmlns:d1p1="http://schemas.openxmlformats.org/markup-compatibility/2006">
     <Application.Resources>
         <FontFamily x:Key="WingDings3">./Font/WINGDNG3.TTF#Wingdings 3</FontFamily>
-        <!-- This is the style used to display enabled or disabled button images for removing filters-->
-        <Style x:Key="ImageStyleForButtons" TargetType="{x:Type Image}">
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}}" Value="True">
-                    <Setter Property="Source" Value="/EventLook;component/Asset/1385_Disable_16x16_72.png"/>
-                </DataTrigger>
-                <DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType={x:Type Button}, Mode=FindAncestor}}" Value="False">
-                    <Setter Property="Source" Value="/EventLook;component/Asset/1385_Disable_16x16_72_disabled.png"/>
-                </DataTrigger>
-            </Style.Triggers>
+        <Style TargetType="Button">
+            <Setter Property="Width" Value="60" />
+            <Setter Property="Height" Value="22" />
+            <Setter Property="Margin" Value="5,0,0,0" />
+        </Style>
+        <Style TargetType="DataGrid">
+            <Setter Property="BorderBrush" Value="LightSteelBlue"/>
+            <Setter Property="HorizontalGridLinesBrush" Value="LightSteelBlue"/>
+            <Setter Property="VerticalGridLinesBrush" Value="LightSteelBlue"/>
+            <Style.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightSkyBlue"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey }" Color="Black"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="LightSteelBlue"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey }" Color="Black"/>
+            </Style.Resources>
         </Style>
     </Application.Resources>
 </Application>

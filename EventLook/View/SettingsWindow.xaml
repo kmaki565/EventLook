@@ -9,13 +9,6 @@
         mc:Ignorable="d"
         Title="Options" Height="360" Width="450" Background="WhiteSmoke">
     <Grid>
-        <Grid.Resources>
-            <Style TargetType="{x:Type Button}">
-                <Setter Property="Width" Value="60" />
-                <Setter Property="Height" Value="22" />
-                <Setter Property="Margin" Value="5,0,0,0" />
-            </Style>
-        </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition />
             <RowDefinition Height="Auto" />

@@ -151,13 +151,8 @@
             <DataGrid x:Name="dataGrid1" ItemsSource="{Binding Source={StaticResource X_CVS}}" 
                       SelectedItem="{Binding SelectedEventItem}" SelectedCellsChanged="DataGrid_SelectedCellsChanged"
                       Margin="5" Grid.Row="2" AutoGenerateColumns="False" IsReadOnly="True"
-                      BorderBrush="LightSteelBlue" HorizontalGridLinesBrush="LightSteelBlue" VerticalGridLinesBrush="LightSteelBlue" 
                       AllowDrop="True" PreviewDragOver="OnPreviewDragOver" Drop="OnDrop">
                 <DataGrid.Resources>
-                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="LightSkyBlue"/>
-                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey }" Color="Black"/>
-                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="LightSteelBlue"/>
-                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey }" Color="Black"/>
                     <ContextMenu x:Key="dataGridContextMenu">
                         <ContextMenu.Items>
                             <MenuItem Header="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.DataContext.Record.ProviderName}" HeaderStringFormat="Filter to &quot;{0}&quot;"
