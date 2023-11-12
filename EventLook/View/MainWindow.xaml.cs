@@ -1,7 +1,6 @@
 ﻿using AboutBoxWpf;
 using CommunityToolkit.Mvvm.Messaging;
 using EventLook.Model;
-using EventLook.View;
 using EventLook.ViewModel;
 using System;
 using System.IO;
@@ -12,7 +11,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 
-namespace EventLook;
+namespace EventLook.View;
 
 /// <summary>
 /// Interaction logic for MainWindow.xaml
