@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventLook", "EventLook\Even
 EndProject
 Project("{C7167F0D-BC9F-4E6E-AFE1-012C56B48DB5}") = "EventLookPackage", "EventLookPackage\EventLookPackage.wapproj", "{D4B4878A-B307-4BF4-BB76-8D9D9D8E3A66}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AboutBoxWpf", "AboutBoxWpf\AboutBoxWpf.csproj", "{4760976C-05AB-4B7E-90AA-64E93CA2C80B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AboutBoxWpf", "AboutBoxWpf\AboutBoxWpf.csproj", "{4760976C-05AB-4B7E-90AA-64E93CA2C80B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{2148775C-5ACC-49F7-99CE-C909370AB503}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -93,6 +95,26 @@ Global
 		{4760976C-05AB-4B7E-90AA-64E93CA2C80B}.Release|x64.Build.0 = Release|x64
 		{4760976C-05AB-4B7E-90AA-64E93CA2C80B}.Release|x86.ActiveCfg = Release|x86
 		{4760976C-05AB-4B7E-90AA-64E93CA2C80B}.Release|x86.Build.0 = Release|x86
+		{2148775C-5ACC-49F7-99CE-C909370AB503}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2148775C-5ACC-49F7-99CE-C909370AB503}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2148775C-5ACC-49F7-99CE-C909370AB503}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{2148775C-5ACC-49F7-99CE-C909370AB503}.Debug|ARM.Build.0 = Debug|Any CPU
+		{2148775C-5ACC-49F7-99CE-C909370AB503}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{2148775C-5ACC-49F7-99CE-C909370AB503}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{2148775C-5ACC-49F7-99CE-C909370AB503}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2148775C-5ACC-49F7-99CE-C909370AB503}.Debug|x64.Build.0 = Debug|Any CPU
+		{2148775C-5ACC-49F7-99CE-C909370AB503}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2148775C-5ACC-49F7-99CE-C909370AB503}.Debug|x86.Build.0 = Debug|Any CPU
+		{2148775C-5ACC-49F7-99CE-C909370AB503}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2148775C-5ACC-49F7-99CE-C909370AB503}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2148775C-5ACC-49F7-99CE-C909370AB503}.Release|ARM.ActiveCfg = Release|Any CPU
+		{2148775C-5ACC-49F7-99CE-C909370AB503}.Release|ARM.Build.0 = Release|Any CPU
+		{2148775C-5ACC-49F7-99CE-C909370AB503}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{2148775C-5ACC-49F7-99CE-C909370AB503}.Release|ARM64.Build.0 = Release|Any CPU
+		{2148775C-5ACC-49F7-99CE-C909370AB503}.Release|x64.ActiveCfg = Release|Any CPU
+		{2148775C-5ACC-49F7-99CE-C909370AB503}.Release|x64.Build.0 = Release|Any CPU
+		{2148775C-5ACC-49F7-99CE-C909370AB503}.Release|x86.ActiveCfg = Release|Any CPU
+		{2148775C-5ACC-49F7-99CE-C909370AB503}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
