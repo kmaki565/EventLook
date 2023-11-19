@@ -25,7 +25,7 @@ The inbox Windows Event Viewer is a great app that provides comprehensive functi
 
 # Install
 Install from [Microsoft Store](https://www.microsoft.com/store/apps/9NJV5FQ089Z0).
-You could also download the latest artifact from [Actions](https://github.com/kmaki565/EventLook/actions), unzip it, and run EventLook.exe. No registry/local storage is used as of now.
+Alternatively, you could download the latest artifact from [Actions](https://github.com/kmaki565/EventLook/actions), unzip it, and run EventLook.exe. Settings will be saved in `user.config` under `%LOCALAPPDATA%\EventLook`. No registry is used.
 
 # Technologies
 - The basic structure for DataGrid with filters is based on an article in CodeProject: [Multi-filtered WPF DataGrid with MVVM](https://www.codeproject.com/Articles/442498/Multi-filtered-WPF-DataGrid-with-MVVM)
