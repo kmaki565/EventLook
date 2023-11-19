@@ -22,6 +22,8 @@ jobs:
     - run: nuget restore ${{ env.PROJECT_NAME }}.sln
     - uses: microsoft/setup-msbuild@v1.0.2
     - run: msbuild ${{ env.PROJECT_NAME }}.sln '/p:Configuration=Release;Platform=x64;AppxBundle=Always;AppxBundlePlatforms=x64|x86|arm64;AppxPackageSigningEnabled=false'
+    - name: Run unit test
+      run: dotnet test Tests\Tests.csproj
     - name: Delete large runtime folder and save x64 only to reduce size of artifact
       run: |
         Remove-Item -Recurse ${{ env.PROJECT_NAME }}\bin\ARM64

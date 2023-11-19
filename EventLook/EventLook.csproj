@@ -9,7 +9,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyTitle>A fast &amp; handy Event Viewer</AssemblyTitle>
-    <AssemblyVersion>1.2.0.0</AssemblyVersion>
+    <AssemblyVersion>1.2.1.0</AssemblyVersion>
     <Description>$(AssemblyTitle)</Description>
     <Copyright>Copyright (C) K. Maki</Copyright>
     <Product>EventLook</Product>
@@ -37,8 +37,6 @@
     </AssemblyMetadata>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Asset\1385_Disable_16x16_72.png" />
-    <Resource Include="Asset\1385_Disable_16x16_72_disabled.png" />
     <Resource Include="Asset\favicon.ico" />
     <Resource Include="Font\WINGDNG3.TTF" />
   </ItemGroup>

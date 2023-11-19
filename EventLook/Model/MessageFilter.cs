@@ -50,8 +50,8 @@ public class MessageFilter : FilterBase
         var filterGroups = MessageFilterText.Split('|').Where(x => !string.IsNullOrWhiteSpace(x));
         foreach (var filterText in filterGroups)
         {
-            // Then, do AND search for each group. 
-            var searchWords = filterText.ToLower().Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+            // Then, do AND search (case-insensitive) for each group. 
+            IEnumerable<string> searchWords = TextHelper.SplitQuotedText(filterText.ToLower());
             if (searchWords.All(x => evt.Message.ToLower().Contains(x)))
                 return true;
         }
