@@ -5,7 +5,7 @@
 | :point_up: EventLook is now available in [Microsoft Store](https://www.microsoft.com/store/apps/9NJV5FQ089Z0)! |
 |-----|
 
-A fast & handy alternative to Windows Event Viewer built on WPF and .NET 6
+A fast & handy alternative to Windows Event Viewer
 
 ![screenshot](/Screenshot-1.png)
 
@@ -28,6 +28,7 @@ Install from [Microsoft Store](https://www.microsoft.com/store/apps/9NJV5FQ089Z0
 Alternatively, you could download the latest artifact from [Actions](https://github.com/kmaki565/EventLook/actions), unzip it, and run EventLook.exe. Settings will be saved in `user.config` under `%LOCALAPPDATA%\EventLook`. No registry is used.
 
 # Technologies
+- WPF on .NET 8
 - The basic structure for DataGrid with filters is based on an article in CodeProject: [Multi-filtered WPF DataGrid with MVVM](https://www.codeproject.com/Articles/442498/Multi-filtered-WPF-DataGrid-with-MVVM)
 - [MVVM Toolkit](https://learn.microsoft.com/en-us/dotnet/communitytoolkit/mvvm/)
 - [Extended WPF Toolkit](https://github.com/xceedsoftware/wpftoolkit)
