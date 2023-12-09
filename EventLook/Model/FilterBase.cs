@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -45,7 +46,10 @@ public abstract class FilterBase : Monitorable
     {
         if (isFilterAdded || cvs == null) return;
 
+        SaveSortDescription();
         cvs.Filter += DoFilter;
+        RestoreSortDescription();
+
         isFilterAdded = true;
         FireFilterUpdated(EventArgs.Empty);
     }
@@ -53,7 +57,10 @@ public abstract class FilterBase : Monitorable
     {
         if (!isFilterAdded || cvs == null) return;
 
+        SaveSortDescription();
         cvs.Filter -= DoFilter;
+        RestoreSortDescription();
+
         isFilterAdded = false;
         FireFilterUpdated(EventArgs.Empty);
     }
@@ -79,5 +86,26 @@ public abstract class FilterBase : Monitorable
     protected virtual void FireFilterUpdated(EventArgs e)
     {
         FilterUpdated?.Invoke(this, e);
+    }
+
+    private SortDescription sortDesc;
+    /// <summary>
+    /// Saves the first sort description of the collection view, 
+    /// assuming multiple descriptions cannot be specified from the UI.
+    /// </summary>
+    private void SaveSortDescription()
+    {
+        sortDesc = cvs.View.SortDescriptions.FirstOrDefault();
+    }
+    /// <summary>
+    /// Restores sort description of the view, since apparently 
+    /// it's cleared when the filter event handler is added/removed.
+    /// </summary>
+    private void RestoreSortDescription()
+    {
+        if (sortDesc == default) return;
+        
+        cvs.View.SortDescriptions.Clear();
+        cvs.View.SortDescriptions.Add(sortDesc);
     }
 }

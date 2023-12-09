@@ -356,7 +356,7 @@ public class MainViewModel : ObservableRecipient
     }
     /// <summary>
     /// Gets or sets the CollectionViewSource which is the proxy for the
-    /// collection of Things and the datagrid in which each thing is displayed.
+    /// collection of Events and the datagrid in which each Event is displayed.
     /// </summary>
     private CollectionViewSource CVS { get; set; }
     /// <summary>
