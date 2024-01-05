@@ -25,10 +25,10 @@ public class LevelFilter : FilterBase
         private set;
     }
 
-    public override void Refresh(IEnumerable<EventItem> events, bool carryOver)
+    public override void Refresh(IEnumerable<EventItem> events, bool reset)
     {
         // Remember filters and their selections before clearing (needs ToList)
-        var prevFilters = carryOver ? levelFilters.Select(f => new { f.Level, f.Selected }).ToList() : null;
+        var prevFilters = reset ? null : levelFilters.Select(f => new { f.Level, f.Selected }).ToList();
 
         levelFilters.Clear();
 
@@ -44,18 +44,25 @@ public class LevelFilter : FilterBase
 
         Apply();
     }
-    public override void Reset()
+    public override void Clear()
     {
-        RemoveFilter();
         foreach (var lf in levelFilters)
         {
             lf.Selected = true;
         }
+        Apply();
+    }
+    public override void Reset()
+    {
+        levelFilters.Clear();
     }
 
     protected override bool IsFilterMatched(EventItem evt)
     {
-        return LevelFilters.Where(lf => lf.Selected).Any(lf => lf.Level == evt.Record.Level);
+        if (levelFilters.Count == 0)
+            return true;
+
+        return levelFilters.Where(lf => lf.Selected).Any(lf => lf.Level == evt.Record.Level);
     }
 
     /// <summary>
@@ -64,10 +71,10 @@ public class LevelFilter : FilterBase
     /// <returns>Returns true if success.</returns>
     public bool SetSingleFilter(byte? level)
     {
-        if (LevelFilters.Any(x => x.Level == level) == false)
+        if (levelFilters.Any(x => x.Level == level) == false)
             return false;
 
-        foreach (var filterItem in LevelFilters)
+        foreach (var filterItem in levelFilters)
         {
             filterItem.Selected = (filterItem.Level == level);
         }
@@ -79,10 +86,10 @@ public class LevelFilter : FilterBase
     /// <returns>Returns true if success.</returns>
     public bool UncheckFilter(byte? level)
     {
-        if (LevelFilters.Any(x => x.Level == level) == false)
+        if (levelFilters.Any(x => x.Level == level) == false)
             return false;
 
-        foreach (var filterItem in LevelFilters)
+        foreach (var filterItem in levelFilters)
         {
             if (filterItem.Level == level)
                 filterItem.Selected = false;
