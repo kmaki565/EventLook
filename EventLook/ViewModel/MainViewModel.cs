@@ -43,6 +43,7 @@ public class MainViewModel : ObservableRecipient
 
         TimeZones = new ObservableCollection<TimeZoneInfo>(TimeZoneInfo.GetSystemTimeZones());
         SelectedTimeZone = TimeZones.FirstOrDefault(x => x.Id == TimeZoneInfo.Local.Id);
+        ShowsMillisec = Properties.Settings.Default.ShowsMillisec;
 
         progress = new Progress<ProgressInfo>(ProgressCallback); // Needs to instantiate in UI thread
         stopwatch = new Stopwatch();
@@ -125,6 +126,7 @@ public class MainViewModel : ObservableRecipient
     public ObservableCollection<TimeZoneInfo> TimeZones { get; private set; }
     private TimeZoneInfo selectedTimeZone;
     public TimeZoneInfo SelectedTimeZone { get => selectedTimeZone; set => SetProperty(ref selectedTimeZone, value); }
+    public bool ShowsMillisec { get; set; }
 
     private readonly bool isRunAsAdmin;
     public bool IsRunAsAdmin { get => isRunAsAdmin; }
@@ -422,6 +424,7 @@ public class MainViewModel : ObservableRecipient
             LogSources = LogSources.ToList(),
             Ranges = Ranges.ToList(),
             SelectedRange = rangeMgr.GetStartupRange(),
+            ShowsMillisec = ShowsMillisec
         };
         var openSettingsVm = new SettingsViewModel(LogPickerWindowService, originalSettings);
         string previousLogPath = SelectedLogSource?.Path;
@@ -431,11 +434,15 @@ public class MainViewModel : ObservableRecipient
         if (ret != true)    // Cancel
             return;
 
-        // Reflect the new settings to UI.
+        // Save new settings.
         SettingsData newSettings = openSettingsVm.GetSettingsInfo();
         Properties.Settings.Default.StartupLogNames = newSettings.LogSources.Select(x => x.Path).ToList();
         Properties.Settings.Default.StartupRangeDays = newSettings.SelectedRange.DaysFromNow;
+        Properties.Settings.Default.ShowsMillisec = newSettings.ShowsMillisec;
         Properties.Settings.Default.Save();
+
+        // Reflect new settings to the UI.
+        ShowsMillisec = newSettings.ShowsMillisec;
 
         // Replace non-file logs with the new ones.
         readyToRefresh = false; // Avoid Refresh being called multiple times.

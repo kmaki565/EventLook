@@ -133,16 +133,17 @@ public class ExpandedToGridLengthConverter : IValueConverter
     }
 }
 
-public class UtcToAnotherTimeZoneConverter : IMultiValueConverter
+public class UtcToAnotherTimeZoneStringConverter : IMultiValueConverter
 {
     public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
     {
-        if (values[0] is DateTime utcTime && values[1] is TimeZoneInfo timeZone)
+        if (values[0] is DateTime utcTime && values[1] is TimeZoneInfo timeZone && values[2] is bool showsMillisec)
         {
-            return TimeZoneInfo.ConvertTimeFromUtc(utcTime, timeZone);
+            DateTime time = TimeZoneInfo.ConvertTimeFromUtc(utcTime, timeZone);
+            return showsMillisec ? time.ToString("yyyy-MM-dd HH:mm:ss.fff") : time.ToString("yyyy-MM-dd HH:mm:ss");
         }
         else
-            throw new ArgumentException("Arguments must be 1. UTC time and 2. TimeZoneInfo.");
+            throw new ArgumentException("Arguments must be 1. UTC time, 2. TimeZoneInfo and 3. boolean for whether to show milliseconds in time of event.");
     }
 
     public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)

@@ -33,7 +33,7 @@
                                      UnknownIconPath="/Asset/StatusHidden_16x.png"/>
         <v:ExpandedToGridLengthConverter x:Key="ExpandedToGridLengthConverter"/>
         <v:InverseBooleanConverter x:Key="InverseBooleanConverter" />
-        <v:UtcToAnotherTimeZoneConverter x:Key="UtcToAnotherTimeZoneConverter"/>
+        <v:UtcToAnotherTimeZoneStringConverter x:Key="UtcToAnotherTimeZoneStringConverter"/>
         <v:TimeZoneToOffsetTextConverter x:Key="TimeZoneToOffsetTextConverter"/>
         <!-- This next line instantiates a CollectionViewSource with the collection of Events as its collection of objects-->
         <CollectionViewSource Source="{Binding Events}" x:Key="X_CVS"/>
@@ -192,9 +192,10 @@
                 <DataGrid.Columns>
                     <DataGridTextColumn SortMemberPath="TimeOfEvent">
                         <DataGridTextColumn.Binding>
-                            <MultiBinding Converter="{StaticResource UtcToAnotherTimeZoneConverter}" StringFormat="yyyy-MM-dd HH:mm:ss">
+                            <MultiBinding Converter="{StaticResource UtcToAnotherTimeZoneStringConverter}">
                                 <Binding Path="TimeOfEvent"/>
                                 <Binding Path="DataContext.SelectedTimeZone" RelativeSource="{RelativeSource AncestorType=DataGrid}"/>
+                                <Binding Path="DataContext.ShowsMillisec" RelativeSource="{RelativeSource AncestorType=DataGrid}"/>
                             </MultiBinding>
                         </DataGridTextColumn.Binding>
                         <DataGridTextColumn.HeaderTemplate>
