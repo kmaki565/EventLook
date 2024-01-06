@@ -33,18 +33,15 @@
                 </Grid>
             </TabItem>
             <TabItem Header="Settings">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="50"/>
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
-                    <StackPanel Orientation="Horizontal" Margin="10,0">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="10,16,10,8">
                         <TextBlock Text="Default range to display: " Margin="0,0,10,0" VerticalAlignment="Center"/>
                         <ComboBox VerticalAlignment="Center" MinWidth="100" Height="24"
                                   ItemsSource="{Binding Ranges}" SelectedItem="{Binding SelectedRange}"
                                   DisplayMemberPath="Text" SelectedValuePath="Text"/>
                     </StackPanel>
-                </Grid>
+                    <CheckBox Content="Show milliseconds for Time of event" Margin="10,8" IsChecked="{Binding ShowsMillisec}"/>
+                </StackPanel>
             </TabItem>
         </TabControl>
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">

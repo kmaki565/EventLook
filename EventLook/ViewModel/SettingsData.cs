@@ -9,4 +9,5 @@ public class SettingsData
     public List<LogSource> LogSources { get; set; }
     public List<Range> Ranges { get; set; }
     public Range SelectedRange { get; set; }
+    public bool ShowsMillisec { get; set; }
 }

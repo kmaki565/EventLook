@@ -25,6 +25,7 @@ public class SettingsViewModel : ObservableObject
         LogSources = new ObservableCollection<LogSource>(originalSettings.LogSources.Where(x => x.PathType == PathType.LogName));
         Ranges = new List<Model.Range>(originalSettings.Ranges);
         SelectedRange = Ranges.FirstOrDefault(r => r.Text == originalSettings.SelectedRange.Text);
+        ShowsMillisec = originalSettings.ShowsMillisec;
 
         AddCommand = new RelayCommand(AddLogSource);
         RemoveCommand = new RelayCommand(RemoveLogSource);
@@ -38,6 +39,7 @@ public class SettingsViewModel : ObservableObject
     public IReadOnlyCollection<Model.Range> Ranges { get; set; }
     private Model.Range selectedRange;
     public Model.Range SelectedRange { get => selectedRange; set => SetProperty(ref selectedRange, value); }
+    public bool ShowsMillisec { get; set; }
 
     /// <summary>
     /// Returns the result of the settings dialog.
@@ -49,7 +51,8 @@ public class SettingsViewModel : ObservableObject
         {
             LogSources = LogSources.ToList(),
             Ranges = Ranges.ToList(),
-            SelectedRange = SelectedRange
+            SelectedRange = SelectedRange,
+            ShowsMillisec = ShowsMillisec
         };
     }
 
