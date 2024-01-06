@@ -157,7 +157,10 @@ public class MainViewModel : ObservableRecipient
         
         await Task.Run(() => LoadEvents());
 
-        filters.ForEach(f => f.Refresh(Events, reset));
+        // If the log source selection is changed before completing loading events, we don't want to enumerate
+        // the source filter items with the previous log source.
+        if (!IsUpdating)
+            filters.ForEach(f => f.Refresh(Events, reset));
 
         Refreshed?.Invoke();
     }

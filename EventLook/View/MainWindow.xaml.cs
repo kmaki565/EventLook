@@ -116,6 +116,9 @@ public partial class MainWindow : Window
     private void OnRefreshing()
     {
         isRefreshing = true;
+
+        // When an older event is selected, refreshing entire events causes the DataGrid to keep auto-scrolling.
+        // This is to workaround the issue, but needs to be revisited.
         ScrollToTop();
     }
     private void OnRefreshed()
