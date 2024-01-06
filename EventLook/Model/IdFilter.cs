@@ -28,19 +28,16 @@ public class IdFilter : FilterBase
             idFilterNum = value;
             NotifyPropertyChanged();
 
-            if (value == null)
-                RemoveFilter();
-            else
-                Apply();
+            Apply();
         }
     }
 
-    public override void Refresh(IEnumerable<EventItem> events, bool carryOver)
+    public override void Refresh(IEnumerable<EventItem> events, bool reset)
     {
-        if (!carryOver)
-            Reset();
+        if (reset)
+            Clear();
     }
-    public override void Reset()
+    public override void Clear()
     {
         IdFilterNum = null;
     }
@@ -50,6 +47,6 @@ public class IdFilter : FilterBase
         if (idFilterNum.HasValue)
             return evt.Record.Id == IdFilterNum.Value;
         else
-            return true;    // Shouldn't come here - null means no filter specified.
+            return true;    // No filter specified.
     }
 }

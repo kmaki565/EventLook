@@ -93,7 +93,7 @@ public class MainViewModel : ObservableRecipient
 
             if (readyToRefresh)
             {
-                Refresh(carryOver: false);
+                Refresh(reset: true);
             }
         }
     }
@@ -107,7 +107,7 @@ public class MainViewModel : ObservableRecipient
             SetProperty(ref selectedRange, value);
 
             if (readyToRefresh && !selectedRange.IsCustom)
-                Refresh(carryOver: true);
+                Refresh(reset: false);
         }
     }
     public ReadOnlyObservableCollection<SourceFilterItem> SourceFilters { get => sourceFilter.SourceFilters; }
@@ -138,7 +138,7 @@ public class MainViewModel : ObservableRecipient
             f.FilterUpdated += OnFilterUpdated;
         });
 
-        Refresh(carryOver: false);
+        Refresh(reset: true);
         readyToRefresh = true;
     }
 
@@ -146,18 +146,23 @@ public class MainViewModel : ObservableRecipient
     public event Action Refreshed;
     private void RefreshForCommand()
     {
-        Refresh(carryOver: true);
+        Refresh(reset: false);
     }
-    private async void Refresh(bool carryOver)
+    private async void Refresh(bool reset)
     {
         Refreshing?.Invoke();
 
         UpdateDateTimes();
 
+        if (reset)
+            filters.ForEach(f => f.Reset());
+        
         await Task.Run(() => LoadEvents());
 
-        //TODO: It's ideal if we refresh filters while loading events.
-        filters.ForEach(f => f.Refresh(Events, carryOver));
+        // If the log source selection is changed before completing loading events, we don't want to enumerate
+        // the source filter items with the previous log source.
+        if (!IsUpdating)
+            filters.ForEach(f => f.Refresh(Events, reset));
 
         Refreshed?.Invoke();
     }
@@ -173,9 +178,9 @@ public class MainViewModel : ObservableRecipient
     {
         Application.Current.MainWindow.Close();
     }
-    private void ResetFilters()
+    private void ClearFilters()
     {
-        filters.ForEach(f => f.Reset());
+        filters.ForEach(f => f.Clear());
     }
     private async void ApplySourceFilter()
     {
@@ -262,7 +267,7 @@ public class MainViewModel : ObservableRecipient
         RefreshCommand = new RelayCommand(RefreshForCommand, () => !IsUpdating);
         CancelCommand = new RelayCommand(Cancel, () => IsUpdating);
         ExitCommand = new RelayCommand(Exit); 
-        ResetFiltersCommand = new RelayCommand(ResetFilters);
+        ResetFiltersCommand = new RelayCommand(ClearFilters);
         ApplySourceFilterCommand = new RelayCommand(ApplySourceFilter);
         ApplyLevelFilterCommand = new RelayCommand(ApplyLevelFilter);
         OpenDetailsCommand = new RelayCommand(OpenDetails);
@@ -358,7 +363,7 @@ public class MainViewModel : ObservableRecipient
     }
     /// <summary>
     /// Gets or sets the CollectionViewSource which is the proxy for the
-    /// collection of Things and the datagrid in which each thing is displayed.
+    /// collection of Events and the datagrid in which each Event is displayed.
     /// </summary>
     private CollectionViewSource CVS { get; set; }
     /// <summary>

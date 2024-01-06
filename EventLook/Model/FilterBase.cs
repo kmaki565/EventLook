@@ -17,52 +17,47 @@ public abstract class FilterBase : Monitorable
     public void SetCvs(CollectionViewSource cvs)
     {
         this.cvs = cvs;
+        this.cvs.Filter += DoFilter;
     }
     /// <summary>
     /// Refreshes filter UI (e.g. populate filter items in a drop down) by loaded events,
-    /// If carryOver is true, it'll try to carry over filters user specified (except newly populated checkboxes).
-    /// Otherwise all filters will be cleared (e.g. checkboxes all checked).
+    /// If reset is true, all filters will be cancelled (e.g. checkboxes all checked).
+    /// Otherwise, it'll try to carry over filters user specified (except newly populated checkboxes).
     /// </summary>
     /// <param name="events">Loaded event items</param>
-    public virtual void Refresh(IEnumerable<EventItem> events, bool carryOver) { }
+    public virtual void Refresh(IEnumerable<EventItem> events, bool reset) { }
 
     /// <summary>
-    /// Removes filter and restores the default UI (to be called by "Reset filter" button).
+    /// Removes filter, but keeps the filter items in the dropdown (if available).
+    /// This is to be called by "Reset filter" button.
     /// </summary>
-    public abstract void Reset();
+    public abstract void Clear();
+    /// <summary>
+    /// Removes filter and filter items in the dropdown (if available).
+    /// </summary>
+    public virtual void Reset()
+    {
+        Clear();
+    }
 
     /// <summary>
     /// Applies filter when the user operates the filter UI.
     /// </summary>
-    public virtual void Apply()
+    public void Apply()
     {
-        RemoveFilter();
-        AddFilter();
+        if (cvs != null)
+        {
+            cvs.View.Refresh();
+            FireFilterUpdated(EventArgs.Empty);
+        }
     }
 
-    private bool isFilterAdded = false;
-    protected void AddFilter()
-    {
-        if (isFilterAdded || cvs == null) return;
-
-        cvs.Filter += DoFilter;
-        isFilterAdded = true;
-        FireFilterUpdated(EventArgs.Empty);
-    }
-    protected void RemoveFilter()
-    {
-        if (!isFilterAdded || cvs == null) return;
-
-        cvs.Filter -= DoFilter;
-        isFilterAdded = false;
-        FireFilterUpdated(EventArgs.Empty);
-    }
     protected void DoFilter(object sender, FilterEventArgs e)
     {
         // Set false if the event does not match to the filter criteria.
         // When using multiple filters, do not explicitly set anything to true.
 
-        if (!(e.Item is EventItem evt))
+        if (e.Item is not EventItem evt)
             e.Accepted = false;
         else if (!IsFilterMatched(evt))
             e.Accepted = false;

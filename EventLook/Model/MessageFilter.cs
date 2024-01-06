@@ -26,26 +26,26 @@ public class MessageFilter : FilterBase
 
             messageFilterText = value;
             NotifyPropertyChanged();
-
-            if (value == "")
-                RemoveFilter();
-            else
-                Apply();
+            
+            Apply();
         }
     }
 
-    public override void Refresh(IEnumerable<EventItem> events, bool carryOver)
+    public override void Refresh(IEnumerable<EventItem> events, bool reset)
     {
-        if (!carryOver)
-            Reset();
+        if (reset)
+            Clear();
     }
-    public override void Reset()
+    public override void Clear()
     {
         MessageFilterText = "";
     }
 
     protected override bool IsFilterMatched(EventItem evt)
     {
+        if (MessageFilterText == "")
+            return true;
+
         // First, make text groups for OR search.
         var filterGroups = MessageFilterText.Split('|').Where(x => !string.IsNullOrWhiteSpace(x));
         foreach (var filterText in filterGroups)

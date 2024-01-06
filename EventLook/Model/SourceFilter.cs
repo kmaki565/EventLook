@@ -27,10 +27,10 @@ public class SourceFilter : FilterBase
         private set; 
     }
 
-    public override void Refresh(IEnumerable<EventItem> events, bool carryOver)
+    public override void Refresh(IEnumerable<EventItem> events, bool reset)
     {
         // Remember filters and their selections before clearing (needs ToList)
-        var prevFilters = carryOver ? sourceFilters.Select(f => new { f.Name, f.Selected }).ToList() : null;
+        var prevFilters = reset ? null : sourceFilters.Select(f => new { f.Name, f.Selected }).ToList();
 
         sourceFilters.Clear();
 
@@ -46,18 +46,25 @@ public class SourceFilter : FilterBase
 
         Apply();
     }
-    public override void Reset()
+    public override void Clear()
     {
-        RemoveFilter();
-        foreach (var sf in SourceFilters)
+        foreach (var sf in sourceFilters)
         {
             sf.Selected = true;
         }
+        Apply();
+    }
+    public override void Reset()
+    {
+        sourceFilters.Clear();
     }
 
     protected override bool IsFilterMatched(EventItem evt)
     {
-        return SourceFilters.Where(sf => sf.Selected).Any(sf => String.Compare(sf.Name, evt.Record.ProviderName) == 0);
+        if (sourceFilters.Count == 0)
+            return true;
+
+        return sourceFilters.Where(sf => sf.Selected).Any(sf => string.Equals(sf.Name, evt.Record.ProviderName));
     }
 
     /// <summary>
@@ -67,10 +74,10 @@ public class SourceFilter : FilterBase
     /// <returns>Returns true if success.</returns>
     public bool SetSingleFilter(string name)
     {
-        if (SourceFilters.Any(x => x.Name == name) == false)
+        if (sourceFilters.Any(x => x.Name == name) == false)
             return false;
 
-        foreach (var filterItem in SourceFilters)
+        foreach (var filterItem in sourceFilters)
         {
             filterItem.Selected = (filterItem.Name == name);
         }
@@ -83,10 +90,10 @@ public class SourceFilter : FilterBase
     /// <returns>Returns true if success.</returns>
     public bool UncheckFilter(string name)
     {
-        if (SourceFilters.Any(x => x.Name == name) == false)
+        if (sourceFilters.Any(x => x.Name == name) == false)
             return false;
 
-        foreach (var filterItem in SourceFilters)
+        foreach (var filterItem in sourceFilters)
         {
             if (filterItem.Name == name)
                 filterItem.Selected = false;
