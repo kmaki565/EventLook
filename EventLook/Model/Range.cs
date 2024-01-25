@@ -24,7 +24,7 @@ public class RangeMgr
             new Range() { Text = "Last 7 days", DaysFromNow = 7, IsCustom = false },
             new Range() { Text = "Last 15 days", DaysFromNow = 15, IsCustom = false },
             new Range() { Text = "Last 30 days", DaysFromNow = 30, IsCustom = false },
-            new Range() { Text = "Any time", DaysFromNow = 0, IsCustom = false },
+            new Range() { Text = "All time", DaysFromNow = 0, IsCustom = false },
             new Range() { Text = "Custom range", DaysFromNow = 0, IsCustom = true },
         };
     }
@@ -32,8 +32,8 @@ public class RangeMgr
 
     public Range GetStartupRange()
     {
-        // Default is "Any time".
-        // Note that user's choice "Custom range" is handled as "Any time" at startup as we don't save IsCustom property.
+        // Default is "All time".
+        // Note that user's choice "Custom range" is handled as "All time" at startup as we don't save IsCustom property.
         return Ranges.FirstOrDefault(x => x.DaysFromNow == Properties.Settings.Default.StartupRangeDays) ??
             Ranges.First(x => x.DaysFromNow == 0 && x.IsCustom == false);
     }
