@@ -125,13 +125,13 @@
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Source: " Margin="5,0,0,0" VerticalAlignment="Center"/>
                     <xctk:CheckComboBox Width="220" 
-                            IsSelectAllActive="True"
+                            IsSelectAllActive="True" IsAllItemsSelectedContentActive="True"
                             Delimiter=", "
                             ItemsSource="{Binding SourceFilters}" DisplayMemberPath="Name" SelectedMemberPath="Selected"
                             Command="{Binding ApplySourceFilterCommand}"/>
                     <TextBlock Text="Level: " Margin="5,0,0,0" VerticalAlignment="Center"/>
                     <xctk:CheckComboBox Width="120" 
-                            IsSelectAllActive="True"
+                            IsSelectAllActive="True" IsAllItemsSelectedContentActive="True"
                             Delimiter=", "
                             ItemsSource="{Binding LevelFilters}" SelectedMemberPath="Selected"
                             Command="{Binding ApplyLevelFilterCommand}"/>
