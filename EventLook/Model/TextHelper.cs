@@ -42,4 +42,9 @@ public static class TextHelper
                    .Where(x => x != "")
             : input.Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
     }
+
+    public static bool IsWordToExclude(string word)
+    {
+        return word.StartsWith('-') && !word.Contains(' ');
+    }
 }

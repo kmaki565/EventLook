@@ -51,8 +51,12 @@ public class MessageFilter : FilterBase
         foreach (var filterText in filterGroups)
         {
             // Then, do AND search (case-insensitive) for each group. 
+            //TODO: Do just once to build search words to improve performance.
             IEnumerable<string> searchWords = TextHelper.SplitQuotedText(filterText.ToLower());
-            if (searchWords.All(x => evt.Message.ToLower().Contains(x)))
+            List<string> includedWords = searchWords.Where(x => !TextHelper.IsWordToExclude(x)).ToList();
+            List<string> excludedWords = searchWords.Where(x => TextHelper.IsWordToExclude(x)).Select(x => x.Remove(0, 1)).ToList();
+            string target = evt.Message.ToLower();
+            if (excludedWords.All(x => !target.Contains(x)) && includedWords.All(x => target.Contains(x)))
                 return true;
         }
         return false;
