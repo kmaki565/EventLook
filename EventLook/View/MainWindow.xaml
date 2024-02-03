@@ -7,7 +7,7 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" xmlns:viewmodel="clr-namespace:EventLook.ViewModel" d:DataContext="{d:DesignInstance Type=viewmodel:MainViewModel}"
         mc:Ignorable="d"
         ResizeMode="CanResizeWithGrip"
-        PreviewKeyDown="Window_PreviewKeyDown">
+        PreviewKeyDown="Window_PreviewKeyDown" d:DesignHeight="640" d:DesignWidth="1100">
     <Window.Style>
         <Style TargetType="Window">
             <Style.Triggers>
@@ -124,12 +124,12 @@
             <Expander x:Name="Ex1" Header="F_ilters" Grid.Row="1" Margin="10,0,0,0" ExpandDirection="Down">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Source: " Margin="5,0,0,0" VerticalAlignment="Center"/>
-                    <xctk:CheckComboBox Width="220" 
+                    <xctk:CheckComboBox Width="250" 
                             IsSelectAllActive="True" IsAllItemsSelectedContentActive="True"
                             Delimiter=", "
                             ItemsSource="{Binding SourceFilters}" DisplayMemberPath="Name" SelectedMemberPath="Selected"
                             Command="{Binding ApplySourceFilterCommand}"/>
-                    <TextBlock Text="Level: " Margin="5,0,0,0" VerticalAlignment="Center"/>
+                    <TextBlock Text="Level: " Margin="10,0,0,0" VerticalAlignment="Center"/>
                     <xctk:CheckComboBox Width="120" 
                             IsSelectAllActive="True" IsAllItemsSelectedContentActive="True"
                             Delimiter=", "
@@ -142,8 +142,8 @@
                     <TextBlock Text="Message contains: " Margin="10,0,0,0" VerticalAlignment="Center"/>
                     <TextBox x:Name="textBoxMsgFilter" Text="{Binding MsgFilter.MessageFilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=300}"
                              v:TextBoxBehavior.EscapeClearsText="True"
-                             Width="180" VerticalContentAlignment="Center" />
-                    <Button Content="Reset filters" Height="25" Margin="10,0,0,0" Command="{Binding ResetFiltersCommand, Mode=OneWay}"/>
+                             MinWidth="200" VerticalContentAlignment="Center" />
+                    <Button Content="Reset filters" Height="25" Width="70" Margin="15,0,0,0" Command="{Binding ResetFiltersCommand, Mode=OneWay}"/>
                 </StackPanel>
             </Expander>
 
