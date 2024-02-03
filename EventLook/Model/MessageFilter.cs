@@ -10,8 +10,10 @@ namespace EventLook.Model;
 
 public class MessageFilter : FilterBase
 {
+    private readonly List<AndSearchMaterial> andSearchGroups;
     public MessageFilter()
     {
+        andSearchGroups = new List<AndSearchMaterial>();
         MessageFilterText = "";
     }
 
@@ -26,7 +28,14 @@ public class MessageFilter : FilterBase
 
             messageFilterText = value;
             NotifyPropertyChanged();
-            
+
+            andSearchGroups.Clear();
+            // Make text groups for OR search, then build AND-search materials for each group.
+            foreach (var groupText in messageFilterText.Split('|').Where(x => !string.IsNullOrWhiteSpace(x)))
+            {
+                andSearchGroups.Add(new AndSearchMaterial(groupText));
+            }
+
             Apply();
         }
     }
@@ -46,15 +55,7 @@ public class MessageFilter : FilterBase
         if (MessageFilterText == "")
             return true;
 
-        // First, make text groups for OR search.
-        var filterGroups = MessageFilterText.Split('|').Where(x => !string.IsNullOrWhiteSpace(x));
-        foreach (var filterText in filterGroups)
-        {
-            // Then, do AND search (case-insensitive) for each group. 
-            IEnumerable<string> searchWords = TextHelper.SplitQuotedText(filterText.ToLower());
-            if (searchWords.All(x => evt.Message.ToLower().Contains(x)))
-                return true;
-        }
-        return false;
+        // If any of groups is matched, return true (= OR search).
+        return andSearchGroups.Any(x => TextHelper.IsTextMatched(evt.Message, x));
     }
 }

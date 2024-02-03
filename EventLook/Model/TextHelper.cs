@@ -42,4 +42,29 @@ public static class TextHelper
                    .Where(x => x != "")
             : input.Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
     }
+
+    /// <summary>
+    /// Performs AND search (case-insensitive).
+    /// Return true if target text contains all included words and does not contain any excluded words.
+    /// </summary>
+    public static bool IsTextMatched(string target, AndSearchMaterial andSearch)
+    {
+        return andSearch.WordsToInclude.All(x => target.Contains(x, StringComparison.OrdinalIgnoreCase))
+            && andSearch.WordsToExclude.All(x => !target.Contains(x, StringComparison.OrdinalIgnoreCase));
+    }
+}
+
+public class AndSearchMaterial
+{
+    public AndSearchMaterial(string str)
+    {
+        //TODO: Exclude search with quoted text is not supported (e.g. -"abc def" is treated as "abc def"),
+        // and quoting a minus sign is not supported (e.g. "-abc" is treated as "abc").
+        IEnumerable<string> searchWords = TextHelper.SplitQuotedText(str);
+        WordsToInclude = searchWords.Where(x => !x.StartsWith('-'));
+        // If -abc is supplied, abc will be the excluded keyword.
+        WordsToExclude = searchWords.Where(x => Regex.IsMatch(x, @"^-\S+")).Select(x => x.Remove(0, 1));
+    }
+    public IEnumerable<string> WordsToInclude { get; }
+    public IEnumerable<string> WordsToExclude { get; }
 }
