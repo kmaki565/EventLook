@@ -68,6 +68,8 @@ public class MainViewModel : ObservableRecipient
     private readonly Stopwatch stopwatch;
     private bool readyToRefresh = false;
     private int loadedEventCount = 0;
+    private bool isAppend = false;
+    private DateTime lastLogDate = DateTime.MinValue;
     private Task ongoingTask;
 
     // Services to be injected.
@@ -146,18 +148,24 @@ public class MainViewModel : ObservableRecipient
     public event Action Refreshed;
     private void RefreshForCommand()
     {
+        isAppend = lastLogDate != DateTime.MinValue && !SelectedRange.IsCustom;
         Refresh(reset: false);
     }
+    /// <summary>
+    /// Refreshes events to show.
+    /// If reset is true, all filters will be cleared.
+    /// </summary>
+    /// <param name="reset"></param>
     private async void Refresh(bool reset)
     {
         Refreshing?.Invoke();
 
-        UpdateDateTimes();
+        UpdateDateTimeInUi();
 
         if (reset)
             filters.ForEach(f => f.Reset());
         
-        await Task.Run(() => LoadEvents());
+        await Task.Run(LoadEvents);
 
         // If the log source selection is changed before completing loading events, we don't want to enumerate
         // the source filter items with the previous log source.
@@ -284,7 +292,7 @@ public class MainViewModel : ObservableRecipient
     }
     #endregion
 
-    private void UpdateDateTimes()
+    private void UpdateDateTimeInUi()
     {
         if (SelectedRange.IsCustom)
             return;
@@ -311,20 +319,48 @@ public class MainViewModel : ObservableRecipient
     {
         Cancel();
 
-        await Update(DataService.ReadEvents(selectedLogSource, FromDateTime, ToDateTime, progress));
+        await Update(DataService.ReadEvents(selectedLogSource, 
+            isAppend && (lastLogDate != DateTime.MinValue) ? lastLogDate + TimeSpan.FromSeconds(1) : FromDateTime, //TODO: Better way to avoid duplicate logs.
+            ToDateTime,
+            progress));
     }
+
+    private int appendCount = 0;
     private void ProgressCallback(ProgressInfo progressInfo)
     {
-        if (progressInfo.IsFirst)
-            Events.Clear();
-
-        //TODO: Improve performance with AddRange in ObservableCollection.
-        foreach (var evt in progressInfo.LoadedEvents)
+        if (isAppend)
         {
-            Events.Add(evt);
+            if (progressInfo.IsFirst)
+                appendCount = 0;
+
+            foreach (var evt in progressInfo.LoadedEvents)
+            {
+                Events.Insert(appendCount, evt);    // We read logs from the newest to the oldest.
+                appendCount++;
+            }
+        }
+        else
+        {
+            if (progressInfo.IsFirst)
+                Events.Clear();
+
+            //TODO: Improve performance with AddRange in ObservableCollection.
+            foreach (var evt in progressInfo.LoadedEvents)
+            {
+                Events.Add(evt);
+            }
         }
         loadedEventCount = Events.Count;
         UpdateStatusText(progressInfo.Message);
+
+        if (progressInfo.IsComplete)
+        {
+            lastLogDate = Events.Any() && progressInfo.Message == ""    // If some events are loaded without error,
+                ? Events.First().TimeOfEvent    // save the latest event time.
+                : DateTime.MinValue;
+
+            isAppend = false;   // Apparently, the last callback comes after the finally block of Update() method.
+        }
     }
     private async Task Update(Task task)
     {
@@ -332,7 +368,8 @@ public class MainViewModel : ObservableRecipient
         {
             ongoingTask = task;
             stopwatch.Restart();
-            loadedEventCount = 0;
+            if (!isAppend) 
+                loadedEventCount = 0;
             IsUpdating = true;
             UpdateStatusText();
             UpdateFilterInfoText();

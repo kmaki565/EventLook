@@ -37,7 +37,7 @@ public class DataService : IDataService
                 {
                     ReverseDirection = true
                 };
-                var reader = new System.Diagnostics.Eventing.Reader.EventLogReader(elQuery);
+                var reader = new EventLogReader(elQuery);
                 var eventRecord = reader.ReadEvent();
                 Debug.WriteLine("Begin Reading");
                 await Task.Run(() =>
@@ -50,7 +50,7 @@ public class DataService : IDataService
                         ++count;
                         if (count % 100 == 0)
                         {
-                            var info = new ProgressInfo(eventRecords.ConvertAll(e => new EventItem(e)), false, isFirst);
+                            var info = new ProgressInfo(eventRecords.ConvertAll(e => new EventItem(e)), isComplete: false, isFirst);
                             cts.Token.ThrowIfCancellationRequested();
                             progress.Report(info);
                             isFirst = false;
@@ -77,7 +77,7 @@ public class DataService : IDataService
             }
             finally
             {
-                var info_comp = new ProgressInfo(eventRecords.ConvertAll(e => new EventItem(e)), true, isFirst, errMsg);
+                var info_comp = new ProgressInfo(eventRecords.ConvertAll(e => new EventItem(e)), isComplete: true, isFirst, errMsg);
                 progress.Report(info_comp);
                 Debug.WriteLine("End Reading");
             }
