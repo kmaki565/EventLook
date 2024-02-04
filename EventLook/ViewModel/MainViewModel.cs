@@ -320,7 +320,7 @@ public class MainViewModel : ObservableRecipient
         Cancel();
 
         await Update(DataService.ReadEvents(selectedLogSource, 
-            isAppend && (lastLogDate != DateTime.MinValue) ? lastLogDate + TimeSpan.FromSeconds(1) : FromDateTime, //TODO: Better way to avoid duplicate logs.
+            isAppend && (lastLogDate != DateTime.MinValue) ? lastLogDate : FromDateTime,
             ToDateTime,
             progress));
     }
@@ -344,7 +344,6 @@ public class MainViewModel : ObservableRecipient
             if (progressInfo.IsFirst)
                 Events.Clear();
 
-            //TODO: Improve performance with AddRange in ObservableCollection.
             foreach (var evt in progressInfo.LoadedEvents)
             {
                 Events.Add(evt);

@@ -30,8 +30,8 @@ public class DataService : IDataService
             try
             {
                 string sQuery = string.Format(" *[System[TimeCreated[@SystemTime > '{0}' and @SystemTime <= '{1}']]]",
-                    fromTime.ToUniversalTime().ToString("s"),
-                    toTime.ToUniversalTime().ToString("s"));
+                    fromTime.ToUniversalTime().ToString("o"),
+                    toTime.ToUniversalTime().ToString("o"));
 
                 var elQuery = new EventLogQuery(eventSource.Path, eventSource.PathType, sQuery)
                 {
