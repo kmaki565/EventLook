@@ -68,6 +68,8 @@ public class MainViewModel : ObservableRecipient
     private readonly Stopwatch stopwatch;
     private bool readyToRefresh = false;
     private int loadedEventCount = 0;
+    private bool isAppend = false;
+    private DateTime lastLogDate = DateTime.MinValue;
     private Task ongoingTask;
 
     // Services to be injected.
@@ -146,18 +148,27 @@ public class MainViewModel : ObservableRecipient
     public event Action Refreshed;
     private void RefreshForCommand()
     {
-        Refresh(reset: false);
+        Refresh(reset: false, append: true);
     }
-    private async void Refresh(bool reset)
+    /// <summary>
+    /// Refreshes events to show.
+    /// If reset is true, all filters will be cleared.
+    /// </summary>
+    /// <param name="reset"></param>
+    private async void Refresh(bool reset, bool append = false)
     {
         Refreshing?.Invoke();
 
-        UpdateDateTimes();
+        isAppend = append
+            ? lastLogDate != DateTime.MinValue && !SelectedRange.IsCustom
+            : false;
+
+        UpdateDateTimeInUi();
 
         if (reset)
             filters.ForEach(f => f.Reset());
         
-        await Task.Run(() => LoadEvents());
+        await Task.Run(LoadEvents);
 
         // If the log source selection is changed before completing loading events, we don't want to enumerate
         // the source filter items with the previous log source.
@@ -284,12 +295,12 @@ public class MainViewModel : ObservableRecipient
     }
     #endregion
 
-    private void UpdateDateTimes()
+    private void UpdateDateTimeInUi()
     {
         if (SelectedRange.IsCustom)
             return;
 
-        if (SelectedRange.DaysFromNow == 0)
+        if (SelectedRange.DaysFromNow == 0) // All time
         {
             FromDateTime = new DateTime(1970, 1, 1, 0, 0, 0);
             ToDateTime = new DateTime(2030, 12, 31, 0, 0, 0);
@@ -300,7 +311,8 @@ public class MainViewModel : ObservableRecipient
             ToDateTime = (SelectedLogSource.PathType == PathType.FilePath) 
                 ? SelectedLogSource.FileWriteTime
                 : DateTime.Now;
-            FromDateTime = ToDateTime - TimeSpan.FromDays(SelectedRange.DaysFromNow);
+            if (!isAppend)
+                FromDateTime = ToDateTime - TimeSpan.FromDays(SelectedRange.DaysFromNow);
         }
 
         // These seem necessary to ensure DateTimePicker be updated
@@ -311,20 +323,46 @@ public class MainViewModel : ObservableRecipient
     {
         Cancel();
 
-        await Update(DataService.ReadEvents(selectedLogSource, FromDateTime, ToDateTime, progress));
+        await Update(DataService.ReadEvents(selectedLogSource, 
+            isAppend ? lastLogDate : FromDateTime,
+            ToDateTime,
+            progress));
     }
+
+    private int appendCount = 0;
     private void ProgressCallback(ProgressInfo progressInfo)
     {
-        if (progressInfo.IsFirst)
-            Events.Clear();
-
-        //TODO: Improve performance with AddRange in ObservableCollection.
-        foreach (var evt in progressInfo.LoadedEvents)
+        if (isAppend)
         {
-            Events.Add(evt);
+            if (progressInfo.IsFirst)
+                appendCount = 0;
+
+            foreach (var evt in progressInfo.LoadedEvents)
+            {
+                Events.Insert(appendCount, evt);    // We read logs from the newest to the oldest.
+                appendCount++;
+            }
         }
+        else
+        {
+            if (progressInfo.IsFirst)
+                Events.Clear();
+
+            foreach (var evt in progressInfo.LoadedEvents)
+            {
+                Events.Add(evt);
+            }
+        }
+
         loadedEventCount = Events.Count;
         UpdateStatusText(progressInfo.Message);
+
+        if (progressInfo.IsComplete)
+        {
+            lastLogDate = Events.Any() && progressInfo.Message == ""    // If some events are loaded without error,
+                ? Events.First().TimeOfEvent    // save the latest event time.
+                : DateTime.MinValue;
+        }
     }
     private async Task Update(Task task)
     {
@@ -332,7 +370,8 @@ public class MainViewModel : ObservableRecipient
         {
             ongoingTask = task;
             stopwatch.Restart();
-            loadedEventCount = 0;
+            if (!isAppend) 
+                loadedEventCount = 0;
             IsUpdating = true;
             UpdateStatusText();
             UpdateFilterInfoText();
@@ -347,9 +386,14 @@ public class MainViewModel : ObservableRecipient
     }
     private void UpdateStatusText(string additionalNote = "")
     {
-        StatusText = IsUpdating ?
-            $"Loading {loadedEventCount} events... {additionalNote}" :
-            $"{loadedEventCount} events loaded. ({stopwatch.Elapsed.TotalSeconds:F1} sec) {additionalNote}"; // 1 digit after decimal point
+        if (IsUpdating)
+            StatusText = $"Loading {loadedEventCount} events... {additionalNote}";
+        else
+        {
+            StatusText = isAppend
+                ? $"{loadedEventCount} ({appendCount} new) events loaded. {additionalNote}"
+                : $"{loadedEventCount} events loaded. ({stopwatch.Elapsed.TotalSeconds:F1} sec) {additionalNote}";  // 1 digit after decimal point
+        }
     }
     private void UpdateFilterInfoText()
     {
