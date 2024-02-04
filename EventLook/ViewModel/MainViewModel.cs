@@ -148,17 +148,20 @@ public class MainViewModel : ObservableRecipient
     public event Action Refreshed;
     private void RefreshForCommand()
     {
-        isAppend = lastLogDate != DateTime.MinValue && !SelectedRange.IsCustom;
-        Refresh(reset: false);
+        Refresh(reset: false, append: true);
     }
     /// <summary>
     /// Refreshes events to show.
     /// If reset is true, all filters will be cleared.
     /// </summary>
     /// <param name="reset"></param>
-    private async void Refresh(bool reset)
+    private async void Refresh(bool reset, bool append = false)
     {
         Refreshing?.Invoke();
+
+        isAppend = append
+            ? lastLogDate != DateTime.MinValue && !SelectedRange.IsCustom
+            : false;
 
         UpdateDateTimeInUi();
 
@@ -297,7 +300,7 @@ public class MainViewModel : ObservableRecipient
         if (SelectedRange.IsCustom)
             return;
 
-        if (SelectedRange.DaysFromNow == 0)
+        if (SelectedRange.DaysFromNow == 0) // All time
         {
             FromDateTime = new DateTime(1970, 1, 1, 0, 0, 0);
             ToDateTime = new DateTime(2030, 12, 31, 0, 0, 0);
@@ -349,6 +352,7 @@ public class MainViewModel : ObservableRecipient
                 Events.Add(evt);
             }
         }
+
         loadedEventCount = Events.Count;
         UpdateStatusText(progressInfo.Message);
 
@@ -357,8 +361,6 @@ public class MainViewModel : ObservableRecipient
             lastLogDate = Events.Any() && progressInfo.Message == ""    // If some events are loaded without error,
                 ? Events.First().TimeOfEvent    // save the latest event time.
                 : DateTime.MinValue;
-
-            isAppend = false;   // Apparently, the last callback comes after the finally block of Update() method.
         }
     }
     private async Task Update(Task task)
@@ -383,9 +385,14 @@ public class MainViewModel : ObservableRecipient
     }
     private void UpdateStatusText(string additionalNote = "")
     {
-        StatusText = IsUpdating ?
-            $"Loading {loadedEventCount} events... {additionalNote}" :
-            $"{loadedEventCount} events loaded. ({stopwatch.Elapsed.TotalSeconds:F1} sec) {additionalNote}"; // 1 digit after decimal point
+        if (IsUpdating)
+            StatusText = $"Loading {loadedEventCount} events... {additionalNote}";
+        else
+        {
+            StatusText = isAppend
+                ? $"{loadedEventCount} ({appendCount} new) events loaded. {additionalNote}"
+                : $"{loadedEventCount} events loaded. ({stopwatch.Elapsed.TotalSeconds:F1} sec) {additionalNote}";  // 1 digit after decimal point
+        }
     }
     private void UpdateFilterInfoText()
     {
