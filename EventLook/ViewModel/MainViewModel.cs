@@ -311,7 +311,8 @@ public class MainViewModel : ObservableRecipient
             ToDateTime = (SelectedLogSource.PathType == PathType.FilePath) 
                 ? SelectedLogSource.FileWriteTime
                 : DateTime.Now;
-            FromDateTime = ToDateTime - TimeSpan.FromDays(SelectedRange.DaysFromNow);
+            if (!isAppend)
+                FromDateTime = ToDateTime - TimeSpan.FromDays(SelectedRange.DaysFromNow);
         }
 
         // These seem necessary to ensure DateTimePicker be updated
@@ -323,7 +324,7 @@ public class MainViewModel : ObservableRecipient
         Cancel();
 
         await Update(DataService.ReadEvents(selectedLogSource, 
-            isAppend && (lastLogDate != DateTime.MinValue) ? lastLogDate : FromDateTime,
+            isAppend ? lastLogDate : FromDateTime,
             ToDateTime,
             progress));
     }
