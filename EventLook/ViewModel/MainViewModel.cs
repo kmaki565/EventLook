@@ -46,6 +46,8 @@ public class MainViewModel : ObservableRecipient
         ShowsMillisec = Properties.Settings.Default.ShowsMillisec;
 
         progress = new Progress<ProgressInfo>(ProgressCallback); // Needs to instantiate in UI thread
+        progress_watcher = new Progress<ProgressInfo>(WatcherCallback);
+        
         stopwatch = new Stopwatch();
 
         Messenger.Register<MainViewModel, ViewCollectionViewSourceMessageToken>(this, (r, m) => r.Handle_ViewCollectionViewSourceMessageToken(m));
@@ -65,6 +67,7 @@ public class MainViewModel : ObservableRecipient
     public IdFilter IdFilter { get; }
     private readonly List<FilterBase> filters;
     private readonly Progress<ProgressInfo> progress;
+    private readonly Progress<ProgressInfo> progress_watcher;
     private readonly Stopwatch stopwatch;
     private bool readyToRefresh = false;
     private int loadedEventCount = 0;
@@ -362,8 +365,28 @@ public class MainViewModel : ObservableRecipient
             lastLogDate = Events.Any() && progressInfo.Message == ""    // If some events are loaded without error,
                 ? Events.First().TimeOfEvent    // save the latest event time.
                 : DateTime.MinValue;
+
+            DataService.SubscribeEvents(SelectedLogSource, progress_watcher);
+            //TODO: Unsubscribe
         }
     }
+
+    private void WatcherCallback(ProgressInfo progressInfo)
+    {
+        if (progressInfo.LoadedEvents.Any())
+        {
+            int count = 0;
+            foreach (var evt in progressInfo.LoadedEvents)  // Single event should be loaded at a time, but just in case.
+            {
+                Events.Insert(count, evt);
+                count++;
+            }
+            loadedEventCount = Events.Count;
+            UpdateStatusText();
+            //TODO: Update Filter text too
+        }
+    }
+
     private async Task Update(Task task)
     {
         try
