@@ -99,6 +99,7 @@ public class MainViewModel : ObservableRecipient
 
             if (readyToRefresh)
             {
+                DataService.UnsubscribeEvents();
                 Refresh(reset: true);
             }
         }
@@ -366,12 +367,14 @@ public class MainViewModel : ObservableRecipient
             isLastReadSuccess = Events.Any() && progressInfo.Message == "";
             if (isLastReadSuccess)
             {
-                //TODO: Fast refresh should be done once, or we'll miss events that came during loading the entire logs.
+                // Fast refresh should be done once before enabling auto refresh.
+                // Otherwise we'll miss events that came during loading the entire logs.
+                if (!isAppend)
+                    Refresh(reset: false, append: true);
                 DataService.SubscribeEvents(SelectedLogSource, progressAutoRefresh);
                 isAutoRefreshing = true;
                 UpdateStatusText();
             }
-            //TODO: Unsubscribe after source change, before loading the new source events.
         }
     }
 
