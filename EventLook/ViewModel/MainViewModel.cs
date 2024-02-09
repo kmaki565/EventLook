@@ -332,7 +332,7 @@ public class MainViewModel : ObservableRecipient
         OpenFileCommand = new RelayCommand(OpenFile);
         OpenLogPickerCommand = new RelayCommand(OpenLogPicker);
         OpenSettingsCommand = new RelayCommand(OpenSettings);
-        LaunchEventViewerCommand = new RelayCommand(LaunchEventViewer);
+        LaunchEventViewerCommand = new RelayCommand(() => ProcessHelper.LaunchEventViewer(SelectedLogSource));
         CopyMessageTextCommand = new RelayCommand(CopyMessageText);
     }
     #endregion
@@ -580,21 +580,6 @@ public class MainViewModel : ObservableRecipient
 
         readyToRefresh = true;
         SelectedRange = Ranges.FirstOrDefault(r => r.Text == newSettings.SelectedRange.Text);   // Fire Refresh
-    }
-    private void LaunchEventViewer()
-    {
-        string arg = "";
-        if (SelectedLogSource?.PathType == PathType.FilePath)
-            arg = $"/l:\"{selectedLogSource.Path}\"";
-        else if (selectedLogSource?.PathType == PathType.LogName)
-            arg = $"/c:\"{selectedLogSource.Path}\"";
-
-        Process.Start(new ProcessStartInfo
-        {
-            UseShellExecute = true,
-            FileName = "eventvwr.msc",
-            Arguments = arg,
-        });
     }
     /// <summary>
     /// Copies Message text of the selected log to clipboard.
