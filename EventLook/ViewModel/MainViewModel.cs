@@ -73,7 +73,6 @@ public class MainViewModel : ObservableRecipient
     private int loadedEventCount = 0;
     private bool isLastReadSuccess = false;
     private bool isAppend = false;
-    private bool isAutoRefreshing = false;
     private Task ongoingTask;
 
     // Services to be injected.
@@ -119,24 +118,62 @@ public class MainViewModel : ObservableRecipient
     }
     public ReadOnlyObservableCollection<SourceFilterItem> SourceFilters { get => sourceFilter.SourceFilters; }
     public ReadOnlyObservableCollection<LevelFilterItem> LevelFilters { get => levelFilter.LevelFilters; }
+
     private string statusText;
     public string StatusText { get => statusText; set => SetProperty(ref statusText, value); }
+    
     private string filterInfoText;
     public string FilterInfoText { get => filterInfoText; set => SetProperty(ref filterInfoText, value); }
+    
     private bool isUpdating = false;
     public bool IsUpdating { get => isUpdating; set => SetProperty(ref isUpdating, value); }
+
+    private bool isAutoRefreshing = false;
+    public bool IsAutoRefreshing 
+    { 
+        get => isAutoRefreshing; 
+        set 
+        { 
+            SetProperty(ref isAutoRefreshing, value); 
+            RefreshCommand?.NotifyCanExecuteChanged(); 
+        } 
+    }
+    
     private DateTime fromDateTime;
     public DateTime FromDateTime { get => fromDateTime; set => SetProperty(ref fromDateTime, value); }
+    
     private DateTime toDateTime;
     public DateTime ToDateTime { get => toDateTime; set => SetProperty(ref toDateTime, value); }
 
     public ObservableCollection<TimeZoneInfo> TimeZones { get; private set; }
+    
     private TimeZoneInfo selectedTimeZone;
     public TimeZoneInfo SelectedTimeZone { get => selectedTimeZone; set => SetProperty(ref selectedTimeZone, value); }
+    
     public bool ShowsMillisec { get; set; }
 
     private readonly bool isRunAsAdmin;
     public bool IsRunAsAdmin { get => isRunAsAdmin; }
+
+    private bool isAutoRefreshEnabled;
+    public bool IsAutoRefreshEnabled 
+    { 
+        get => isAutoRefreshEnabled;
+        set
+        {
+            SetProperty(ref isAutoRefreshEnabled, value);
+            if (value)
+            {
+                if (selectedLogSource?.PathType == PathType.LogName)
+                    Refresh(reset: false, append: true);    // Fast refresh will kick auto refresh
+            }
+            else
+            {
+                DataService.UnsubscribeEvents();
+                isAutoRefreshing = false;
+            }
+        }
+    }
 
     public void OnLoaded()
     {
@@ -164,9 +201,9 @@ public class MainViewModel : ObservableRecipient
     {
         Refreshing?.Invoke();
 
-        isAppend = append && !SelectedRange.IsCustom && isLastReadSuccess;
+        isAppend = append && !SelectedRange.IsCustom && selectedLogSource?.PathType == PathType.LogName && isLastReadSuccess;
         isLastReadSuccess = false;
-        isAutoRefreshing = false;
+        IsAutoRefreshing = false;
 
         UpdateDateTimeInUi();
 
@@ -260,7 +297,7 @@ public class MainViewModel : ObservableRecipient
     }
 
     #region commands
-    public ICommand RefreshCommand { get; private set; }
+    public IRelayCommand RefreshCommand { get; private set; }
     public ICommand CancelCommand { get; private set; }
     public ICommand ExitCommand { get; private set; }
     public ICommand ApplySourceFilterCommand { get; private set; }
@@ -280,7 +317,7 @@ public class MainViewModel : ObservableRecipient
 
     private void InitializeCommands()
     {
-        RefreshCommand = new RelayCommand(RefreshForCommand, () => !IsUpdating);
+        RefreshCommand = new RelayCommand(RefreshForCommand, () => !IsUpdating && !IsAutoRefreshing);
         CancelCommand = new RelayCommand(Cancel, () => IsUpdating);
         ExitCommand = new RelayCommand(Exit); 
         ResetFiltersCommand = new RelayCommand(ClearFilters);
@@ -365,14 +402,14 @@ public class MainViewModel : ObservableRecipient
         if (progressInfo.IsComplete)
         {
             isLastReadSuccess = Events.Any() && progressInfo.Message == "";
-            if (isLastReadSuccess)
+            if (isLastReadSuccess && IsAutoRefreshEnabled && selectedLogSource?.PathType == PathType.LogName)
             {
                 // Fast refresh should be done once before enabling auto refresh.
                 // Otherwise we'll miss events that came during loading the entire logs.
                 if (!isAppend)
                     Refresh(reset: false, append: true);
                 DataService.SubscribeEvents(SelectedLogSource, progressAutoRefresh);
-                isAutoRefreshing = true;
+                IsAutoRefreshing = true;
                 UpdateStatusText();
             }
         }
@@ -417,7 +454,7 @@ public class MainViewModel : ObservableRecipient
     {
         if (IsUpdating)
             StatusText = $"Loading {loadedEventCount} events... {additionalNote}";
-        else if (isAutoRefreshing)
+        else if (IsAutoRefreshing)
             StatusText = $"{loadedEventCount} events loaded. Waiting for new events... {additionalNote}";
         else
         {

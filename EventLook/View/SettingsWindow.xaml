@@ -7,7 +7,7 @@
         xmlns:viewmodel="clr-namespace:EventLook.ViewModel"
         d:DataContext="{d:DesignInstance Type=viewmodel:SettingsViewModel}"
         mc:Ignorable="d"
-        Title="Options" Height="360" Width="450" Background="WhiteSmoke">
+        Title="Settings" Height="360" Width="450" Background="WhiteSmoke">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition />
