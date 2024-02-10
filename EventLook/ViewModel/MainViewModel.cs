@@ -171,6 +171,8 @@ public class MainViewModel : ObservableRecipient
             {
                 DataService.UnsubscribeEvents();
                 isAutoRefreshing = false;
+                isAppend = false;
+                UpdateStatusText();
             }
         }
     }
@@ -469,8 +471,8 @@ public class MainViewModel : ObservableRecipient
             FilterInfoText = "";
         else
         {
-            int visibleRowCounts = CVS.View.Cast<object>().Count(); // This must be run in the main thread.
-            FilterInfoText = (visibleRowCounts == Events.Count) ? "" : $" {visibleRowCounts} events matched to the filter(s).";
+            int visibleRowCount = CVS.View.Cast<object>().Count(); // This must be run in the main thread.
+            FilterInfoText = (visibleRowCount == Events.Count) ? "" : $" {visibleRowCount} events matched to the filter(s).";
         }
     }
     /// <summary>
@@ -593,6 +595,6 @@ public class MainViewModel : ObservableRecipient
         {
             Clipboard.SetText(SelectedEventItem.Message);
         }
-        catch (Exception) { }    // Ignore OpenClipboard exception}
+        catch (Exception) { }    // Ignore OpenClipboard exception
     }
 }
