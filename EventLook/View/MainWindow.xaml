@@ -35,6 +35,8 @@
         <v:InverseBooleanConverter x:Key="InverseBooleanConverter" />
         <v:UtcToAnotherTimeZoneStringConverter x:Key="UtcToAnotherTimeZoneStringConverter"/>
         <v:TimeZoneToOffsetTextConverter x:Key="TimeZoneToOffsetTextConverter"/>
+        <v:StatusTextConverter x:Key="StatusTextConverter"/>
+        <v:FilterInfoTextConverter x:Key="FilterInfoTextConverter"/>
         <!-- This next line instantiates a CollectionViewSource with the collection of Events as its collection of objects-->
         <CollectionViewSource Source="{Binding Events}" x:Key="X_CVS"/>
     </Window.Resources>
@@ -64,8 +66,28 @@
         <StatusBar DockPanel.Dock="Bottom" Background="WhiteSmoke">
             <StatusBarItem>
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="{Binding StatusText}" />
-                    <TextBlock Text="{Binding FilterInfoText}" />
+                    <TextBlock>
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{StaticResource StatusTextConverter}">
+                                <Binding Path="IsUpdating"/>
+                                <Binding Path="IsAutoRefreshing"/>
+                                <Binding Path="IsAppend"/>
+                                <Binding Path="LoadedEventCount"/>
+                                <Binding Path="AppendCount"/>
+                                <Binding Path="LastElapsedTime"/>
+                                <Binding Path="ErrorMessage"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                    <TextBlock>
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{StaticResource FilterInfoTextConverter}">
+                                <Binding Path="IsUpdating"/>
+                                <Binding Path="AreEventsFiltered"/>
+                                <Binding Path="VisibleEventCount"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
                 </StackPanel>
             </StatusBarItem>
         </StatusBar>

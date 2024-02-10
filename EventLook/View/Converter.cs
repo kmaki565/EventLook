@@ -173,3 +173,58 @@ public class TimeZoneToOffsetTextConverter : IValueConverter
         throw new NotImplementedException();
     }
 }
+
+/// <summary>
+/// Generates the status text based on the various indicators.
+/// 0: IsUpdating, 1: IsAutoRefreshing, 2: IsAppend, 3: LoadedEventCount, 4: AppendCount, 5: LastElapsedTime, 6: ErrorMessage
+/// </summary>
+public class StatusTextConverter : IMultiValueConverter
+{
+    public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (values[0] is bool isUpdating && values[1] is bool isAutoRefreshing && values[2] is bool isAppend
+            && values[3] is int loadedEventCount && values[4] is int appendCount
+            && values[5] is TimeSpan lastEpasedTime && values[6] is string errorMessage)
+        {
+            if (isUpdating)
+                return $"Loading {loadedEventCount} events... {errorMessage}";
+            else if (isAutoRefreshing)
+                return $"{loadedEventCount} events loaded. Waiting for new events... {errorMessage}";
+            else
+                return isAppend
+                    ? $"{loadedEventCount} ({appendCount} new) events loaded. {errorMessage}"
+                    : $"{loadedEventCount} events loaded. ({lastEpasedTime.TotalSeconds:F1} sec) {errorMessage}";  // 1 digit after decimal point
+        }
+        else
+            throw new ArgumentException("Arguments not matched to this converter.");
+    }
+
+    public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}
+/// <summary>
+/// Generates the filter info text based on the various indicators.
+/// 0: IsUpdating, 1: AreEventsFiltered, 2: VisibleEventCount
+/// </summary>
+public class FilterInfoTextConverter : IMultiValueConverter
+{
+    public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (values[0] is bool isUpdating && values[1] is bool areEventsFiltered && values[2] is int visibleEventCount)
+        {
+            if (isUpdating)
+                return "";
+            else
+                return areEventsFiltered ? $" {visibleEventCount} events matched to the filter(s)." : "";
+        }
+        else
+            throw new ArgumentException("Arguments not matched to this converter.");
+    }
+
+    public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}

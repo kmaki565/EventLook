@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Diagnostics.Eventing.Reader;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -62,7 +61,6 @@ public class MainViewModel : ObservableRecipient
     private readonly LevelFilter levelFilter;
     // I had to bind the property of MessageFilter directly,
     // since NotifyPropertyChanged from inside MessageFilter didn't work.
-    // This may be controversial.
     public MessageFilter MsgFilter { get; }
     public IdFilter IdFilter { get; }
     private readonly List<FilterBase> filters;
@@ -70,9 +68,7 @@ public class MainViewModel : ObservableRecipient
     private readonly Progress<ProgressInfo> progressAutoRefresh;
     private readonly Stopwatch stopwatch;
     private bool readyToRefresh = false;
-    private int loadedEventCount = 0;
     private bool isLastReadSuccess = false;
-    private bool isAppend = false;
     private Task ongoingTask;
 
     // Services to be injected.
@@ -118,12 +114,6 @@ public class MainViewModel : ObservableRecipient
     }
     public ReadOnlyObservableCollection<SourceFilterItem> SourceFilters { get => sourceFilter.SourceFilters; }
     public ReadOnlyObservableCollection<LevelFilterItem> LevelFilters { get => levelFilter.LevelFilters; }
-
-    private string statusText;
-    public string StatusText { get => statusText; set => SetProperty(ref statusText, value); }
-    
-    private string filterInfoText;
-    public string FilterInfoText { get => filterInfoText; set => SetProperty(ref filterInfoText, value); }
     
     private bool isUpdating = false;
     public bool IsUpdating { get => isUpdating; set => SetProperty(ref isUpdating, value); }
@@ -139,6 +129,27 @@ public class MainViewModel : ObservableRecipient
         } 
     }
     
+    private int loadedEventCount = 0;
+    public int LoadedEventCount { get => loadedEventCount; set => SetProperty(ref loadedEventCount, value); }
+
+    private bool isAppend = false;
+    public bool IsAppend { get => isAppend; set => SetProperty(ref isAppend, value); }
+
+    private int appendCount = 0;
+    public int AppendCount { get => appendCount; set => SetProperty(ref appendCount, value); }
+
+    private int visibleEventCount = 0;
+    public int VisibleEventCount { get => visibleEventCount; set => SetProperty(ref visibleEventCount, value); }
+
+    private bool areEventsFiltered = false;
+    public bool AreEventsFiltered { get => areEventsFiltered; set => SetProperty(ref areEventsFiltered, value); }
+
+    private string errorMessage = "";
+    public string ErrorMessage { get => errorMessage; set => SetProperty(ref errorMessage, value); }
+
+    private TimeSpan lastElapsedTime;
+    public TimeSpan LastElapsedTime { get => lastElapsedTime; set => SetProperty(ref lastElapsedTime, value); }
+
     private DateTime fromDateTime;
     public DateTime FromDateTime { get => fromDateTime; set => SetProperty(ref fromDateTime, value); }
     
@@ -170,9 +181,8 @@ public class MainViewModel : ObservableRecipient
             else
             {
                 DataService.UnsubscribeEvents();
-                isAutoRefreshing = false;
-                isAppend = false;
-                UpdateStatusText();
+                IsAutoRefreshing = false;
+                IsAppend = false;
             }
         }
     }
@@ -203,7 +213,7 @@ public class MainViewModel : ObservableRecipient
     {
         Refreshing?.Invoke();
 
-        isAppend = append && !SelectedRange.IsCustom && selectedLogSource?.PathType == PathType.LogName && isLastReadSuccess;
+        IsAppend = append && !SelectedRange.IsCustom && selectedLogSource?.PathType == PathType.LogName && isLastReadSuccess;
         isLastReadSuccess = false;
         IsAutoRefreshing = false;
 
@@ -295,7 +305,8 @@ public class MainViewModel : ObservableRecipient
     }
     private void OnFilterUpdated(object sender, EventArgs e)
     {
-        UpdateFilterInfoText();
+        VisibleEventCount = CVS.View.Cast<object>().Count();
+        AreEventsFiltered = VisibleEventCount < Events.Count;
     }
 
     #region commands
@@ -355,7 +366,7 @@ public class MainViewModel : ObservableRecipient
             ToDateTime = (SelectedLogSource.PathType == PathType.FilePath) 
                 ? SelectedLogSource.FileWriteTime
                 : DateTime.Now;
-            if (!isAppend)
+            if (!IsAppend)
                 FromDateTime = ToDateTime - TimeSpan.FromDays(SelectedRange.DaysFromNow);
         }
 
@@ -368,23 +379,22 @@ public class MainViewModel : ObservableRecipient
         Cancel();
 
         await Update(DataService.ReadEvents(selectedLogSource, 
-            isAppend ? Events.First().TimeOfEvent : FromDateTime,
+            IsAppend ? Events.First().TimeOfEvent : FromDateTime,
             ToDateTime,
             progress));
     }
 
-    private int appendCount = 0;
     private void ProgressCallback(ProgressInfo progressInfo)
     {
-        if (isAppend)
+        if (IsAppend)
         {
             if (progressInfo.IsFirst)
-                appendCount = 0;
+                AppendCount = 0;
 
             foreach (var evt in progressInfo.LoadedEvents)
             {
-                Events.Insert(appendCount, evt);    // We read logs from the newest to the oldest.
-                appendCount++;
+                Events.Insert(AppendCount, evt);    // We read logs from the newest to the oldest.
+                AppendCount++;
             }
         }
         else
@@ -398,8 +408,8 @@ public class MainViewModel : ObservableRecipient
             }
         }
 
-        loadedEventCount = Events.Count;
-        UpdateStatusText(progressInfo.Message);
+        LoadedEventCount = Events.Count;
+        ErrorMessage = progressInfo.Message;
 
         if (progressInfo.IsComplete)
         {
@@ -408,11 +418,10 @@ public class MainViewModel : ObservableRecipient
             {
                 // Fast refresh should be done once before enabling auto refresh.
                 // Otherwise we'll miss events that came during loading the entire logs.
-                if (!isAppend)
+                if (!IsAppend)
                     Refresh(reset: false, append: true);
                 DataService.SubscribeEvents(SelectedLogSource, progressAutoRefresh);
                 IsAutoRefreshing = true;
-                UpdateStatusText();
             }
         }
     }
@@ -427,8 +436,7 @@ public class MainViewModel : ObservableRecipient
                 Events.Insert(count, evt);
                 count++;
             }
-            loadedEventCount = Events.Count;
-            UpdateStatusText();
+            LoadedEventCount = Events.Count;
             filters.ForEach(f => f.Refresh(Events, reset: false));
         }
     }
@@ -439,42 +447,19 @@ public class MainViewModel : ObservableRecipient
         {
             ongoingTask = task;
             stopwatch.Restart();
-            if (!isAppend) 
-                loadedEventCount = 0;
+            if (!IsAppend) 
+                LoadedEventCount = 0;
             IsUpdating = true;
-            UpdateStatusText();
-            UpdateFilterInfoText();
             await task;
         }
         finally
         {
             IsUpdating = false;
             stopwatch.Stop();
+            LastElapsedTime = stopwatch.Elapsed;
         }
     }
-    private void UpdateStatusText(string additionalNote = "")
-    {
-        if (IsUpdating)
-            StatusText = $"Loading {loadedEventCount} events... {additionalNote}";
-        else if (IsAutoRefreshing)
-            StatusText = $"{loadedEventCount} events loaded. Waiting for new events... {additionalNote}";
-        else
-        {
-            StatusText = isAppend
-                ? $"{loadedEventCount} ({appendCount} new) events loaded. {additionalNote}"
-                : $"{loadedEventCount} events loaded. ({stopwatch.Elapsed.TotalSeconds:F1} sec) {additionalNote}";  // 1 digit after decimal point
-        }
-    }
-    private void UpdateFilterInfoText()
-    {
-        if (IsUpdating)
-            FilterInfoText = "";
-        else
-        {
-            int visibleRowCount = CVS.View.Cast<object>().Count(); // This must be run in the main thread.
-            FilterInfoText = (visibleRowCount == Events.Count) ? "" : $" {visibleRowCount} events matched to the filter(s).";
-        }
-    }
+
     /// <summary>
     /// Gets or sets the CollectionViewSource which is the proxy for the
     /// collection of Events and the datagrid in which each Event is displayed.
