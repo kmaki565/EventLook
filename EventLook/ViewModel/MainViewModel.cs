@@ -87,7 +87,7 @@ public class MainViewModel : ObservableRecipient
         get => selectedLogSource;
         set
         {
-            if (value == null)
+            if (value == null || value == selectedLogSource)
                 return;
 
             SetProperty(ref selectedLogSource, value);
@@ -106,6 +106,9 @@ public class MainViewModel : ObservableRecipient
         get => selectedRange;
         set
         {
+            if (value == null || value == selectedRange)
+                return;
+
             SetProperty(ref selectedRange, value);
 
             if (readyToRefresh && !selectedRange.IsCustom)
@@ -123,7 +126,10 @@ public class MainViewModel : ObservableRecipient
     { 
         get => isAutoRefreshing; 
         set 
-        { 
+        {
+            if (value == isAutoRefreshing) 
+                return;
+
             SetProperty(ref isAutoRefreshing, value); 
             RefreshCommand?.NotifyCanExecuteChanged(); 
         } 
@@ -172,10 +178,13 @@ public class MainViewModel : ObservableRecipient
         get => isAutoRefreshEnabled;
         set
         {
+            if (value == isAutoRefreshEnabled)
+                return;
+
             SetProperty(ref isAutoRefreshEnabled, value);
             if (value)
             {
-                if (selectedLogSource?.PathType == PathType.LogName)
+                if (SelectedLogSource?.PathType == PathType.LogName)
                     Refresh(reset: false, append: true);    // Fast refresh will kick auto refresh
             }
             else
@@ -213,7 +222,7 @@ public class MainViewModel : ObservableRecipient
     {
         Refreshing?.Invoke();
 
-        IsAppend = append && !SelectedRange.IsCustom && selectedLogSource?.PathType == PathType.LogName && isLastReadSuccess;
+        IsAppend = append && !SelectedRange.IsCustom && SelectedLogSource?.PathType == PathType.LogName && isLastReadSuccess;
         isLastReadSuccess = false;
         IsAutoRefreshing = false;
 
@@ -378,7 +387,7 @@ public class MainViewModel : ObservableRecipient
     {
         Cancel();
 
-        await Update(DataService.ReadEvents(selectedLogSource, 
+        await Update(DataService.ReadEvents(SelectedLogSource, 
             IsAppend ? Events.First().TimeOfEvent : FromDateTime,
             ToDateTime,
             progress));
@@ -414,7 +423,7 @@ public class MainViewModel : ObservableRecipient
         if (progressInfo.IsComplete)
         {
             isLastReadSuccess = Events.Any() && progressInfo.Message == "";
-            if (isLastReadSuccess && IsAutoRefreshEnabled && selectedLogSource?.PathType == PathType.LogName)
+            if (isLastReadSuccess && IsAutoRefreshEnabled && SelectedLogSource?.PathType == PathType.LogName)
             {
                 // Fast refresh should be done once before enabling auto refresh.
                 // Otherwise we'll miss events that came during loading the entire logs.
@@ -565,8 +574,10 @@ public class MainViewModel : ObservableRecipient
         else
             SelectedLogSource = LogSources.FirstOrDefault();
 
+        SelectedRange = Ranges.FirstOrDefault(r => r.Text == newSettings.SelectedRange.Text);
+        
         readyToRefresh = true;
-        SelectedRange = Ranges.FirstOrDefault(r => r.Text == newSettings.SelectedRange.Text);   // Fire Refresh
+        Refresh(reset: true);
     }
     /// <summary>
     /// Copies Message text of the selected log to clipboard.
