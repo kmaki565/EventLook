@@ -51,10 +51,17 @@ public class EventItem
             Message = "(EventLook) Exception occurred while reading the description:\r\n" + ex.Message;
         }
     }
-    #region Properties
+
     public EventRecord Record { get; set; }
     public DateTime TimeOfEvent { get; }
     public string Message { get; }
     public string MessageOneLine { get { return Regex.Replace(Message, @"[\r\n]+", " "); } }
-    #endregion
+    /// <summary>
+    /// Indicates the time when the event was loaded by the app.
+    /// </summary>
+    public DateTime TimeLoaded { get; set; }
+    /// <summary>
+    /// Indicates if the event is newly loaded.
+    /// </summary>
+    public bool IsNewLoaded { get; set; }
 }

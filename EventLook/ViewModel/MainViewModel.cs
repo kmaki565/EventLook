@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace EventLook.ViewModel;
 
@@ -48,6 +49,11 @@ public class MainViewModel : ObservableRecipient
         progressAutoRefresh = new Progress<ProgressInfo>(AutoRefreshCallback);
         
         stopwatch = new Stopwatch();
+        newLoadedUpdateTimer = new DispatcherTimer  // Setup a periodic timer which we'll run later.
+        {
+            Interval = TimeSpan.FromSeconds(1)
+        };
+        newLoadedUpdateTimer.Tick += NewLoadedUpdateTimer_Tick;
 
         Messenger.Register<MainViewModel, ViewCollectionViewSourceMessageToken>(this, (r, m) => r.Handle_ViewCollectionViewSourceMessageToken(m));
         Messenger.Register<MainViewModel, FileToBeProcessedMessageToken>(this, (r, m) => r.Handle_FileToBeProcessedMessageToken(m));
@@ -55,6 +61,7 @@ public class MainViewModel : ObservableRecipient
         Messenger.Register<MainViewModel, LogPickerWindowServiceMessageToken>(this, (r, m) => r.Handle_LogPickerWindowServiceMessageToken(m));
         Messenger.Register<MainViewModel, SettingsWindowServiceMessageToken>(this, (r, m) => r.Handle_SettingsWindowServiceMessageToken(m));
     }
+
     private readonly LogSourceMgr logSourceMgr;
     private readonly RangeMgr rangeMgr;
     private readonly Model.SourceFilter sourceFilter;
@@ -67,9 +74,11 @@ public class MainViewModel : ObservableRecipient
     private readonly Progress<ProgressInfo> progress;
     private readonly Progress<ProgressInfo> progressAutoRefresh;
     private readonly Stopwatch stopwatch;
+    private readonly DispatcherTimer newLoadedUpdateTimer;
     private bool readyToRefresh = false;
     private bool isLastReadSuccess = false;
     private Task ongoingTask;
+    private readonly TimeSpan newLoadedTimeThreshold = TimeSpan.FromSeconds(5);
 
     // Services to be injected.
     private readonly IDataService DataService;
@@ -223,6 +232,8 @@ public class MainViewModel : ObservableRecipient
         Refreshing?.Invoke();
 
         IsAppend = append && !SelectedRange.IsCustom && SelectedLogSource?.PathType == PathType.LogName && isLastReadSuccess;
+        if (IsAppend)
+            UpdateIsNewLoaded(all: true);
         isLastReadSuccess = false;
         IsAutoRefreshing = false;
 
@@ -392,6 +403,24 @@ public class MainViewModel : ObservableRecipient
             ToDateTime,
             progress));
     }
+    private async Task Update(Task task)
+    {
+        try
+        {
+            ongoingTask = task;
+            stopwatch.Restart();
+            if (!IsAppend)
+                LoadedEventCount = 0;
+            IsUpdating = true;
+            await task;
+        }
+        finally
+        {
+            IsUpdating = false;
+            stopwatch.Stop();
+            LastElapsedTime = stopwatch.Elapsed;
+        }
+    }
 
     private void ProgressCallback(ProgressInfo progressInfo)
     {
@@ -400,11 +429,7 @@ public class MainViewModel : ObservableRecipient
             if (progressInfo.IsFirst)
                 AppendCount = 0;
 
-            foreach (var evt in progressInfo.LoadedEvents)
-            {
-                Events.Insert(AppendCount, evt);    // We read logs from the newest to the oldest.
-                AppendCount++;
-            }
+            AppendCount += InsertEvents(progressInfo.LoadedEvents);
         }
         else
         {
@@ -439,34 +464,45 @@ public class MainViewModel : ObservableRecipient
     {
         if (progressInfo.LoadedEvents.Any())
         {
-            int count = 0;
-            foreach (var evt in progressInfo.LoadedEvents)  // Single event should be loaded at a time, but just in case.
-            {
-                Events.Insert(count, evt);
-                count++;
-            }
+            InsertEvents(progressInfo.LoadedEvents);
             LoadedEventCount = Events.Count;
             filters.ForEach(f => f.Refresh(Events, reset: false));
         }
     }
-
-    private async Task Update(Task task)
+    private int InsertEvents(IEnumerable<EventItem> events)
     {
-        try
+        int count = 0;
+        foreach (var evt in events)
         {
-            ongoingTask = task;
-            stopwatch.Restart();
-            if (!IsAppend) 
-                LoadedEventCount = 0;
-            IsUpdating = true;
-            await task;
+            evt.IsNewLoaded = true;
+            evt.TimeLoaded = DateTime.Now;
+            Events.Insert(count, evt);    // We read logs from the newest to the oldest.
+            count++;
         }
-        finally
-        {
-            IsUpdating = false;
-            stopwatch.Stop();
-            LastElapsedTime = stopwatch.Elapsed;
-        }
+        if (count > 0 && !newLoadedUpdateTimer.IsEnabled)
+            newLoadedUpdateTimer.Start();
+        return count;
+    }
+
+    private void NewLoadedUpdateTimer_Tick(object sender, EventArgs e)
+    {
+        // Update the flag and stop the timer if there are no more events with the flag on.
+        if (UpdateIsNewLoaded() == false)
+            newLoadedUpdateTimer.Stop();
+    }
+    /// <summary>
+    /// Turns off the newly-loaded flag of the events that were loaded before the threshold time
+    /// and returns whether there are still events with the flag on.
+    /// This must be called from the UI thread.
+    /// </summary>
+    /// <param name="all">When true, all events' flag will be turned off.</param>
+    private bool UpdateIsNewLoaded(bool all = false)
+    {
+        Events.TakeWhile(e => e.IsNewLoaded)
+            .Where(e => all || DateTime.Now - e.TimeLoaded >= newLoadedTimeThreshold)
+            .ToList().ForEach(e => e.IsNewLoaded = false);
+        CVS.View.Refresh();
+        return Events.Any(e => e.IsNewLoaded);
     }
 
     /// <summary>
