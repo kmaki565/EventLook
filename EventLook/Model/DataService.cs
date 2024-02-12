@@ -11,14 +11,21 @@ namespace EventLook.Model;
 
 public interface IDataService
 {
-    Task<int> ReadEvents(LogSource eventSource, DateTime fromTime, DateTime toTime, IProgress<ProgressInfo> progress);
-
+    Task<int> ReadEvents(LogSource eventSource, DateTime fromTime, DateTime toTime, bool readFromNew, IProgress<ProgressInfo> progress);
     void Cancel();
+    /// <summary>
+    /// Subscribes to events in an event log channel. The caller will be reported whenever a new event comes in.
+    /// </summary>
+    /// <param name="eventSource"></param>
+    /// <param name="handler"></param>
+    /// <returns>True if success.</returns>
+    bool SubscribeEvents(LogSource eventSource, IProgress<ProgressInfo> progress);
+    void UnsubscribeEvents();
 }
 public class DataService : IDataService
 {
     private CancellationTokenSource cts;
-    public async Task<int> ReadEvents(LogSource eventSource, DateTime fromTime, DateTime toTime, IProgress<ProgressInfo> progress)
+    public async Task<int> ReadEvents(LogSource eventSource, DateTime fromTime, DateTime toTime, bool readFromNew, IProgress<ProgressInfo> progress)
     {
         using (cts = new CancellationTokenSource())
         {
@@ -35,7 +42,7 @@ public class DataService : IDataService
 
                 var elQuery = new EventLogQuery(eventSource.Path, eventSource.PathType, sQuery)
                 {
-                    ReverseDirection = true
+                    ReverseDirection = readFromNew
                 };
                 var reader = new EventLogReader(elQuery);
                 var eventRecord = reader.ReadEvent();
@@ -87,6 +94,53 @@ public class DataService : IDataService
     public void Cancel()
     {
         cts.Cancel();
+    }
+
+    private IProgress<ProgressInfo> progress = null;
+    private EventLogWatcher watcher = null;
+    public bool SubscribeEvents(LogSource source, IProgress<ProgressInfo> progress)
+    {
+        if (source.PathType == PathType.FilePath)
+            return false;
+
+        this.progress = progress;
+
+        try
+        {
+            UnsubscribeEvents();
+            watcher = new EventLogWatcher(new EventLogQuery(source.Path, PathType.LogName, "*"));
+            watcher.EventRecordWritten += new EventHandler<EventRecordWrittenEventArgs>(EventRecordWrittenHandler);
+            watcher.Enabled = true;
+            return true;
+        }
+        catch (EventLogException)
+        {
+            return false;
+        }
+    }
+    public void UnsubscribeEvents()
+    {
+        if (watcher != null)
+        {
+            watcher.Enabled = false;
+            watcher.Dispose();
+            watcher = null;
+        }
+    }
+    private void EventRecordWrittenHandler(object sender, EventRecordWrittenEventArgs arg)
+    {
+        if (arg.EventRecord == null)
+            return;
+        try
+        {
+            var item = new EventItem(arg.EventRecord);
+            var info = new ProgressInfo(new List<EventItem> { item }, isComplete: true, isFirst: true);
+            progress?.Report(info);
+        }
+        catch (Exception ex)
+        {
+            progress?.Report(new ProgressInfo(new List<EventItem>(), isComplete: true, isFirst: true, ex.Message));
+        }
     }
 
     /// <summary>

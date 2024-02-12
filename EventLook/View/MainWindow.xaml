@@ -3,8 +3,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" 
         xmlns:v="clr-namespace:EventLook.View"
-        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" xmlns:viewmodel="clr-namespace:EventLook.ViewModel" d:DataContext="{d:DesignInstance Type=viewmodel:MainViewModel}"
+        xmlns:viewmodel="clr-namespace:EventLook.ViewModel"
+        d:DataContext="{d:DesignInstance Type=viewmodel:MainViewModel}"
         mc:Ignorable="d"
         ResizeMode="CanResizeWithGrip"
         PreviewKeyDown="Window_PreviewKeyDown" d:DesignHeight="640" d:DesignWidth="1100">
@@ -35,6 +37,8 @@
         <v:InverseBooleanConverter x:Key="InverseBooleanConverter" />
         <v:UtcToAnotherTimeZoneStringConverter x:Key="UtcToAnotherTimeZoneStringConverter"/>
         <v:TimeZoneToOffsetTextConverter x:Key="TimeZoneToOffsetTextConverter"/>
+        <v:StatusTextConverter x:Key="StatusTextConverter"/>
+        <v:FilterInfoTextConverter x:Key="FilterInfoTextConverter"/>
         <!-- This next line instantiates a CollectionViewSource with the collection of Events as its collection of objects-->
         <CollectionViewSource Source="{Binding Events}" x:Key="X_CVS"/>
     </Window.Resources>
@@ -54,14 +58,38 @@
                 <MenuItem Header="_Launch Windows Event Viewer" Command="{Binding LaunchEventViewerCommand}"/>
                 <MenuItem Header="E_xit" Command="{Binding ExitCommand}" />
             </MenuItem>
-            <MenuItem Header="_Options" Command="{Binding OpenSettingsCommand}" />
+            <MenuItem Header="_Options">
+                <MenuItem Header="_Auto Refresh" IsCheckable="True" IsChecked="{Binding IsAutoRefreshEnabled}"/>
+                <Separator />
+                <MenuItem Header="_Settings..." Command="{Binding OpenSettingsCommand}" />
+            </MenuItem> 
             <MenuItem Header="_About" Click="MenuItem_About_Click"/>
         </Menu>
         <StatusBar DockPanel.Dock="Bottom" Background="WhiteSmoke">
             <StatusBarItem>
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="{Binding StatusText}" />
-                    <TextBlock Text="{Binding FilterInfoText}" />
+                    <TextBlock>
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{StaticResource StatusTextConverter}">
+                                <Binding Path="IsUpdating"/>
+                                <Binding Path="IsAutoRefreshing"/>
+                                <Binding Path="IsAppend"/>
+                                <Binding Path="LoadedEventCount"/>
+                                <Binding Path="AppendCount"/>
+                                <Binding Path="LastElapsedTime"/>
+                                <Binding Path="ErrorMessage"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                    <TextBlock>
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{StaticResource FilterInfoTextConverter}">
+                                <Binding Path="IsUpdating"/>
+                                <Binding Path="AreEventsFiltered"/>
+                                <Binding Path="VisibleEventCount"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
                 </StackPanel>
             </StatusBarItem>
         </StatusBar>
@@ -181,8 +209,13 @@
                     </Style>
                 </DataGrid.CellStyle>
                 <DataGrid.RowStyle>
-                    <Style TargetType="DataGridRow" BasedOn="{StaticResource {x:Type DataGridRow}}">
+                    <Style TargetType="DataGridRow">
                         <Setter Property="ContextMenu" Value="{StaticResource dataGridContextMenu}" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsNewLoaded}" Value="True">
+                                <Setter Property="Background" Value="Yellow"/>
+                            </DataTrigger>
+                        </Style.Triggers>
                     </Style>
                 </DataGrid.RowStyle>
                 <DataGrid.InputBindings>

@@ -9,12 +9,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Diagnostics.Eventing.Reader;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace EventLook.ViewModel;
 
@@ -46,7 +46,14 @@ public class MainViewModel : ObservableRecipient
         ShowsMillisec = Properties.Settings.Default.ShowsMillisec;
 
         progress = new Progress<ProgressInfo>(ProgressCallback); // Needs to instantiate in UI thread
+        progressAutoRefresh = new Progress<ProgressInfo>(AutoRefreshCallback);
+        
         stopwatch = new Stopwatch();
+        newLoadedUpdateTimer = new DispatcherTimer  // Setup a periodic timer which we'll run later.
+        {
+            Interval = TimeSpan.FromSeconds(1)
+        };
+        newLoadedUpdateTimer.Tick += NewLoadedUpdateTimer_Tick;
 
         Messenger.Register<MainViewModel, ViewCollectionViewSourceMessageToken>(this, (r, m) => r.Handle_ViewCollectionViewSourceMessageToken(m));
         Messenger.Register<MainViewModel, FileToBeProcessedMessageToken>(this, (r, m) => r.Handle_FileToBeProcessedMessageToken(m));
@@ -54,23 +61,24 @@ public class MainViewModel : ObservableRecipient
         Messenger.Register<MainViewModel, LogPickerWindowServiceMessageToken>(this, (r, m) => r.Handle_LogPickerWindowServiceMessageToken(m));
         Messenger.Register<MainViewModel, SettingsWindowServiceMessageToken>(this, (r, m) => r.Handle_SettingsWindowServiceMessageToken(m));
     }
+
     private readonly LogSourceMgr logSourceMgr;
     private readonly RangeMgr rangeMgr;
     private readonly Model.SourceFilter sourceFilter;
     private readonly LevelFilter levelFilter;
     // I had to bind the property of MessageFilter directly,
     // since NotifyPropertyChanged from inside MessageFilter didn't work.
-    // This may be controversial.
     public MessageFilter MsgFilter { get; }
     public IdFilter IdFilter { get; }
     private readonly List<FilterBase> filters;
     private readonly Progress<ProgressInfo> progress;
+    private readonly Progress<ProgressInfo> progressAutoRefresh;
     private readonly Stopwatch stopwatch;
+    private readonly DispatcherTimer newLoadedUpdateTimer;
     private bool readyToRefresh = false;
-    private int loadedEventCount = 0;
-    private bool isAppend = false;
-    private DateTime lastLogDate = DateTime.MinValue;
+    private bool isLastReadSuccess = false;
     private Task ongoingTask;
+    private readonly TimeSpan newLoadedTimeThreshold = TimeSpan.FromSeconds(5);
 
     // Services to be injected.
     private readonly IDataService DataService;
@@ -88,13 +96,14 @@ public class MainViewModel : ObservableRecipient
         get => selectedLogSource;
         set
         {
-            if (value == null)
+            if (value == null || value == selectedLogSource)
                 return;
 
             SetProperty(ref selectedLogSource, value);
 
             if (readyToRefresh)
             {
+                DataService.UnsubscribeEvents();
                 Refresh(reset: true);
             }
         }
@@ -106,6 +115,9 @@ public class MainViewModel : ObservableRecipient
         get => selectedRange;
         set
         {
+            if (value == null || value == selectedRange)
+                return;
+
             SetProperty(ref selectedRange, value);
 
             if (readyToRefresh && !selectedRange.IsCustom)
@@ -114,24 +126,84 @@ public class MainViewModel : ObservableRecipient
     }
     public ReadOnlyObservableCollection<SourceFilterItem> SourceFilters { get => sourceFilter.SourceFilters; }
     public ReadOnlyObservableCollection<LevelFilterItem> LevelFilters { get => levelFilter.LevelFilters; }
-    private string statusText;
-    public string StatusText { get => statusText; set => SetProperty(ref statusText, value); }
-    private string filterInfoText;
-    public string FilterInfoText { get => filterInfoText; set => SetProperty(ref filterInfoText, value); }
+    
     private bool isUpdating = false;
     public bool IsUpdating { get => isUpdating; set => SetProperty(ref isUpdating, value); }
+
+    private bool isAutoRefreshing = false;
+    public bool IsAutoRefreshing 
+    { 
+        get => isAutoRefreshing; 
+        set 
+        {
+            if (value == isAutoRefreshing) 
+                return;
+
+            SetProperty(ref isAutoRefreshing, value); 
+            RefreshCommand?.NotifyCanExecuteChanged(); 
+        } 
+    }
+    
+    private int loadedEventCount = 0;
+    public int LoadedEventCount { get => loadedEventCount; set => SetProperty(ref loadedEventCount, value); }
+
+    private bool isAppend = false;
+    public bool IsAppend { get => isAppend; set => SetProperty(ref isAppend, value); }
+
+    private int appendCount = 0;
+    public int AppendCount { get => appendCount; set => SetProperty(ref appendCount, value); }
+
+    private int visibleEventCount = 0;
+    public int VisibleEventCount { get => visibleEventCount; set => SetProperty(ref visibleEventCount, value); }
+
+    private bool areEventsFiltered = false;
+    public bool AreEventsFiltered { get => areEventsFiltered; set => SetProperty(ref areEventsFiltered, value); }
+
+    private string errorMessage = "";
+    public string ErrorMessage { get => errorMessage; set => SetProperty(ref errorMessage, value); }
+
+    private TimeSpan lastElapsedTime;
+    public TimeSpan LastElapsedTime { get => lastElapsedTime; set => SetProperty(ref lastElapsedTime, value); }
+
     private DateTime fromDateTime;
     public DateTime FromDateTime { get => fromDateTime; set => SetProperty(ref fromDateTime, value); }
+    
     private DateTime toDateTime;
     public DateTime ToDateTime { get => toDateTime; set => SetProperty(ref toDateTime, value); }
 
     public ObservableCollection<TimeZoneInfo> TimeZones { get; private set; }
+    
     private TimeZoneInfo selectedTimeZone;
     public TimeZoneInfo SelectedTimeZone { get => selectedTimeZone; set => SetProperty(ref selectedTimeZone, value); }
+    
     public bool ShowsMillisec { get; set; }
 
     private readonly bool isRunAsAdmin;
     public bool IsRunAsAdmin { get => isRunAsAdmin; }
+
+    private bool isAutoRefreshEnabled;
+    public bool IsAutoRefreshEnabled 
+    { 
+        get => isAutoRefreshEnabled;
+        set
+        {
+            if (value == isAutoRefreshEnabled)
+                return;
+
+            SetProperty(ref isAutoRefreshEnabled, value);
+            if (value)
+            {
+                if (SelectedLogSource?.PathType == PathType.LogName)
+                    Refresh(reset: false, append: true);    // Fast refresh will kick auto refresh
+            }
+            else
+            {
+                DataService.UnsubscribeEvents();
+                IsAutoRefreshing = false;
+                IsAppend = false;
+            }
+        }
+    }
 
     public void OnLoaded()
     {
@@ -159,9 +231,11 @@ public class MainViewModel : ObservableRecipient
     {
         Refreshing?.Invoke();
 
-        isAppend = append
-            ? lastLogDate != DateTime.MinValue && !SelectedRange.IsCustom
-            : false;
+        IsAppend = append && !SelectedRange.IsCustom && SelectedLogSource?.PathType == PathType.LogName && isLastReadSuccess;
+        if (IsAppend)
+            UpdateIsNewLoaded(all: true);
+        isLastReadSuccess = false;
+        IsAutoRefreshing = false;
 
         UpdateDateTimeInUi();
 
@@ -251,11 +325,12 @@ public class MainViewModel : ObservableRecipient
     }
     private void OnFilterUpdated(object sender, EventArgs e)
     {
-        UpdateFilterInfoText();
+        VisibleEventCount = CVS.View.Cast<object>().Count();
+        AreEventsFiltered = VisibleEventCount < Events.Count;
     }
 
     #region commands
-    public ICommand RefreshCommand { get; private set; }
+    public IRelayCommand RefreshCommand { get; private set; }
     public ICommand CancelCommand { get; private set; }
     public ICommand ExitCommand { get; private set; }
     public ICommand ApplySourceFilterCommand { get; private set; }
@@ -275,7 +350,7 @@ public class MainViewModel : ObservableRecipient
 
     private void InitializeCommands()
     {
-        RefreshCommand = new RelayCommand(RefreshForCommand, () => !IsUpdating);
+        RefreshCommand = new RelayCommand(RefreshForCommand, () => !IsUpdating && !IsAutoRefreshing);
         CancelCommand = new RelayCommand(Cancel, () => IsUpdating);
         ExitCommand = new RelayCommand(Exit); 
         ResetFiltersCommand = new RelayCommand(ClearFilters);
@@ -290,7 +365,7 @@ public class MainViewModel : ObservableRecipient
         OpenFileCommand = new RelayCommand(OpenFile);
         OpenLogPickerCommand = new RelayCommand(OpenLogPicker);
         OpenSettingsCommand = new RelayCommand(OpenSettings);
-        LaunchEventViewerCommand = new RelayCommand(LaunchEventViewer);
+        LaunchEventViewerCommand = new RelayCommand(() => ProcessHelper.LaunchEventViewer(SelectedLogSource));
         CopyMessageTextCommand = new RelayCommand(CopyMessageText);
     }
     #endregion
@@ -311,7 +386,7 @@ public class MainViewModel : ObservableRecipient
             ToDateTime = (SelectedLogSource.PathType == PathType.FilePath) 
                 ? SelectedLogSource.FileWriteTime
                 : DateTime.Now;
-            if (!isAppend)
+            if (!IsAppend)
                 FromDateTime = ToDateTime - TimeSpan.FromDays(SelectedRange.DaysFromNow);
         }
 
@@ -323,25 +398,40 @@ public class MainViewModel : ObservableRecipient
     {
         Cancel();
 
-        await Update(DataService.ReadEvents(selectedLogSource, 
-            isAppend ? lastLogDate : FromDateTime,
-            ToDateTime,
+        // When appending events, request events logged after the current newest event's time, from older to newer.
+        await Update(DataService.ReadEvents(SelectedLogSource, 
+            IsAppend ? Events.First().TimeOfEvent : FromDateTime,
+            ToDateTime, 
+            readFromNew: !IsAppend,
             progress));
     }
+    private async Task Update(Task task)
+    {
+        try
+        {
+            ongoingTask = task;
+            stopwatch.Restart();
+            if (!IsAppend)
+                LoadedEventCount = 0;
+            IsUpdating = true;
+            await task;
+        }
+        finally
+        {
+            IsUpdating = false;
+            stopwatch.Stop();
+            LastElapsedTime = stopwatch.Elapsed;
+        }
+    }
 
-    private int appendCount = 0;
     private void ProgressCallback(ProgressInfo progressInfo)
     {
-        if (isAppend)
+        if (IsAppend)
         {
             if (progressInfo.IsFirst)
-                appendCount = 0;
+                AppendCount = 0;
 
-            foreach (var evt in progressInfo.LoadedEvents)
-            {
-                Events.Insert(appendCount, evt);    // We read logs from the newest to the oldest.
-                appendCount++;
-            }
+            AppendCount += InsertEvents(progressInfo.LoadedEvents);
         }
         else
         {
@@ -354,57 +444,70 @@ public class MainViewModel : ObservableRecipient
             }
         }
 
-        loadedEventCount = Events.Count;
-        UpdateStatusText(progressInfo.Message);
+        LoadedEventCount = Events.Count;
+        ErrorMessage = progressInfo.Message;
 
         if (progressInfo.IsComplete)
         {
-            lastLogDate = Events.Any() && progressInfo.Message == ""    // If some events are loaded without error,
-                ? Events.First().TimeOfEvent    // save the latest event time.
-                : DateTime.MinValue;
+            isLastReadSuccess = Events.Any() && progressInfo.Message == "";
+            if (isLastReadSuccess && IsAutoRefreshEnabled && SelectedLogSource?.PathType == PathType.LogName)
+            {
+                // Fast refresh should be done once before enabling auto refresh.
+                // Otherwise we'll miss events that came during loading the entire logs.
+                if (!IsAppend)
+                    Refresh(reset: false, append: true);
+                DataService.SubscribeEvents(SelectedLogSource, progressAutoRefresh);
+                IsAutoRefreshing = true;
+            }
         }
     }
-    private async Task Update(Task task)
+
+    private void AutoRefreshCallback(ProgressInfo progressInfo)
     {
-        try
+        if (progressInfo.LoadedEvents.Any())
         {
-            ongoingTask = task;
-            stopwatch.Restart();
-            if (!isAppend) 
-                loadedEventCount = 0;
-            IsUpdating = true;
-            UpdateStatusText();
-            UpdateFilterInfoText();
-            await task;
-        }
-        finally
-        {
-            IsUpdating = false;
-            stopwatch.Stop();
-            UpdateStatusText();
+            InsertEvents(progressInfo.LoadedEvents);    // Single event should be loaded at a time.
+            LoadedEventCount = Events.Count;
+            filters.ForEach(f => f.Refresh(Events, reset: false));
         }
     }
-    private void UpdateStatusText(string additionalNote = "")
+    private int InsertEvents(IEnumerable<EventItem> events)
     {
-        if (IsUpdating)
-            StatusText = $"Loading {loadedEventCount} events... {additionalNote}";
-        else
+        int count = 0;
+        foreach (var evt in events)
         {
-            StatusText = isAppend
-                ? $"{loadedEventCount} ({appendCount} new) events loaded. {additionalNote}"
-                : $"{loadedEventCount} events loaded. ({stopwatch.Elapsed.TotalSeconds:F1} sec) {additionalNote}";  // 1 digit after decimal point
+            evt.IsNewLoaded = true;
+            evt.TimeLoaded = DateTime.Now;
+            // When appending, we read events from the oldest to the newest, so always insert to the top.
+            Events.Insert(0, evt);
+            count++;
         }
+        if (count > 0 && !newLoadedUpdateTimer.IsEnabled)
+            newLoadedUpdateTimer.Start();
+        return count;
     }
-    private void UpdateFilterInfoText()
+
+    private void NewLoadedUpdateTimer_Tick(object sender, EventArgs e)
     {
-        if (IsUpdating)
-            FilterInfoText = "";
-        else
-        {
-            int visibleRowCounts = CVS.View.Cast<object>().Count();
-            FilterInfoText = (visibleRowCounts == Events.Count) ? "" : $" {visibleRowCounts} events matched to the filter(s).";
-        }
+        // Update the flag and stop the timer if there are no more events with the flag on.
+        if (UpdateIsNewLoaded() == false)
+            newLoadedUpdateTimer.Stop();
     }
+    /// <summary>
+    /// Turns off the newly-loaded flag of the events that were loaded before the threshold time
+    /// and returns whether there are still events with the flag on.
+    /// This must be called from the UI thread.
+    /// </summary>
+    /// <param name="all">When true, all events' flag will be turned off.</param>
+    private bool UpdateIsNewLoaded(bool all = false)
+    {
+        Events.TakeWhile(e => e.IsNewLoaded)
+            .Where(e => all || DateTime.Now - e.TimeLoaded >= newLoadedTimeThreshold)
+            .ToList().ForEach(e => e.IsNewLoaded = false);
+        CVS.View.Refresh();
+        return Events.Any(e => e.IsNewLoaded);
+    }
+
     /// <summary>
     /// Gets or sets the CollectionViewSource which is the proxy for the
     /// collection of Events and the datagrid in which each Event is displayed.
@@ -510,23 +613,10 @@ public class MainViewModel : ObservableRecipient
         else
             SelectedLogSource = LogSources.FirstOrDefault();
 
+        SelectedRange = Ranges.FirstOrDefault(r => r.Text == newSettings.SelectedRange.Text);
+        
         readyToRefresh = true;
-        SelectedRange = Ranges.FirstOrDefault(r => r.Text == newSettings.SelectedRange.Text);   // Fire Refresh
-    }
-    private void LaunchEventViewer()
-    {
-        string arg = "";
-        if (SelectedLogSource?.PathType == PathType.FilePath)
-            arg = $"/l:\"{selectedLogSource.Path}\"";
-        else if (selectedLogSource?.PathType == PathType.LogName)
-            arg = $"/c:\"{selectedLogSource.Path}\"";
-
-        Process.Start(new ProcessStartInfo
-        {
-            UseShellExecute = true,
-            FileName = "eventvwr.msc",
-            Arguments = arg,
-        });
+        Refresh(reset: true);
     }
     /// <summary>
     /// Copies Message text of the selected log to clipboard.
@@ -540,6 +630,6 @@ public class MainViewModel : ObservableRecipient
         {
             Clipboard.SetText(SelectedEventItem.Message);
         }
-        catch (Exception) { }    // Ignore OpenClipboard exception}
+        catch (Exception) { }    // Ignore OpenClipboard exception
     }
 }
