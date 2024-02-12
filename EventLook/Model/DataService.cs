@@ -11,7 +11,7 @@ namespace EventLook.Model;
 
 public interface IDataService
 {
-    Task<int> ReadEvents(LogSource eventSource, DateTime fromTime, DateTime toTime, IProgress<ProgressInfo> progress);
+    Task<int> ReadEvents(LogSource eventSource, DateTime fromTime, DateTime toTime, bool readFromNew, IProgress<ProgressInfo> progress);
     void Cancel();
     /// <summary>
     /// Subscribes to events in an event log channel. The caller will be reported whenever a new event comes in.
@@ -25,7 +25,7 @@ public interface IDataService
 public class DataService : IDataService
 {
     private CancellationTokenSource cts;
-    public async Task<int> ReadEvents(LogSource eventSource, DateTime fromTime, DateTime toTime, IProgress<ProgressInfo> progress)
+    public async Task<int> ReadEvents(LogSource eventSource, DateTime fromTime, DateTime toTime, bool readFromNew, IProgress<ProgressInfo> progress)
     {
         using (cts = new CancellationTokenSource())
         {
@@ -42,7 +42,7 @@ public class DataService : IDataService
 
                 var elQuery = new EventLogQuery(eventSource.Path, eventSource.PathType, sQuery)
                 {
-                    ReverseDirection = true
+                    ReverseDirection = readFromNew
                 };
                 var reader = new EventLogReader(elQuery);
                 var eventRecord = reader.ReadEvent();

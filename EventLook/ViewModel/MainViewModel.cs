@@ -398,9 +398,11 @@ public class MainViewModel : ObservableRecipient
     {
         Cancel();
 
+        // When appending events, request events logged after the current newest event's time, from older to newer.
         await Update(DataService.ReadEvents(SelectedLogSource, 
             IsAppend ? Events.First().TimeOfEvent : FromDateTime,
-            ToDateTime,
+            ToDateTime, 
+            readFromNew: !IsAppend,
             progress));
     }
     private async Task Update(Task task)
@@ -429,7 +431,7 @@ public class MainViewModel : ObservableRecipient
             if (progressInfo.IsFirst)
                 AppendCount = 0;
 
-            AppendCount += InsertEvents(progressInfo.LoadedEvents, startPosition: AppendCount);
+            AppendCount += InsertEvents(progressInfo.LoadedEvents);
         }
         else
         {
@@ -469,14 +471,15 @@ public class MainViewModel : ObservableRecipient
             filters.ForEach(f => f.Refresh(Events, reset: false));
         }
     }
-    private int InsertEvents(IEnumerable<EventItem> events, int startPosition = 0)
+    private int InsertEvents(IEnumerable<EventItem> events)
     {
         int count = 0;
         foreach (var evt in events)
         {
             evt.IsNewLoaded = true;
             evt.TimeLoaded = DateTime.Now;
-            Events.Insert(startPosition + count, evt);    // We read logs from the newest to the oldest.
+            // When appending, we read events from the oldest to the newest, so always insert to the top.
+            Events.Insert(0, evt);
             count++;
         }
         if (count > 0 && !newLoadedUpdateTimer.IsEnabled)
