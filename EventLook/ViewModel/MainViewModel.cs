@@ -120,7 +120,9 @@ public class MainViewModel : ObservableRecipient
 
             SetProperty(ref selectedRange, value);
 
-            if (readyToRefresh && !selectedRange.IsCustom)
+            if (selectedRange.IsCustom)
+                TurnOffAutoRefresh();   // We do not support auto refresh for custom range.
+            else if (readyToRefresh)
                 Refresh(reset: false);
         }
     }
@@ -193,14 +195,13 @@ public class MainViewModel : ObservableRecipient
             SetProperty(ref isAutoRefreshEnabled, value);
             if (value)
             {
-                if (SelectedLogSource?.PathType == PathType.LogName)
+                // We do not support auto refresh for custom range.
+                if (!SelectedRange.IsCustom && SelectedLogSource?.PathType == PathType.LogName)
                     Refresh(reset: false, append: true);    // Fast refresh will kick auto refresh
             }
             else
             {
-                DataService.UnsubscribeEvents();
-                IsAutoRefreshing = false;
-                IsAppend = false;
+                TurnOffAutoRefresh();
             }
         }
     }
@@ -450,14 +451,9 @@ public class MainViewModel : ObservableRecipient
         if (progressInfo.IsComplete)
         {
             isLastReadSuccess = Events.Any() && progressInfo.Message == "";
-            if (isLastReadSuccess && IsAutoRefreshEnabled && SelectedLogSource?.PathType == PathType.LogName)
+            if (isLastReadSuccess && IsAutoRefreshEnabled && !SelectedRange.IsCustom && SelectedLogSource?.PathType == PathType.LogName)
             {
-                // Fast refresh should be done once before enabling auto refresh.
-                // Otherwise we'll miss events that came during loading the entire logs.
-                if (!IsAppend)
-                    Refresh(reset: false, append: true);
-                DataService.SubscribeEvents(SelectedLogSource, progressAutoRefresh);
-                IsAutoRefreshing = true;
+                TurnOnAutoRefresh();
             }
         }
     }
@@ -470,6 +466,21 @@ public class MainViewModel : ObservableRecipient
             LoadedEventCount = Events.Count;
             filters.ForEach(f => f.Refresh(Events, reset: false));
         }
+    }
+    private void TurnOnAutoRefresh()
+    {
+        // Fast refresh should be done once before enabling auto refresh.
+        // Otherwise we'll miss events that came during loading the entire logs.
+        if (!IsAppend)
+            Refresh(reset: false, append: true);
+        DataService.SubscribeEvents(SelectedLogSource, progressAutoRefresh);
+        IsAutoRefreshing = true;
+    }
+    private void TurnOffAutoRefresh()
+    {
+        DataService.UnsubscribeEvents();
+        IsAutoRefreshing = false;
+        IsAppend = false;
     }
     private int InsertEvents(IEnumerable<EventItem> events)
     {
