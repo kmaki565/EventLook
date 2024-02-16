@@ -390,10 +390,6 @@ public class MainViewModel : ObservableRecipient
             if (!IsAppend)
                 FromDateTime = ToDateTime - TimeSpan.FromDays(SelectedRange.DaysFromNow);
         }
-
-        // These seem necessary to ensure DateTimePicker be updated
-        OnPropertyChanged(nameof(FromDateTime));
-        OnPropertyChanged(nameof(ToDateTime));
     }
     private async Task LoadEvents()
     {
@@ -465,6 +461,9 @@ public class MainViewModel : ObservableRecipient
             InsertEvents(progressInfo.LoadedEvents);    // Single event should be loaded at a time.
             LoadedEventCount = Events.Count;
             filters.ForEach(f => f.Refresh(Events, reset: false));
+            // If the range is like "Last x days", just adjust appearance of the date time picker.
+            if (!SelectedRange.IsCustom && SelectedRange.DaysFromNow != 0)
+                ToDateTime = DateTime.Now;
         }
     }
     private void TurnOnAutoRefresh()
