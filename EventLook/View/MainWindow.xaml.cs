@@ -163,6 +163,7 @@ public partial class MainWindow : Window
         vm.HyperlinkText = "https://github.com/kmaki565/EventLook";
 
         vm.Window.Content = about;
+        vm.Window.Owner = this; // To make the child window always on top of this window.
         vm.Window.ShowDialog();
     }
 }
