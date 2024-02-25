@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Eventing.Reader;
-using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -73,7 +72,7 @@ public class DataService : IDataService
                                 reader.Seek(eventRecord.Bookmark, 1);   // Reset the position to last successful read + 1.
                                 reader.BatchSize /= 2;  // Halve the 2nd param of EvtNext Win32 API to be called.
                                 retryCount++;
-                                Debug.WriteLine($"Retry #{retryCount}. Last successful-read event's RecordId: {eventRecord.RecordId}, Time: {eventRecord.TimeCreated}");
+                                Debug.WriteLine($"Retry #{retryCount}. Last successful-read event's RecordId: {eventRecord.RecordId}, Time: {eventRecord.TimeCreated?.ToString("yyyy-MM-dd HH:mm:ss.fff")}");
                                 continue;
                             }
                             else
