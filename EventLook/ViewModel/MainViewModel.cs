@@ -149,6 +149,9 @@ public class MainViewModel : ObservableRecipient
     private int loadedEventCount = 0;
     public int LoadedEventCount { get => loadedEventCount; set => SetProperty(ref loadedEventCount, value); }
 
+    private int totalEventCount = 0;
+    public int TotalEventCount { get => totalEventCount; set => SetProperty(ref totalEventCount, value); }
+
     private bool isAppend = false;
     public bool IsAppend { get => isAppend; set => SetProperty(ref isAppend, value); }
 
@@ -408,6 +411,7 @@ public class MainViewModel : ObservableRecipient
         {
             ongoingTask = task;
             stopwatch.Restart();
+            TotalEventCount = 0;
             if (!IsAppend)
                 LoadedEventCount = 0;
             IsUpdating = true;
@@ -442,6 +446,8 @@ public class MainViewModel : ObservableRecipient
         }
 
         LoadedEventCount = Events.Count;
+        // Disregard unless the range is "All time".
+        TotalEventCount = (SelectedRange.DaysFromNow == 0 && !SelectedRange.IsCustom) ? progressInfo.RecordCountInfo : 0;
         ErrorMessage = progressInfo.Message;
 
         if (progressInfo.IsComplete)
@@ -473,6 +479,7 @@ public class MainViewModel : ObservableRecipient
         if (!IsAppend)
             Refresh(reset: false, append: true);
         DataService.SubscribeEvents(SelectedLogSource, progressAutoRefresh);
+        TotalEventCount = 0;
         IsAutoRefreshing = true;
     }
     private void TurnOffAutoRefresh()

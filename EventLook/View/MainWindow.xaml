@@ -75,6 +75,7 @@
                                 <Binding Path="IsAutoRefreshing"/>
                                 <Binding Path="IsAppend"/>
                                 <Binding Path="LoadedEventCount"/>
+                                <Binding Path="TotalEventCount"/>
                                 <Binding Path="AppendCount"/>
                                 <Binding Path="LastElapsedTime"/>
                                 <Binding Path="ErrorMessage"/>

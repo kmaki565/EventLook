@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Eventing.Reader;
+using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -11,28 +12,30 @@ namespace EventLook.Model;
 
 public interface IDataService
 {
-    Task<int> ReadEvents(LogSource eventSource, DateTime fromTime, DateTime toTime, bool readFromNew, IProgress<ProgressInfo> progress);
+    Task<int> ReadEvents(LogSource logSource, DateTime fromTime, DateTime toTime, bool readFromNew, IProgress<ProgressInfo> progress);
     void Cancel();
     /// <summary>
     /// Subscribes to events in an event log channel. The caller will be reported whenever a new event comes in.
     /// </summary>
-    /// <param name="eventSource"></param>
+    /// <param name="logSource"></param>
     /// <param name="handler"></param>
     /// <returns>True if success.</returns>
-    bool SubscribeEvents(LogSource eventSource, IProgress<ProgressInfo> progress);
+    bool SubscribeEvents(LogSource logSource, IProgress<ProgressInfo> progress);
     void UnsubscribeEvents();
 }
 public class DataService : IDataService
 {
     private CancellationTokenSource cts;
-    public async Task<int> ReadEvents(LogSource eventSource, DateTime fromTime, DateTime toTime, bool readFromNew, IProgress<ProgressInfo> progress)
+    public async Task<int> ReadEvents(LogSource logSource, DateTime fromTime, DateTime toTime, bool readFromNew, IProgress<ProgressInfo> progress)
     {
         using (cts = new CancellationTokenSource())
         {
             // Event records to be sent to the ViewModel
             var eventRecords = new List<EventRecord>();
+            EventLogReader reader = null;
             string errMsg = "";
             int count = 0;
+            int totalCount = 0;
             bool isFirst = true;
             try
             {
@@ -40,13 +43,18 @@ public class DataService : IDataService
                     fromTime.ToUniversalTime().ToString("o"),
                     toTime.ToUniversalTime().ToString("o"));
 
-                var elQuery = new EventLogQuery(eventSource.Path, eventSource.PathType, sQuery)
+                var elQuery = new EventLogQuery(logSource.Path, logSource.PathType, sQuery)
                 {
                     ReverseDirection = readFromNew
                 };
-                var reader = new EventLogReader(elQuery);
-                var eventRecord = reader.ReadEvent();
                 Debug.WriteLine("Begin Reading");
+
+                // Asynchronously get the record count info.
+                // The count is valid only when "All time" is selected for a Event Log on the local machine.
+                _ = Task.Run(() => totalCount = GetRecordCount(logSource));
+
+                reader = new EventLogReader(elQuery);
+                var eventRecord = reader.ReadEvent();
                 await Task.Run(() =>
                 {
                     for (; eventRecord != null; eventRecord = reader.ReadEvent())
@@ -57,7 +65,7 @@ public class DataService : IDataService
                         ++count;
                         if (count % 100 == 0)
                         {
-                            var info = new ProgressInfo(eventRecords.ConvertAll(e => new EventItem(e)), isComplete: false, isFirst);
+                            var info = new ProgressInfo(eventRecords.ConvertAll(e => new EventItem(e)), isComplete: false, isFirst, totalCount);
                             cts.Token.ThrowIfCancellationRequested();
                             progress.Report(info);
                             isFirst = false;
@@ -84,8 +92,9 @@ public class DataService : IDataService
             }
             finally
             {
-                var info_comp = new ProgressInfo(eventRecords.ConvertAll(e => new EventItem(e)), isComplete: true, isFirst, errMsg);
+                var info_comp = new ProgressInfo(eventRecords.ConvertAll(e => new EventItem(e)), isComplete: true, isFirst, totalCount, errMsg);
                 progress.Report(info_comp);
+                reader?.Dispose();
                 Debug.WriteLine("End Reading");
             }
             return count;
@@ -139,7 +148,7 @@ public class DataService : IDataService
         }
         catch (Exception ex)
         {
-            progress?.Report(new ProgressInfo(new List<EventItem>(), isComplete: true, isFirst: true, ex.Message));
+            progress?.Report(new ProgressInfo(new List<EventItem>(), isComplete: true, isFirst: true, totalEventCount: 0, ex.Message));
         }
     }
 
@@ -197,5 +206,27 @@ public class DataService : IDataService
                 return false;
             }
         }
+    }
+
+    /// <summary>
+    /// Gets the total number of event records in a channel. 
+    /// This refers to the RecordCount property in EventLogInformation instead of iterating ReadEvent() to count.
+    /// So the count does not necessarily match the number of records to be received by the query.
+    /// </summary>
+    private static int GetRecordCount(LogSource source)
+    {
+        if (source.PathType == PathType.LogName)
+        {
+            try
+            {
+                using (var elSession = new EventLogSession())
+                {
+                    EventLogInformation info = elSession.GetLogInformation(source.Path, PathType.LogName);
+                    return Convert.ToInt32(info.RecordCount ?? 0);  // Int should be large enough.
+                }
+            }
+            catch (Exception) { }
+        }
+        return 0;
     }
 }
