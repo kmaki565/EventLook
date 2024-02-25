@@ -26,6 +26,7 @@ public interface IDataService
 public class DataService : IDataService
 {
     private CancellationTokenSource cts;
+    const int WIN32ERROR_RPC_S_INVALID_BOUND = unchecked((int)0x800706C6);
     public async Task<int> ReadEvents(LogSource logSource, DateTime fromTime, DateTime toTime, bool readFromNew, IProgress<ProgressInfo> progress)
     {
         using (cts = new CancellationTokenSource())
@@ -33,6 +34,7 @@ public class DataService : IDataService
             // Event records to be sent to the ViewModel
             var eventRecords = new List<EventRecord>();
             EventLogReader reader = null;
+            EventRecord eventRecord = null;
             string errMsg = "";
             int count = 0;
             int totalCount = 0;
@@ -54,15 +56,36 @@ public class DataService : IDataService
                 _ = Task.Run(() => totalCount = GetRecordCount(logSource));
 
                 reader = new EventLogReader(elQuery);
-                var eventRecord = reader.ReadEvent();
                 await Task.Run(() =>
                 {
-                    for (; eventRecord != null; eventRecord = reader.ReadEvent())
+                    int retryCount = 0;
+                    while (true)
                     {
+                        try
+                        {
+                            eventRecord = reader.ReadEvent();
+                        }
+                        catch (EventLogException ex)
+                        {
+                            // Workaround: ReadEvent can somehow throw an exception "The array bounds are invalid."
+                            if (ex.HResult == WIN32ERROR_RPC_S_INVALID_BOUND && retryCount < 3 && eventRecord?.Bookmark != null)
+                            {
+                                reader.Seek(eventRecord.Bookmark, 1);   // Reset the position to last successful read + 1.
+                                reader.BatchSize /= 2;  // Halve the 2nd param of EvtNext Win32 API to be called.
+                                retryCount++;
+                                Debug.WriteLine($"Retry #{retryCount}. Last successful-read event's RecordId: {eventRecord.RecordId}, Time: {eventRecord.TimeCreated}");
+                                continue;
+                            }
+                            else
+                                throw;
+                        }
+                        if (eventRecord == null)    // No more records.
+                            break;
+
                         cts.Token.ThrowIfCancellationRequested();
 
                         eventRecords.Add(eventRecord);
-                        ++count;
+                        count++;
                         if (count % 100 == 0)
                         {
                             var info = new ProgressInfo(eventRecords.ConvertAll(e => new EventItem(e)), isComplete: false, isFirst, totalCount);
@@ -94,6 +117,7 @@ public class DataService : IDataService
             {
                 var info_comp = new ProgressInfo(eventRecords.ConvertAll(e => new EventItem(e)), isComplete: true, isFirst, totalCount, errMsg);
                 progress.Report(info_comp);
+                eventRecord?.Dispose();
                 reader?.Dispose();
                 Debug.WriteLine("End Reading");
             }
