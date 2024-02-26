@@ -437,7 +437,10 @@ public class MainViewModel : ObservableRecipient
         else
         {
             if (progressInfo.IsFirst)
+            {
+                Events.DisposeAll();
                 Events.Clear();
+            }
 
             foreach (var evt in progressInfo.LoadedEvents)
             {
