@@ -70,7 +70,8 @@ public class DataService : IDataService
                             if (ex.HResult == WIN32ERROR_RPC_S_INVALID_BOUND && retryCount < 3 && eventRecord?.Bookmark != null)
                             {
                                 reader.Seek(eventRecord.Bookmark, 1);   // Reset the position to last successful read + 1.
-                                reader.BatchSize /= 2;  // Halve the 2nd param of EvtNext Win32 API to be called.
+                                if (reader.BatchSize > 1)
+                                    reader.BatchSize /= 2;  // Halve the 2nd param of EvtNext Win32 API to be called.
                                 retryCount++;
                                 Debug.WriteLine($"Retry #{retryCount}. Last successful-read event's RecordId: {eventRecord.RecordId}, Time: {eventRecord.TimeCreated?.ToString("yyyy-MM-dd HH:mm:ss.fff")}");
                                 continue;
