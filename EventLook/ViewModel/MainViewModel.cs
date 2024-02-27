@@ -120,7 +120,9 @@ public class MainViewModel : ObservableRecipient
 
             SetProperty(ref selectedRange, value);
 
-            if (readyToRefresh && !selectedRange.IsCustom)
+            if (selectedRange.IsCustom)
+                TurnOffAutoRefresh();   // We do not support auto refresh for custom range.
+            else if (readyToRefresh)
                 Refresh(reset: false);
         }
     }
@@ -146,6 +148,9 @@ public class MainViewModel : ObservableRecipient
     
     private int loadedEventCount = 0;
     public int LoadedEventCount { get => loadedEventCount; set => SetProperty(ref loadedEventCount, value); }
+
+    private int totalEventCount = 0;
+    public int TotalEventCount { get => totalEventCount; set => SetProperty(ref totalEventCount, value); }
 
     private bool isAppend = false;
     public bool IsAppend { get => isAppend; set => SetProperty(ref isAppend, value); }
@@ -193,14 +198,13 @@ public class MainViewModel : ObservableRecipient
             SetProperty(ref isAutoRefreshEnabled, value);
             if (value)
             {
-                if (SelectedLogSource?.PathType == PathType.LogName)
+                // We do not support auto refresh for custom range.
+                if (!SelectedRange.IsCustom && SelectedLogSource?.PathType == PathType.LogName)
                     Refresh(reset: false, append: true);    // Fast refresh will kick auto refresh
             }
             else
             {
-                DataService.UnsubscribeEvents();
-                IsAutoRefreshing = false;
-                IsAppend = false;
+                TurnOffAutoRefresh();
             }
         }
     }
@@ -389,10 +393,6 @@ public class MainViewModel : ObservableRecipient
             if (!IsAppend)
                 FromDateTime = ToDateTime - TimeSpan.FromDays(SelectedRange.DaysFromNow);
         }
-
-        // These seem necessary to ensure DateTimePicker be updated
-        OnPropertyChanged(nameof(FromDateTime));
-        OnPropertyChanged(nameof(ToDateTime));
     }
     private async Task LoadEvents()
     {
@@ -411,6 +411,7 @@ public class MainViewModel : ObservableRecipient
         {
             ongoingTask = task;
             stopwatch.Restart();
+            TotalEventCount = 0;
             if (!IsAppend)
                 LoadedEventCount = 0;
             IsUpdating = true;
@@ -436,7 +437,10 @@ public class MainViewModel : ObservableRecipient
         else
         {
             if (progressInfo.IsFirst)
+            {
+                Events.DisposeAll();
                 Events.Clear();
+            }
 
             foreach (var evt in progressInfo.LoadedEvents)
             {
@@ -445,19 +449,16 @@ public class MainViewModel : ObservableRecipient
         }
 
         LoadedEventCount = Events.Count;
+        // Disregard unless the range is "All time".
+        TotalEventCount = (SelectedRange.DaysFromNow == 0 && !SelectedRange.IsCustom) ? progressInfo.RecordCountInfo : 0;
         ErrorMessage = progressInfo.Message;
 
         if (progressInfo.IsComplete)
         {
             isLastReadSuccess = Events.Any() && progressInfo.Message == "";
-            if (isLastReadSuccess && IsAutoRefreshEnabled && SelectedLogSource?.PathType == PathType.LogName)
+            if (isLastReadSuccess && IsAutoRefreshEnabled && !SelectedRange.IsCustom && SelectedLogSource?.PathType == PathType.LogName)
             {
-                // Fast refresh should be done once before enabling auto refresh.
-                // Otherwise we'll miss events that came during loading the entire logs.
-                if (!IsAppend)
-                    Refresh(reset: false, append: true);
-                DataService.SubscribeEvents(SelectedLogSource, progressAutoRefresh);
-                IsAutoRefreshing = true;
+                TurnOnAutoRefresh();
             }
         }
     }
@@ -469,7 +470,26 @@ public class MainViewModel : ObservableRecipient
             InsertEvents(progressInfo.LoadedEvents);    // Single event should be loaded at a time.
             LoadedEventCount = Events.Count;
             filters.ForEach(f => f.Refresh(Events, reset: false));
+            // If the range is like "Last x days", just adjust appearance of the date time picker.
+            if (!SelectedRange.IsCustom && SelectedRange.DaysFromNow != 0)
+                ToDateTime = DateTime.Now;
         }
+    }
+    private void TurnOnAutoRefresh()
+    {
+        // Fast refresh should be done once before enabling auto refresh.
+        // Otherwise we'll miss events that came during loading the entire logs.
+        if (!IsAppend)
+            Refresh(reset: false, append: true);
+        DataService.SubscribeEvents(SelectedLogSource, progressAutoRefresh);
+        TotalEventCount = 0;
+        IsAutoRefreshing = true;
+    }
+    private void TurnOffAutoRefresh()
+    {
+        DataService.UnsubscribeEvents();
+        IsAutoRefreshing = false;
+        IsAppend = false;
     }
     private int InsertEvents(IEnumerable<EventItem> events)
     {

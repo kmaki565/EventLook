@@ -12,7 +12,7 @@ namespace EventLook.Model;
 /// Represents a event to display. 
 /// Could not inherit EventLogRecord as it doesn't have a public constructor.
 /// </summary>
-public class EventItem
+public class EventItem : IDisposable
 {
     public EventItem(EventRecord eventRecord)
     {
@@ -64,4 +64,6 @@ public class EventItem
     /// Indicates if the event is newly loaded.
     /// </summary>
     public bool IsNewLoaded { get; set; }
+
+    public void Dispose() => Record.Dispose();
 }

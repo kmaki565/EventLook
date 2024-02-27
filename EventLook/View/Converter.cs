@@ -176,18 +176,20 @@ public class TimeZoneToOffsetTextConverter : IValueConverter
 
 /// <summary>
 /// Generates the status text based on the various indicators.
-/// 0: IsUpdating, 1: IsAutoRefreshing, 2: IsAppend, 3: LoadedEventCount, 4: AppendCount, 5: LastElapsedTime, 6: ErrorMessage
+/// 0: IsUpdating, 1: IsAutoRefreshing, 2: IsAppend, 3: LoadedEventCount, 4: TotalEventCount, 5: AppendCount, 6: LastElapsedTime, 7: ErrorMessage
 /// </summary>
 public class StatusTextConverter : IMultiValueConverter
 {
     public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
     {
         if (values[0] is bool isUpdating && values[1] is bool isAutoRefreshing && values[2] is bool isAppend
-            && values[3] is int loadedEventCount && values[4] is int appendCount
-            && values[5] is TimeSpan lastEpasedTime && values[6] is string errorMessage)
+            && values[3] is int loadedEventCount && values[4] is int totalEventCount && values[5] is int appendCount
+            && values[6] is TimeSpan lastEpasedTime && values[7] is string errorMessage)
         {
             if (isUpdating)
-                return $"Loading {loadedEventCount} events... {errorMessage}";
+                return totalEventCount > 0 
+                    ? $"Loading {loadedEventCount}/{totalEventCount} events... {errorMessage}"
+                    : $"Loading {loadedEventCount} events... {errorMessage}";
             else if (isAutoRefreshing)
                 return $"{loadedEventCount} events loaded. Waiting for new events... {errorMessage}";
             else
