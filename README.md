@@ -17,6 +17,7 @@ The inbox Windows Event Viewer is a great app that provides comprehensive functi
 - Overview events with Event Log messages
 - Asynchronous event fetching for quick glance
 - Provides quicker sort, specifying time range, and filters
+- Supports auto refresh with new events highlighted
 - Provides access to all Event Logs in local machine, including Applications and Services Logs
 - Supports .evtx file (open from Explorer or drag & drop .evtx file)
 - Double click to view event details in XML format
