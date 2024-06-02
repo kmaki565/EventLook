@@ -5,10 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EventLook.View" xmlns:viewmodel="clr-namespace:EventLook.ViewModel" d:DataContext="{d:DesignInstance Type=viewmodel:DetailViewModel}"
         mc:Ignorable="d"
-        FocusManager.FocusedElement="{Binding ElementName=EventXml}"
+        FocusManager.FocusedElement="{Binding ElementName=TextBoxXml}"
         Title="Event Details" Height="450" Width="800">
     <Grid>
-        <TextBox Name="EventXml" Text="{Binding FormattedXml, Mode=OneWay}"
+        <TextBox Name="TextBoxXml" Text="{Binding EventXml, Mode=OneWay}"
                  IsReadOnly="True" IsReadOnlyCaretVisible="True"
                  VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
     </Grid>

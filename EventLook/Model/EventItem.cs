@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
 using System.Linq;
-using System.Reflection.PortableExecutable;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -71,6 +70,13 @@ public class EventItem : IDisposable
     public void Dispose() => Record.Dispose();
 
     private string _xml;
+    /// <summary>
+    /// Fetches the XML representation of the event from log source and event record ID.
+    /// If the XML is already fetched, it returns the cached XML. 
+    /// Returns null if XML cannot be fetched.
+    /// </summary>
+    /// <param name="logSource"></param>
+    /// <returns></returns>
     public string GetXml(LogSource logSource)
     {
         if (_xml == null && RecordId.HasValue)
@@ -84,7 +90,7 @@ public class EventItem : IDisposable
                 eventRecord = reader.ReadEvent();
                 if (eventRecord != null)
                 {
-                    _xml = eventRecord.ToXml();
+                    _xml = TextHelper.FormatXml(eventRecord.ToXml());
                 }
             }
             finally

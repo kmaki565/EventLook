@@ -10,15 +10,5 @@ namespace EventLook.ViewModel;
 public class DetailViewModel(EventItem eventItem, LogSource logSource)
 {
     public EventItem Event { get; set; } = eventItem;
-    public string FormattedXml
-    {
-        get
-        {
-            string xml = Event.GetXml(logSource);
-            if (string.IsNullOrEmpty(xml))
-                return "Could not retrieve XML.";
-
-            return TextHelper.FormatXml(xml);
-        }
-    }
+    public string EventXml { get => Event.GetXml(logSource) ?? "Could not retrieve XML."; }
 }
