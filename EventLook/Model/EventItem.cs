@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
 using System.Linq;
+using System.Reflection.PortableExecutable;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -17,6 +18,7 @@ public class EventItem : IDisposable
     public EventItem(EventRecord eventRecord)
     {
         Record = eventRecord;
+        RecordId = eventRecord.RecordId;
         TimeOfEvent = eventRecord.TimeCreated?.ToUniversalTime() ?? DateTime.MinValue.ToUniversalTime();
         try
         {
@@ -52,7 +54,8 @@ public class EventItem : IDisposable
         }
     }
 
-    public EventRecord Record { get; set; }
+    public EventRecord Record { get; }
+    public long? RecordId { get; }
     public DateTime TimeOfEvent { get; }
     public string Message { get; }
     public string MessageOneLine { get { return Regex.Replace(Message, @"[\r\n]+", " "); } }
@@ -66,4 +69,30 @@ public class EventItem : IDisposable
     public bool IsNewLoaded { get; set; }
 
     public void Dispose() => Record.Dispose();
+
+    private string _xml;
+    public string GetXml(LogSource logSource)
+    {
+        if (_xml == null && RecordId.HasValue)
+        {
+            EventLogQuery query = new(logSource.Path, logSource.PathType, $"*[System/EventRecordID={RecordId.Value}]");
+            EventLogReader reader = null;
+            EventRecord eventRecord = null;
+            try
+            {
+                reader = new EventLogReader(query);
+                eventRecord = reader.ReadEvent();
+                if (eventRecord != null)
+                {
+                    _xml = eventRecord.ToXml();
+                }
+            }
+            finally
+            {
+                eventRecord?.Dispose();
+                reader?.Dispose();
+            }
+        }
+        return _xml;
+    }
 }

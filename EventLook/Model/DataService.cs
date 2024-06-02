@@ -92,6 +92,7 @@ public class DataService : IDataService
                             cts.Token.ThrowIfCancellationRequested();
                             progress.Report(info);
                             isFirst = false;
+                            eventRecords.DisposeAll();
                             eventRecords.Clear();
                         }
                     }
@@ -117,7 +118,7 @@ public class DataService : IDataService
             {
                 var info_comp = new ProgressInfo(eventRecords.ConvertAll(e => new EventItem(e)), isComplete: true, isFirst, totalCount, errMsg);
                 progress.Report(info_comp);
-                eventRecord?.Dispose();
+                eventRecords.DisposeAll();
                 reader?.Dispose();
                 Debug.WriteLine("End Reading");
             }

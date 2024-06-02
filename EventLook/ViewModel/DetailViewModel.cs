@@ -7,12 +7,18 @@ using System.Threading.Tasks;
 
 namespace EventLook.ViewModel;
 
-public class DetailViewModel
+public class DetailViewModel(EventItem eventItem, LogSource logSource)
 {
-    public DetailViewModel(EventItem eventItem)
+    public EventItem Event { get; set; } = eventItem;
+    public string FormattedXml
     {
-        Event = eventItem;
+        get
+        {
+            string xml = Event.GetXml(logSource);
+            if (string.IsNullOrEmpty(xml))
+                return "Could not retrieve XML.";
+
+            return TextHelper.FormatXml(xml);
+        }
     }
-    public EventItem Event { get; set; }
-    public string FormattedXml { get { return TextHelper.FormatXml(Event.Record.ToXml()); } }
 }
