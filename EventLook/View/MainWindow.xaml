@@ -224,6 +224,7 @@
                     <KeyBinding Key="Enter" Command="{Binding OpenDetailsCommand}" />
                 </DataGrid.InputBindings>
                 <DataGrid.Columns>
+                    <DataGridTextColumn Header="RecordID" Binding="{Binding Record.RecordId}" Visibility="Collapsed"/>
                     <DataGridTextColumn SortMemberPath="TimeOfEvent">
                         <DataGridTextColumn.Binding>
                             <MultiBinding Converter="{StaticResource UtcToAnotherTimeZoneStringConverter}">

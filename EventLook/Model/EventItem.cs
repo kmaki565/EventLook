@@ -17,7 +17,6 @@ public class EventItem : IDisposable
     public EventItem(EventRecord eventRecord)
     {
         Record = eventRecord;
-        RecordId = eventRecord.RecordId;
         TimeOfEvent = eventRecord.TimeCreated?.ToUniversalTime() ?? DateTime.MinValue.ToUniversalTime();
         try
         {
@@ -54,7 +53,6 @@ public class EventItem : IDisposable
     }
 
     public EventRecord Record { get; }
-    public long? RecordId { get; }
     public DateTime TimeOfEvent { get; }
     public string Message { get; }
     public string MessageOneLine { get { return Regex.Replace(Message, @"[\r\n]+", " "); } }
@@ -67,7 +65,11 @@ public class EventItem : IDisposable
     /// </summary>
     public bool IsNewLoaded { get; set; }
 
-    public void Dispose() => Record.Dispose();
+    public void Dispose()
+    {
+        Record.Dispose();
+        GC.SuppressFinalize(this);
+    }
 
     private string _xml;
     /// <summary>
@@ -79,9 +81,9 @@ public class EventItem : IDisposable
     /// <returns></returns>
     public string GetXml(LogSource logSource)
     {
-        if (_xml == null && RecordId.HasValue)
+        if (_xml == null && Record.RecordId.HasValue)
         {
-            EventLogQuery query = new(logSource.Path, logSource.PathType, $"*[System/EventRecordID={RecordId.Value}]");
+            EventLogQuery query = new(logSource.Path, logSource.PathType, $"*[System/EventRecordID={Record.RecordId.Value}]");
             EventLogReader reader = null;
             EventRecord eventRecord = null;
             try
