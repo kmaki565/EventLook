@@ -284,7 +284,7 @@ public class MainViewModel : ObservableRecipient
     }
     private void OpenDetails()
     {
-        var detailVm = new DetailViewModel(SelectedEventItem, SelectedLogSource);
+        var detailVm = new DetailViewModel(SelectedEventItem);
         DetailWindowService.Show(detailVm);
     }
     private void FilterToSelectedSource()

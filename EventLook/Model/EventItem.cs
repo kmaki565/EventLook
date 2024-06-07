@@ -14,8 +14,10 @@ namespace EventLook.Model;
 /// </summary>
 public class EventItem : IDisposable
 {
-    public EventItem(EventRecord eventRecord)
+    private readonly LogSource logSource;
+    public EventItem(LogSource logSource, EventRecord eventRecord)
     {
+        this.logSource = logSource;
         Record = eventRecord;
         TimeOfEvent = eventRecord.TimeCreated?.ToUniversalTime() ?? DateTime.MinValue.ToUniversalTime();
         try
@@ -71,15 +73,13 @@ public class EventItem : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    private string _xml;
     /// <summary>
     /// Fetches the XML representation of the event from log source and event record ID.
     /// If the XML is already fetched, it returns the cached XML. 
     /// Returns null if XML cannot be fetched.
     /// </summary>
-    /// <param name="logSource"></param>
-    /// <returns></returns>
-    public string GetXml(LogSource logSource)
+    private string _xml;
+    public string GetXml()
     {
         if (_xml == null && Record.RecordId.HasValue)
         {

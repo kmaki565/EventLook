@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace EventLook.ViewModel;
 
-public class DetailViewModel(EventItem eventItem, LogSource logSource)
+public class DetailViewModel(EventItem eventItem)
 {
     public EventItem Event { get; set; } = eventItem;
-    public string EventXml { get => Event.GetXml(logSource) ?? "Could not retrieve XML."; }
+    public string EventXml { get => Event.GetXml() ?? "Could not retrieve XML."; }
 }
