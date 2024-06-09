@@ -230,3 +230,21 @@ public class FilterInfoTextConverter : IMultiValueConverter
         throw new NotImplementedException();
     }
 }
+
+public class SelectedEventsTextConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is int count)
+        {
+            return count > 1 ? $"{count} events selected" : "";
+        }
+        else
+            throw new ArgumentException("Argument must be an integer.");
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}

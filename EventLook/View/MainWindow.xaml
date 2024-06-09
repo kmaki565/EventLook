@@ -40,6 +40,7 @@
         <v:TimeZoneToOffsetTextConverter x:Key="TimeZoneToOffsetTextConverter"/>
         <v:StatusTextConverter x:Key="StatusTextConverter"/>
         <v:FilterInfoTextConverter x:Key="FilterInfoTextConverter"/>
+        <v:SelectedEventsTextConverter x:Key="SelectedEventsTextConverter"/>
         <!-- This next line instantiates a CollectionViewSource with the collection of Events as its collection of objects-->
         <CollectionViewSource Source="{Binding Events}" x:Key="X_CVS"/>
         <DataGridTextColumn x:Key="RecordIdColumn" Header="Record ID" Binding="{Binding Record.RecordId}" Visibility="{Binding DataContext.ShowsRecordId, Source={x:Reference _window}, Converter={StaticResource BooleanToVisibilityConverter}}"/>
@@ -94,6 +95,9 @@
                         </TextBlock.Text>
                     </TextBlock>
                 </StackPanel>
+            </StatusBarItem>
+            <StatusBarItem HorizontalAlignment="Right" Margin="10,0">
+                <TextBlock Text="{Binding ElementName=dataGrid1, Path=SelectedItems.Count, Converter={StaticResource SelectedEventsTextConverter}}"/>
             </StatusBarItem>
         </StatusBar>
 
