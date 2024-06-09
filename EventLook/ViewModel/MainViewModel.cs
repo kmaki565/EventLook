@@ -288,7 +288,10 @@ public class MainViewModel : ObservableRecipient
     }
     private void OpenDetails()
     {
-        var detailVm = new DetailViewModel(SelectedEventItem, CVS.View);
+        if (SelectedEventItem == null)
+            return;
+
+        var detailVm = new DetailViewModel(CVS.View);
         DetailWindowService.Show(detailVm);
     }
     private void FilterToSelectedSource()

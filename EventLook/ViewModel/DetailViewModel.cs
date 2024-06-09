@@ -12,11 +12,19 @@ namespace EventLook.ViewModel;
 
 public class DetailViewModel : ObservableObject
 {
+    /// <summary>
+    /// VM for the detail window.
+    /// Receives the main view of the events to walk through the events.
+    /// </summary>
     private readonly ICollectionView _view;
-    public DetailViewModel(EventItem eventItem, ICollectionView view)
+    private int position;
+    public DetailViewModel(ICollectionView view)
     {
-        Event = eventItem;
         _view = view;
+        Event = (EventItem)_view.CurrentItem;
+        // Save my position in case multiple detail windows are open.
+        position = _view.CurrentPosition;
+
         UpCommand = new RelayCommand(() => Move(isUp: true), IsNotFirst);
         DownCommand = new RelayCommand(() => Move(isUp: false), IsNotLast);
     }
@@ -41,18 +49,18 @@ public class DetailViewModel : ObservableObject
 
     private bool IsNotFirst()
     {
-        return _view.CurrentItem != null && _view.CurrentPosition > 0;
+        return Event != null && position > 0;
     }
     private bool IsNotLast()
     {
-        return _view.CurrentItem != null && _view.CurrentPosition < _view.Cast<object>().Count() - 1;
+        return Event != null && position < _view.Cast<object>().Count() - 1;
     }
     private void Move(bool isUp)
     {
         if (isUp && IsNotFirst())
-            _view.MoveCurrentToPrevious();
+            _view.MoveCurrentToPosition(--position);
         else if (!isUp && IsNotLast())
-            _view.MoveCurrentToNext();
+            _view.MoveCurrentToPosition(++position);
         else
             return;
 
