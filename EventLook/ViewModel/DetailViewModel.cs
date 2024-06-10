@@ -25,8 +25,8 @@ public class DetailViewModel : ObservableObject
         // Save my position in case multiple detail windows are open.
         position = _view.CurrentPosition;
 
-        UpCommand = new RelayCommand(() => Move(isUp: true), IsNotFirst);
-        DownCommand = new RelayCommand(() => Move(isUp: false), IsNotLast);
+        UpCommand = new RelayCommand(() => Move(isUp: true), CanMoveUp);
+        DownCommand = new RelayCommand(() => Move(isUp: false), CanMoveDown);
     }
 
     private EventItem _event;
@@ -47,22 +47,26 @@ public class DetailViewModel : ObservableObject
     public IRelayCommand UpCommand { get; private set; }
     public IRelayCommand DownCommand { get; private set; }
 
-    private bool IsNotFirst()
+    private bool CanMoveUp()
     {
-        return Event != null && position > 0;
+        if (_view.CurrentItem is EventItem ev && Event?.LogSource == ev.LogSource && position > 0 && position < _view.Cast<object>().Count())
+            return true;
+        else
+            return false;
     }
-    private bool IsNotLast()
+    private bool CanMoveDown()
     {
-        return Event != null && position < _view.Cast<object>().Count() - 1;
+        if (_view.CurrentItem is EventItem ev && Event?.LogSource == ev.LogSource && position < _view.Cast<object>().Count() - 1)
+            return true;
+        else
+            return false;
     }
     private void Move(bool isUp)
     {
-        if (isUp && IsNotFirst())
+        if (isUp)
             _view.MoveCurrentToPosition(--position);
-        else if (!isUp && IsNotLast())
+        else 
             _view.MoveCurrentToPosition(++position);
-        else
-            return;
 
         Event = (EventItem)_view.CurrentItem;
         UpdateCanExecute();

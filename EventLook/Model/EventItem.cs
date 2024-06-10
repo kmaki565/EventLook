@@ -14,10 +14,9 @@ namespace EventLook.Model;
 /// </summary>
 public class EventItem : IDisposable
 {
-    private readonly LogSource logSource;
     public EventItem(LogSource logSource, EventRecord eventRecord)
     {
-        this.logSource = logSource;
+        LogSource = logSource;
         Record = eventRecord;
         TimeOfEvent = eventRecord.TimeCreated?.ToUniversalTime() ?? DateTime.MinValue.ToUniversalTime();
         try
@@ -54,6 +53,7 @@ public class EventItem : IDisposable
         }
     }
 
+    public LogSource LogSource { get; }
     public EventRecord Record { get; }
     public DateTime TimeOfEvent { get; }
     public string Message { get; }
@@ -83,7 +83,7 @@ public class EventItem : IDisposable
     {
         if (_xml == null && Record.RecordId.HasValue)
         {
-            EventLogQuery query = new(logSource.Path, logSource.PathType, $"*[System/EventRecordID={Record.RecordId.Value}]");
+            EventLogQuery query = new(LogSource.Path, LogSource.PathType, $"*[System/EventRecordID={Record.RecordId.Value}]");
             EventLogReader reader = null;
             EventRecord eventRecord = null;
             try
