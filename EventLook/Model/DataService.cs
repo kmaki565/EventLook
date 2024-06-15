@@ -145,7 +145,7 @@ public class DataService : IDataService
         try
         {
             UnsubscribeEvents();
-            watcher = new EventLogWatcher(new EventLogQuery(source.Path, PathType.LogName, "*"));
+            watcher = new EventLogWatcher(source.Path);
             watcher.EventRecordWritten += new EventHandler<EventRecordWrittenEventArgs>(EventRecordWrittenHandler);
             watcher.Enabled = true;
             return true;
