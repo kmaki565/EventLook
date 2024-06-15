@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using EventLook.Model;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -21,6 +22,8 @@ public class DetailViewModel : ObservableObject
     public DetailViewModel(ICollectionView view)
     {
         _view = view;
+        _view.CollectionChanged += OnCollectionChanged;
+
         Event = (EventItem)_view.CurrentItem;
         // Save my position in case multiple detail windows are open.
         position = _view.CurrentPosition;
@@ -47,8 +50,17 @@ public class DetailViewModel : ObservableObject
     public IRelayCommand UpCommand { get; private set; }
     public IRelayCommand DownCommand { get; private set; }
 
+    private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    {
+        // CollectionChanged event is raised too many times when log source is changed.
+        // Handle Reset event only hoping to cover most cases.
+        if (e.Action == NotifyCollectionChangedAction.Reset)
+            UpdateCanExecute();
+    }
+
     private bool CanMoveUp()
     {
+        //TODO: Check if the current displayed item exists in the view.
         if (_view.CurrentItem is EventItem ev && Event?.LogSource == ev.LogSource && position > 0 && position < _view.Cast<object>().Count())
             return true;
         else
@@ -61,8 +73,14 @@ public class DetailViewModel : ObservableObject
         else
             return false;
     }
+
+    /// <summary>
+    /// Updates the item to display by moving up/down in the view based on the position.
+    /// </summary>
+    /// <param name="isUp"></param>
     private void Move(bool isUp)
     {
+        // Limitation: the position and item may not match when filter is updated.
         if (isUp)
             _view.MoveCurrentToPosition(--position);
         else 
