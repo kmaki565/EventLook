@@ -52,26 +52,48 @@ public class DetailViewModel : ObservableObject
 
     private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
-        // CollectionChanged event is raised too many times when log source is changed.
+        // CollectionChanged (Add) event is raised too many times when log source is changed.
         // Handle Reset event only hoping to cover most cases.
         if (e.Action == NotifyCollectionChangedAction.Reset)
+        {
+            UpdatePosition();
             UpdateCanExecute();
+        }
+    }
+    private void UpdateCanExecute()
+    {
+        UpCommand?.NotifyCanExecuteChanged();
+        DownCommand?.NotifyCanExecuteChanged();
     }
 
     private bool CanMoveUp()
     {
-        //TODO: Check if the current displayed item exists in the view.
-        if (_view.CurrentItem is EventItem ev && Event?.LogSource == ev.LogSource && position > 0 && position < _view.Cast<object>().Count())
-            return true;
-        else
-            return false;
+        return IsEventInView() && !IsFirst();
     }
     private bool CanMoveDown()
     {
-        if (_view.CurrentItem is EventItem ev && Event?.LogSource == ev.LogSource && position < _view.Cast<object>().Count() - 1)
-            return true;
-        else
-            return false;
+        return IsEventInView() && !IsLast();
+    }
+
+    private bool IsEventInView()
+    {
+        return _view.Cast<EventItem>().Any(x => x.LogSource == Event?.LogSource && x.Record.RecordId == Event?.Record.RecordId);
+    }
+    /// <summary>
+    /// Checks if the displayed event is the first item (or before) in the view.
+    /// </summary>
+    /// <returns></returns>
+    private bool IsFirst()
+    {
+        return position <= 0;
+    }
+    /// <summary>
+    /// Checks if the displayed event is the last item (or beyond) in the view.
+    /// </summary>
+    /// <returns></returns>
+    private bool IsLast()
+    {
+        return position >= _view.Cast<object>().Count() - 1;
     }
 
     /// <summary>
@@ -80,19 +102,26 @@ public class DetailViewModel : ObservableObject
     /// <param name="isUp"></param>
     private void Move(bool isUp)
     {
-        // Limitation: the position and item may not match when filter is updated.
-        if (isUp)
+        if (isUp && !IsFirst())
             _view.MoveCurrentToPosition(--position);
-        else 
+        else if (!isUp && !IsLast())
             _view.MoveCurrentToPosition(++position);
+        else
+            return;
 
         Event = (EventItem)_view.CurrentItem;
         UpdateCanExecute();
     }
-
-    private void UpdateCanExecute()
+    /// <summary>
+    /// Updates position in the object in case the view has changed (sort, filter, etc.).
+    /// </summary>
+    private void UpdatePosition()
     {
-        UpCommand?.NotifyCanExecuteChanged();
-        DownCommand?.NotifyCanExecuteChanged();
+        if (IsEventInView())
+        {
+            // Apparently we can't get the position directly from the view.
+            // This may cause issue when multiple detail windows are open.
+            position = _view.CurrentPosition;
+        }
     }
 }
