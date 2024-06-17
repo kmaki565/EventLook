@@ -5,11 +5,17 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EventLook.View" xmlns:viewmodel="clr-namespace:EventLook.ViewModel" d:DataContext="{d:DesignInstance Type=viewmodel:DetailViewModel}"
         mc:Ignorable="d"
-        FocusManager.FocusedElement="{Binding ElementName=EventXml}"
-        Title="Event Details" Height="450" Width="800">
+        FocusManager.FocusedElement="{Binding ElementName=TextBoxXml}"
+        Title="Event Details" Height="550" Width="900">
     <Grid>
-        <TextBox Name="EventXml" Text="{Binding FormattedXml, Mode=OneWay}"
-                 IsReadOnly="True" IsReadOnlyCaretVisible="True"
-                 VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
+        <DockPanel>
+            <StackPanel DockPanel.Dock="Right" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <Button Command="{Binding UpCommand}" FontFamily="Segoe UI Symbol" Content="&#xE110;" FontSize="15" Width="30" Height="30" Margin="10"/>
+                <Button Command="{Binding DownCommand}" FontFamily="Segoe UI Symbol" Content="&#xE1FD;" FontSize="15" Width="30" Height="30" Margin="10"/>
+            </StackPanel>
+            <RichTextBox Name="RichTextBoxXml" FontSize="14"
+             local:TextBoxBehavior.HighlightedXml="{Binding EventXml, Mode=OneWay}"
+             IsReadOnly="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Margin="10,10,0,10"/>
+        </DockPanel>
     </Grid>
 </Window>

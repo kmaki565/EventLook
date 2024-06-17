@@ -10,4 +10,5 @@ public class SettingsData
     public List<Range> Ranges { get; set; }
     public Range SelectedRange { get; set; }
     public bool ShowsMillisec { get; set; }
+    public bool ShowsRecordId { get; set; }
 }

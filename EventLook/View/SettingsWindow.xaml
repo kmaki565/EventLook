@@ -41,6 +41,7 @@
                                   DisplayMemberPath="Text" SelectedValuePath="Text"/>
                     </StackPanel>
                     <CheckBox Content="Show milliseconds for Time of event" Margin="10,8" IsChecked="{Binding ShowsMillisec}"/>
+                    <CheckBox Content="Show Record ID column" Margin="10,8" IsChecked="{Binding ShowsRecordId}"/>
                 </StackPanel>
             </TabItem>
         </TabControl>

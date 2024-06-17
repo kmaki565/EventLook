@@ -1,15 +1,23 @@
 ﻿<Window x:Class="EventLook.View.MainWindow"
+        Name="_window"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" 
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:v="clr-namespace:EventLook.View"
         xmlns:viewmodel="clr-namespace:EventLook.ViewModel"
+        xmlns:properties="clr-namespace:EventLook.Properties"
         d:DataContext="{d:DesignInstance Type=viewmodel:MainViewModel}"
         mc:Ignorable="d"
         ResizeMode="CanResizeWithGrip"
-        PreviewKeyDown="Window_PreviewKeyDown" d:DesignHeight="640" d:DesignWidth="1100">
+        PreviewKeyDown="Window_PreviewKeyDown"
+        d:DesignHeight="640"
+        d:DesignWidth="1100"
+        Height="{Binding Source={x:Static properties:Settings.Default}, Path=WinHeight, Mode=TwoWay}"
+        Width="{Binding Source={x:Static properties:Settings.Default}, Path=WinWidth, Mode=TwoWay}"
+        WindowStartupLocation="CenterScreen"
+        Closing="Window_Closing">
     <Window.Style>
         <Style TargetType="Window">
             <Style.Triggers>
@@ -39,30 +47,37 @@
         <v:TimeZoneToOffsetTextConverter x:Key="TimeZoneToOffsetTextConverter"/>
         <v:StatusTextConverter x:Key="StatusTextConverter"/>
         <v:FilterInfoTextConverter x:Key="FilterInfoTextConverter"/>
+        <v:SelectedEventsTextConverter x:Key="SelectedEventsTextConverter"/>
         <!-- This next line instantiates a CollectionViewSource with the collection of Events as its collection of objects-->
         <CollectionViewSource Source="{Binding Events}" x:Key="X_CVS"/>
+        <DataGridTextColumn x:Key="RecordIdColumn" Header="Record ID" Binding="{Binding Record.RecordId}" Visibility="{Binding DataContext.ShowsRecordId, Source={x:Reference _window}, Converter={StaticResource BooleanToVisibilityConverter}}"/>
     </Window.Resources>
     <Window.InputBindings>
         <KeyBinding Key="F5" Command="{Binding RefreshCommand}"/>
         <KeyBinding Key="F5" Modifiers="Shift" Command="{Binding CancelCommand}"/>
         <KeyBinding Key="L" Modifiers="Ctrl" Command="{Binding OpenLogPickerCommand}"/>
         <KeyBinding Key="O" Modifiers="Ctrl" Command="{Binding OpenFileCommand}"/>
+        <KeyBinding Key="S" Modifiers="Ctrl" Command="{Binding ExportToCSVCommand}"/>
     </Window.InputBindings>
-    
+
     <DockPanel>
         <Menu DockPanel.Dock="Top" Background="White">
             <MenuItem Header="_File">
                 <MenuItem Header="Open Event _Log on local computer" InputGestureText="Ctrl+L" Command="{Binding OpenLogPickerCommand}"/>
                 <MenuItem Header="_Open .evtx File" InputGestureText="Ctrl+O" Command="{Binding OpenFileCommand}"/>
+                <MenuItem Header="_Export to CSV File" InputGestureText="Ctrl+S" Command="{Binding ExportToCsvCommand}"/>
                 <Separator />
                 <MenuItem Header="_Launch Windows Event Viewer" Command="{Binding LaunchEventViewerCommand}"/>
+                <Separator Visibility="{Binding IsRunAsAdmin, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
+                <MenuItem Header="Run as _Administrator" Command="{Binding RunAsAdminCommand}" Visibility="{Binding IsRunAsAdmin, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
+                <Separator Visibility="{Binding IsRunAsAdmin, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
                 <MenuItem Header="E_xit" Command="{Binding ExitCommand}" />
             </MenuItem>
             <MenuItem Header="_Options">
                 <MenuItem Header="_Auto Refresh" IsCheckable="True" IsChecked="{Binding IsAutoRefreshEnabled}"/>
                 <Separator />
                 <MenuItem Header="_Settings..." Command="{Binding OpenSettingsCommand}" />
-            </MenuItem> 
+            </MenuItem>
             <MenuItem Header="_About" Click="MenuItem_About_Click"/>
         </Menu>
         <StatusBar DockPanel.Dock="Bottom" Background="WhiteSmoke">
@@ -93,6 +108,9 @@
                     </TextBlock>
                 </StackPanel>
             </StatusBarItem>
+            <StatusBarItem HorizontalAlignment="Right" Margin="10,0">
+                <TextBlock Text="{Binding ElementName=dataGrid1, Path=SelectedItems.Count, Converter={StaticResource SelectedEventsTextConverter}}"/>
+            </StatusBarItem>
         </StatusBar>
 
         <Grid>
@@ -103,25 +121,25 @@
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,5,0,5">
-                <ComboBox  
+                <ComboBox
                   x:Name="ComboBox_Source" ItemsSource="{Binding LogSources}" SelectedItem="{Binding SelectedLogSource}"
-                  DisplayMemberPath="DisplayName" SelectedValuePath="Path" 
+                  DisplayMemberPath="DisplayName" SelectedValuePath="Path"
                   HorizontalAlignment="Left" Margin="10,0,0,0" MinWidth="250" />
-                <ComboBox  
+                <ComboBox
                       ItemsSource="{Binding Ranges}" SelectedItem="{Binding SelectedRange}"
                       DisplayMemberPath="Text" SelectedValuePath="Text"
                       HorizontalAlignment="Left" Margin="10,0,0,0" MinWidth="100" />
                 <TextBlock Text="From:" Margin="10,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-                <xctk:DateTimePicker Margin="8,0,0,0" MinWidth="160" 
-                                 AutoCloseCalendar="True" 
+                <xctk:DateTimePicker Margin="8,0,0,0" MinWidth="160"
+                                 AutoCloseCalendar="True"
                                  IsReadOnly="{Binding SelectedRange.IsCustom, Converter={StaticResource InverseBooleanConverter}}"
-                                 Value="{Binding FromDateTime, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" 
+                                 Value="{Binding FromDateTime, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                  Format="Custom" FormatString="yyyy-MM-dd HH:mm (z)"/>
                 <TextBlock Text="To:" Margin="8,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Right"/>
                 <xctk:DateTimePicker Margin="8,0,0,0" MinWidth="160"
                                  AutoCloseCalendar="True"
                                  IsReadOnly="{Binding SelectedRange.IsCustom, Converter={StaticResource InverseBooleanConverter}}"
-                                 Value="{Binding ToDateTime, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" 
+                                 Value="{Binding ToDateTime, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                  Format="Custom" FormatString="yyyy-MM-dd HH:mm (z)"/>
                 <ComboBox
                     ItemsSource="{Binding TimeZones}" SelectedItem="{Binding SelectedTimeZone}"
@@ -153,13 +171,13 @@
             <Expander x:Name="Ex1" Header="F_ilters" Grid.Row="1" Margin="10,0,0,0" ExpandDirection="Down">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Source: " Margin="5,0,0,0" VerticalAlignment="Center"/>
-                    <xctk:CheckComboBox Width="250" 
+                    <xctk:CheckComboBox Width="250"
                             IsSelectAllActive="True" IsAllItemsSelectedContentActive="True"
                             Delimiter=", "
                             ItemsSource="{Binding SourceFilters}" DisplayMemberPath="Name" SelectedMemberPath="Selected"
                             Command="{Binding ApplySourceFilterCommand}"/>
                     <TextBlock Text="Level: " Margin="10,0,0,0" VerticalAlignment="Center"/>
-                    <xctk:CheckComboBox Width="120" 
+                    <xctk:CheckComboBox Width="120"
                             IsSelectAllActive="True" IsAllItemsSelectedContentActive="True"
                             Delimiter=", "
                             ItemsSource="{Binding LevelFilters}" SelectedMemberPath="Selected"
@@ -177,7 +195,7 @@
             </Expander>
 
             <!-- *** The ItemsSource of the data grid is bound to the CollectionViewSource object that was instantiated above -->
-            <DataGrid x:Name="dataGrid1" ItemsSource="{Binding Source={StaticResource X_CVS}}" 
+            <DataGrid x:Name="dataGrid1" ItemsSource="{Binding Source={StaticResource X_CVS}}"
                       SelectedItem="{Binding SelectedEventItem}" SelectedCellsChanged="DataGrid_SelectedCellsChanged"
                       Margin="5" Grid.Row="2" AutoGenerateColumns="False" IsReadOnly="True"
                       AllowDrop="True" PreviewDragOver="OnPreviewDragOver" Drop="OnDrop">
@@ -186,7 +204,7 @@
                         <ContextMenu.Items>
                             <MenuItem Header="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.DataContext.Record.ProviderName}" HeaderStringFormat="Filter to &quot;{0}&quot;"
                                       Command="{Binding DataContext.FilterToSelectedSourceCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"/>
-                            <MenuItem Header="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.DataContext.Record.ProviderName}" HeaderStringFormat="Exclude &quot;{0}&quot;" 
+                            <MenuItem Header="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.DataContext.Record.ProviderName}" HeaderStringFormat="Exclude &quot;{0}&quot;"
                                       Command="{Binding DataContext.ExcludeSelectedSourceCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"/>
                             <Separator/>
                             <MenuItem Header="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.DataContext.Record.Level, Converter={StaticResource EventLevelToDisplayTextConverter}}" HeaderStringFormat="Filter to {0}"
@@ -224,6 +242,7 @@
                     <KeyBinding Key="Enter" Command="{Binding OpenDetailsCommand}" />
                 </DataGrid.InputBindings>
                 <DataGrid.Columns>
+                    <StaticResource ResourceKey="RecordIdColumn"/>
                     <DataGridTextColumn SortMemberPath="TimeOfEvent">
                         <DataGridTextColumn.Binding>
                             <MultiBinding Converter="{StaticResource UtcToAnotherTimeZoneStringConverter}">
