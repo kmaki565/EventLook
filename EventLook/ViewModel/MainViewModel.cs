@@ -44,6 +44,7 @@ public class MainViewModel : ObservableRecipient
         TimeZones = new ObservableCollection<TimeZoneInfo>(TimeZoneInfo.GetSystemTimeZones());
         SelectedTimeZone = TimeZones.FirstOrDefault(x => x.Id == TimeZoneInfo.Local.Id);
         ShowsMillisec = Properties.Settings.Default.ShowsMillisec;
+        ShowsRecordId = Properties.Settings.Default.ShowsRecordId;
 
         progress = new Progress<ProgressInfo>(ProgressCallback); // Needs to instantiate in UI thread
         progressAutoRefresh = new Progress<ProgressInfo>(AutoRefreshCallback);
@@ -183,6 +184,9 @@ public class MainViewModel : ObservableRecipient
     
     public bool ShowsMillisec { get; set; }
 
+    private bool showsRecordId;
+    public bool ShowsRecordId { get => showsRecordId; set => SetProperty(ref showsRecordId, value); }
+
     private readonly bool isRunAsAdmin;
     public bool IsRunAsAdmin { get => isRunAsAdmin; }
 
@@ -284,7 +288,10 @@ public class MainViewModel : ObservableRecipient
     }
     private void OpenDetails()
     {
-        var detailVm = new DetailViewModel(SelectedEventItem);
+        if (SelectedEventItem == null)
+            return;
+
+        var detailVm = new DetailViewModel(CVS.View);
         DetailWindowService.Show(detailVm);
     }
     private void FilterToSelectedSource()
@@ -596,7 +603,8 @@ public class MainViewModel : ObservableRecipient
             LogSources = LogSources.ToList(),
             Ranges = Ranges.ToList(),
             SelectedRange = rangeMgr.GetStartupRange(),
-            ShowsMillisec = ShowsMillisec
+            ShowsMillisec = ShowsMillisec,
+            ShowsRecordId = ShowsRecordId
         };
         var openSettingsVm = new SettingsViewModel(LogPickerWindowService, originalSettings);
         string previousLogPath = SelectedLogSource?.Path;
@@ -611,10 +619,12 @@ public class MainViewModel : ObservableRecipient
         Properties.Settings.Default.StartupLogNames = newSettings.LogSources.Select(x => x.Path).ToList();
         Properties.Settings.Default.StartupRangeDays = newSettings.SelectedRange.DaysFromNow;
         Properties.Settings.Default.ShowsMillisec = newSettings.ShowsMillisec;
+        Properties.Settings.Default.ShowsRecordId = newSettings.ShowsRecordId;
         Properties.Settings.Default.Save();
 
         // Reflect new settings to the UI.
         ShowsMillisec = newSettings.ShowsMillisec;
+        ShowsRecordId = newSettings.ShowsRecordId;
 
         // Replace non-file logs with the new ones.
         readyToRefresh = false; // Avoid Refresh being called multiple times.

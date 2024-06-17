@@ -11,23 +11,25 @@ namespace EventLook.Model;
 
 public interface IDataService
 {
-    Task<int> ReadEvents(LogSource logSource, DateTime fromTime, DateTime toTime, bool readFromNew, IProgress<ProgressInfo> progress);
+    Task<int> ReadEvents(LogSource source, DateTime fromTime, DateTime toTime, bool readFromNew, IProgress<ProgressInfo> progress);
     void Cancel();
     /// <summary>
     /// Subscribes to events in an event log channel. The caller will be reported whenever a new event comes in.
     /// </summary>
-    /// <param name="logSource"></param>
+    /// <param name="source"></param>
     /// <param name="handler"></param>
     /// <returns>True if success.</returns>
-    bool SubscribeEvents(LogSource logSource, IProgress<ProgressInfo> progress);
+    bool SubscribeEvents(LogSource source, IProgress<ProgressInfo> progress);
     void UnsubscribeEvents();
 }
 public class DataService : IDataService
 {
+    private LogSource logSource;
     private CancellationTokenSource cts;
     const int WIN32ERROR_RPC_S_INVALID_BOUND = unchecked((int)0x800706C6);
-    public async Task<int> ReadEvents(LogSource logSource, DateTime fromTime, DateTime toTime, bool readFromNew, IProgress<ProgressInfo> progress)
+    public async Task<int> ReadEvents(LogSource source, DateTime fromTime, DateTime toTime, bool readFromNew, IProgress<ProgressInfo> progress)
     {
+        logSource = source;
         using (cts = new CancellationTokenSource())
         {
             // Event records to be sent to the ViewModel
@@ -44,7 +46,7 @@ public class DataService : IDataService
                     fromTime.ToUniversalTime().ToString("o"),
                     toTime.ToUniversalTime().ToString("o"));
 
-                var elQuery = new EventLogQuery(logSource.Path, logSource.PathType, sQuery)
+                var elQuery = new EventLogQuery(source.Path, source.PathType, sQuery)
                 {
                     ReverseDirection = readFromNew
                 };
@@ -52,7 +54,7 @@ public class DataService : IDataService
 
                 // Asynchronously get the record count info.
                 // The count is valid only when "All time" is selected for a Event Log on the local machine.
-                _ = Task.Run(() => totalCount = GetRecordCount(logSource));
+                _ = Task.Run(() => totalCount = GetRecordCount(source));
 
                 reader = new EventLogReader(elQuery);
                 await Task.Run(() =>
@@ -88,10 +90,11 @@ public class DataService : IDataService
                         count++;
                         if (count % 100 == 0)
                         {
-                            var info = new ProgressInfo(eventRecords.ConvertAll(e => new EventItem(e)), isComplete: false, isFirst, totalCount);
+                            var info = new ProgressInfo(eventRecords.ConvertAll(e => new EventItem(source, e)), isComplete: false, isFirst, totalCount);
                             cts.Token.ThrowIfCancellationRequested();
                             progress.Report(info);
                             isFirst = false;
+                            eventRecords.DisposeAll();
                             eventRecords.Clear();
                         }
                     }
@@ -115,9 +118,9 @@ public class DataService : IDataService
             }
             finally
             {
-                var info_comp = new ProgressInfo(eventRecords.ConvertAll(e => new EventItem(e)), isComplete: true, isFirst, totalCount, errMsg);
+                var info_comp = new ProgressInfo(eventRecords.ConvertAll(e => new EventItem(source, e)), isComplete: true, isFirst, totalCount, errMsg);
                 progress.Report(info_comp);
-                eventRecord?.Dispose();
+                eventRecords.DisposeAll();
                 reader?.Dispose();
                 Debug.WriteLine("End Reading");
             }
@@ -136,12 +139,13 @@ public class DataService : IDataService
         if (source.PathType == PathType.FilePath)
             return false;
 
+        this.logSource = source;
         this.progress = progress;
 
         try
         {
             UnsubscribeEvents();
-            watcher = new EventLogWatcher(new EventLogQuery(source.Path, PathType.LogName, "*"));
+            watcher = new EventLogWatcher(source.Path);
             watcher.EventRecordWritten += new EventHandler<EventRecordWrittenEventArgs>(EventRecordWrittenHandler);
             watcher.Enabled = true;
             return true;
@@ -166,7 +170,7 @@ public class DataService : IDataService
             return;
         try
         {
-            var item = new EventItem(arg.EventRecord);
+            var item = new EventItem(logSource, arg.EventRecord);
             var info = new ProgressInfo(new List<EventItem> { item }, isComplete: true, isFirst: true);
             progress?.Report(info);
         }

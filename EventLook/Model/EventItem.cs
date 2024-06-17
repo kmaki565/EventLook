@@ -14,8 +14,9 @@ namespace EventLook.Model;
 /// </summary>
 public class EventItem : IDisposable
 {
-    public EventItem(EventRecord eventRecord)
+    public EventItem(LogSource logSource, EventRecord eventRecord)
     {
+        LogSource = logSource;
         Record = eventRecord;
         TimeOfEvent = eventRecord.TimeCreated?.ToUniversalTime() ?? DateTime.MinValue.ToUniversalTime();
         try
@@ -52,7 +53,8 @@ public class EventItem : IDisposable
         }
     }
 
-    public EventRecord Record { get; set; }
+    public LogSource LogSource { get; }
+    public EventRecord Record { get; }
     public DateTime TimeOfEvent { get; }
     public string Message { get; }
     public string MessageOneLine { get { return Regex.Replace(Message, @"[\r\n]+", " "); } }
@@ -65,5 +67,40 @@ public class EventItem : IDisposable
     /// </summary>
     public bool IsNewLoaded { get; set; }
 
-    public void Dispose() => Record.Dispose();
+    public void Dispose()
+    {
+        Record.Dispose();
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Fetches the XML representation of the event from log source and event record ID.
+    /// If the XML is already fetched, it returns the cached XML. 
+    /// Returns null if XML cannot be fetched.
+    /// </summary>
+    private string _xml;
+    public string GetXml()
+    {
+        if (_xml == null && Record.RecordId.HasValue)
+        {
+            EventLogQuery query = new(LogSource.Path, LogSource.PathType, $"*[System/EventRecordID={Record.RecordId.Value}]");
+            EventLogReader reader = null;
+            EventRecord eventRecord = null;
+            try
+            {
+                reader = new EventLogReader(query);
+                eventRecord = reader.ReadEvent();
+                if (eventRecord != null)
+                {
+                    _xml = TextHelper.FormatXml(eventRecord.ToXml());
+                }
+            }
+            finally
+            {
+                eventRecord?.Dispose();
+                reader?.Dispose();
+            }
+        }
+        return _xml;
+    }
 }
