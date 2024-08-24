@@ -7,11 +7,15 @@
         mc:Ignorable="d"
         FocusManager.FocusedElement="{Binding ElementName=RichTextBoxXml}"
         Title="Event Details" Height="550" Width="900">
+    <Window.InputBindings>
+        <KeyBinding Key="P" Modifiers="Ctrl" Command="{Binding UpCommand}"/>
+        <KeyBinding Key="N" Modifiers="Ctrl" Command="{Binding DownCommand}"/>
+    </Window.InputBindings>
     <Grid>
         <DockPanel>
             <StackPanel DockPanel.Dock="Right" VerticalAlignment="Center" HorizontalAlignment="Center">
-                <Button Command="{Binding UpCommand}" FontFamily="Segoe UI Symbol" Content="&#xE110;" FontSize="15" Width="30" Height="30" Margin="10"/>
-                <Button Command="{Binding DownCommand}" FontFamily="Segoe UI Symbol" Content="&#xE1FD;" FontSize="15" Width="30" Height="30" Margin="10"/>
+                <Button Command="{Binding UpCommand}" FontFamily="Segoe UI Symbol" Content="&#xE110;" FontSize="15" Width="30" Height="30" Margin="10" ToolTip="Previous event (Ctrl+P)"/>
+                <Button Command="{Binding DownCommand}" FontFamily="Segoe UI Symbol" Content="&#xE1FD;" FontSize="15" Width="30" Height="30" Margin="10" ToolTip="Next event (Ctrl+N)"/>
             </StackPanel>
             <RichTextBox Name="RichTextBoxXml" FontSize="13"
              local:TextBoxBehavior.HighlightedXml="{Binding EventXml, Mode=OneWay}"
