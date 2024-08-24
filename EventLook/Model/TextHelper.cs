@@ -52,6 +52,22 @@ public static class TextHelper
         return andSearch.WordsToInclude.All(x => target.Contains(x, StringComparison.OrdinalIgnoreCase))
             && andSearch.WordsToExclude.All(x => !target.Contains(x, StringComparison.OrdinalIgnoreCase));
     }
+
+    /// <summary>
+    /// Escapes special characters in a CSV value.
+    /// </summary>
+    public static string EscapeCsvValue(string value)
+    {
+        if (value.Contains("\""))
+        {
+            value = value.Replace("\"", "\"\"");
+        }
+        if (value.Contains(",") || value.Contains("\n") || value.Contains("\r"))
+        {
+            value = $"\"{value}\"";
+        }
+        return value;
+    }
 }
 
 public class AndSearchMaterial

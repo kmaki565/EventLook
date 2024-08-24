@@ -1,6 +1,7 @@
 ﻿using AboutBoxWpf;
 using CommunityToolkit.Mvvm.Messaging;
 using EventLook.Model;
+using EventLook.Properties;
 using EventLook.ViewModel;
 using System;
 using System.IO;
@@ -47,6 +48,11 @@ public partial class MainWindow : Window
 
         ProcessCommandLine();
     }
+
+	private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+	{
+		Settings.Default.Save();
+	}
 
     private void ProcessCommandLine()
     {

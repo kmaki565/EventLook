@@ -7,10 +7,17 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" 
         xmlns:v="clr-namespace:EventLook.View"
         xmlns:viewmodel="clr-namespace:EventLook.ViewModel"
+        xmlns:properties="clr-namespace:EventLook.Properties"
         d:DataContext="{d:DesignInstance Type=viewmodel:MainViewModel}"
         mc:Ignorable="d"
         ResizeMode="CanResizeWithGrip"
-        PreviewKeyDown="Window_PreviewKeyDown" d:DesignHeight="640" d:DesignWidth="1100">
+        PreviewKeyDown="Window_PreviewKeyDown"
+        d:DesignHeight="640"
+        d:DesignWidth="1100"
+        Height="{Binding Source={x:Static properties:Settings.Default}, Path=WinHeight, Mode=TwoWay}"
+        Width="{Binding Source={x:Static properties:Settings.Default}, Path=WinWidth, Mode=TwoWay}"
+        WindowStartupLocation="CenterScreen"
+        Closing="Window_Closing">
     <Window.Style>
         <Style TargetType="Window">
             <Style.Triggers>
@@ -50,6 +57,7 @@
         <KeyBinding Key="F5" Modifiers="Shift" Command="{Binding CancelCommand}"/>
         <KeyBinding Key="L" Modifiers="Ctrl" Command="{Binding OpenLogPickerCommand}"/>
         <KeyBinding Key="O" Modifiers="Ctrl" Command="{Binding OpenFileCommand}"/>
+        <KeyBinding Key="S" Modifiers="Ctrl" Command="{Binding ExportToCsvCommand}"/>
     </Window.InputBindings>
     
     <DockPanel>
@@ -57,8 +65,11 @@
             <MenuItem Header="_File">
                 <MenuItem Header="Open Event _Log on local computer" InputGestureText="Ctrl+L" Command="{Binding OpenLogPickerCommand}"/>
                 <MenuItem Header="_Open .evtx File" InputGestureText="Ctrl+O" Command="{Binding OpenFileCommand}"/>
+                <MenuItem Header="Export to C_SV file" InputGestureText="Ctrl+S" Command="{Binding ExportToCsvCommand}"/>
                 <Separator />
-                <MenuItem Header="_Launch Windows Event Viewer" Command="{Binding LaunchEventViewerCommand}"/>
+                <MenuItem Header="Launch Windows _Event Viewer" Command="{Binding LaunchEventViewerCommand}"/>
+                <MenuItem Header="Restart app as _Administrator" Command="{Binding RunAsAdminCommand}" Visibility="{Binding IsRunAsAdmin, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
+                <Separator />
                 <MenuItem Header="E_xit" Command="{Binding ExitCommand}" />
             </MenuItem>
             <MenuItem Header="_Options">
@@ -158,7 +169,7 @@
 
             <Expander x:Name="Ex1" Header="F_ilters" Grid.Row="1" Margin="10,0,0,0" ExpandDirection="Down">
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="Source: " Margin="5,0,0,0" VerticalAlignment="Center"/>
+                    <TextBlock Text="Provider: " Margin="5,0,0,0" VerticalAlignment="Center"/>
                     <xctk:CheckComboBox Width="250" 
                             IsSelectAllActive="True" IsAllItemsSelectedContentActive="True"
                             Delimiter=", "
@@ -245,7 +256,7 @@
                             </DataTemplate>
                         </DataGridTextColumn.HeaderTemplate>
                     </DataGridTextColumn>
-                    <DataGridTextColumn Header="Source" Binding="{Binding Record.ProviderName}" Width="200">
+                    <DataGridTextColumn Header="Provider" Binding="{Binding Record.ProviderName}" Width="200">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
                                 <Style.Triggers>

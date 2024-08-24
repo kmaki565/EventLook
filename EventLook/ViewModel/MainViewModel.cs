@@ -9,7 +9,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Diagnostics.Eventing.Reader;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
@@ -358,6 +360,8 @@ public class MainViewModel : ObservableRecipient
     public ICommand OpenSettingsCommand { get; private set; }
     public ICommand LaunchEventViewerCommand { get; private set; }
     public ICommand CopyMessageTextCommand { get; private set; }
+	public ICommand ExportToCsvCommand { get; private set; }
+    public ICommand RunAsAdminCommand { get; private set; }
 
     private void InitializeCommands()
     {
@@ -378,6 +382,8 @@ public class MainViewModel : ObservableRecipient
         OpenSettingsCommand = new RelayCommand(OpenSettings);
         LaunchEventViewerCommand = new RelayCommand(() => ProcessHelper.LaunchEventViewer(SelectedLogSource));
         CopyMessageTextCommand = new RelayCommand(CopyMessageText);
+		ExportToCsvCommand = new RelayCommand(ExportToCsv);
+        RunAsAdminCommand = new RelayCommand(RunAsAdmin);
     }
     #endregion
 
@@ -661,5 +667,83 @@ public class MainViewModel : ObservableRecipient
             Clipboard.SetText(SelectedEventItem.Message);
         }
         catch (Exception) { }    // Ignore OpenClipboard exception
+    }
+
+    /// <summary>
+    /// Exports the current events to a CSV file.
+    /// </summary>
+	private void ExportToCsv()
+    {
+        try
+        {
+            var saveFileDialog = new SaveFileDialog
+            {
+				Title = "Export to CSV",
+                Filter = "CSV files (*.csv)|*.csv|All files (*.*)|*.*",
+                FileName = $"ExportedEvents_{DateTime.Now.ToString("yyyyMMdd-HHmmss")}.csv"
+            };
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                var sb = new StringBuilder();
+				sb.AppendLine("RecordId,Time,Provider,Level,EventId,Message");
+
+                // Ensure the CollectionViewSource is initialized and has a view
+                if (CVS?.View != null)
+                {
+                    foreach (EventItem eventItem in CVS.View)
+                    {
+                        var eventRecord = eventItem.Record;
+
+                        var line = string.Format("{0},{1},{2},{3},{4},{5}",
+							TextHelper.EscapeCsvValue(eventRecord.RecordId.ToString()),
+							TextHelper.EscapeCsvValue(eventRecord.TimeCreated.ToString()),
+							TextHelper.EscapeCsvValue(eventRecord.ProviderName),
+							TextHelper.EscapeCsvValue(eventRecord.Level.ToString()),
+							TextHelper.EscapeCsvValue(eventRecord.Id.ToString()),
+							TextHelper.EscapeCsvValue(eventItem.MessageOneLine));
+                        sb.AppendLine(line);
+                    }
+                }
+
+                var filePath = saveFileDialog.FileName;
+				File.WriteAllText(filePath, sb.ToString(), Encoding.UTF8);
+
+                var result = MessageBox.Show($"Events exported. Click OK to open file location.", "Export Complete", MessageBoxButton.OKCancel, MessageBoxImage.Information);
+                if (result == MessageBoxResult.OK)
+                {
+                    Process.Start("explorer.exe", $"/select,\"{filePath}\"");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"An error occurred while exporting: {ex.Message}", "Export to CSV", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    /// <summary>
+    /// Restarts the application with administrator privileges.
+    /// </summary>
+    private void RunAsAdmin()
+    {
+        try
+        {
+            var exePath = Process.GetCurrentProcess().MainModule.FileName;
+
+            var startInfo = new ProcessStartInfo(exePath)
+            {
+                UseShellExecute = true,
+                Verb = "runas"
+            };
+
+            Process.Start(startInfo);
+
+			Application.Current.MainWindow.Close();
+        }
+		catch
+        {
+            MessageBox.Show("Failed to restart as administrator.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 }
