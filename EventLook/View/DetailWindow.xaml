@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EventLook.View" xmlns:viewmodel="clr-namespace:EventLook.ViewModel" d:DataContext="{d:DesignInstance Type=viewmodel:DetailViewModel}"
         mc:Ignorable="d"
-        FocusManager.FocusedElement="{Binding ElementName=TextBoxXml}"
+        FocusManager.FocusedElement="{Binding ElementName=RichTextBoxXml}"
         Title="Event Details" Height="550" Width="900">
     <Grid>
         <DockPanel>
@@ -13,7 +13,7 @@
                 <Button Command="{Binding UpCommand}" FontFamily="Segoe UI Symbol" Content="&#xE110;" FontSize="15" Width="30" Height="30" Margin="10"/>
                 <Button Command="{Binding DownCommand}" FontFamily="Segoe UI Symbol" Content="&#xE1FD;" FontSize="15" Width="30" Height="30" Margin="10"/>
             </StackPanel>
-            <RichTextBox Name="RichTextBoxXml" FontSize="14"
+            <RichTextBox Name="RichTextBoxXml" FontSize="13"
              local:TextBoxBehavior.HighlightedXml="{Binding EventXml, Mode=OneWay}"
              IsReadOnly="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Margin="10,10,0,10"/>
         </DockPanel>

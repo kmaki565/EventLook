@@ -9,6 +9,9 @@ using System.IO;
 
 namespace EventLook.Model;
 
+/// <summary>
+/// Represents a log source, which can be a .evtx file or a local Event Log Channel.
+/// </summary>
 public class LogSource
 {
     public LogSource(string path, PathType type = PathType.LogName)

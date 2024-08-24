@@ -50,7 +50,7 @@ public class MainViewModel : ObservableRecipient
 
         progress = new Progress<ProgressInfo>(ProgressCallback); // Needs to instantiate in UI thread
         progressAutoRefresh = new Progress<ProgressInfo>(AutoRefreshCallback);
-
+        
         stopwatch = new Stopwatch();
         newLoadedUpdateTimer = new DispatcherTimer  // Setup a periodic timer which we'll run later.
         {
@@ -131,24 +131,24 @@ public class MainViewModel : ObservableRecipient
     }
     public ReadOnlyObservableCollection<SourceFilterItem> SourceFilters { get => sourceFilter.SourceFilters; }
     public ReadOnlyObservableCollection<LevelFilterItem> LevelFilters { get => levelFilter.LevelFilters; }
-
+    
     private bool isUpdating = false;
     public bool IsUpdating { get => isUpdating; set => SetProperty(ref isUpdating, value); }
 
     private bool isAutoRefreshing = false;
-    public bool IsAutoRefreshing
-    {
-        get => isAutoRefreshing;
-        set
+    public bool IsAutoRefreshing 
+    { 
+        get => isAutoRefreshing; 
+        set 
         {
-            if (value == isAutoRefreshing)
+            if (value == isAutoRefreshing) 
                 return;
 
-            SetProperty(ref isAutoRefreshing, value);
-            RefreshCommand?.NotifyCanExecuteChanged();
-        }
+            SetProperty(ref isAutoRefreshing, value); 
+            RefreshCommand?.NotifyCanExecuteChanged(); 
+        } 
     }
-
+    
     private int loadedEventCount = 0;
     public int LoadedEventCount { get => loadedEventCount; set => SetProperty(ref loadedEventCount, value); }
 
@@ -175,15 +175,15 @@ public class MainViewModel : ObservableRecipient
 
     private DateTime fromDateTime;
     public DateTime FromDateTime { get => fromDateTime; set => SetProperty(ref fromDateTime, value); }
-
+    
     private DateTime toDateTime;
     public DateTime ToDateTime { get => toDateTime; set => SetProperty(ref toDateTime, value); }
 
     public ObservableCollection<TimeZoneInfo> TimeZones { get; private set; }
-
+    
     private TimeZoneInfo selectedTimeZone;
     public TimeZoneInfo SelectedTimeZone { get => selectedTimeZone; set => SetProperty(ref selectedTimeZone, value); }
-
+    
     public bool ShowsMillisec { get; set; }
 
     private bool showsRecordId;
@@ -193,8 +193,8 @@ public class MainViewModel : ObservableRecipient
     public bool IsRunAsAdmin { get => isRunAsAdmin; }
 
     private bool isAutoRefreshEnabled;
-    public bool IsAutoRefreshEnabled
-    {
+    public bool IsAutoRefreshEnabled 
+    { 
         get => isAutoRefreshEnabled;
         set
         {
@@ -217,8 +217,7 @@ public class MainViewModel : ObservableRecipient
 
     public void OnLoaded()
     {
-        filters.ForEach(f =>
-        {
+        filters.ForEach(f => {
             f.SetCvs(CVS);
             f.FilterUpdated += OnFilterUpdated;
         });
@@ -233,7 +232,6 @@ public class MainViewModel : ObservableRecipient
     {
         Refresh(reset: false, append: true);
     }
-
     /// <summary>
     /// Refreshes events to show.
     /// If reset is true, all filters will be cleared.
@@ -253,7 +251,7 @@ public class MainViewModel : ObservableRecipient
 
         if (reset)
             filters.ForEach(f => f.Reset());
-
+        
         await Task.Run(LoadEvents);
 
         // If the log source selection is changed before completing loading events, we don't want to enumerate
@@ -362,14 +360,14 @@ public class MainViewModel : ObservableRecipient
     public ICommand OpenSettingsCommand { get; private set; }
     public ICommand LaunchEventViewerCommand { get; private set; }
     public ICommand CopyMessageTextCommand { get; private set; }
-    public ICommand ExportToCSVCommand { get; private set; }
+	public ICommand ExportToCsvCommand { get; private set; }
     public ICommand RunAsAdminCommand { get; private set; }
 
     private void InitializeCommands()
     {
         RefreshCommand = new RelayCommand(RefreshForCommand, () => !IsUpdating && !IsAutoRefreshing);
         CancelCommand = new RelayCommand(Cancel, () => IsUpdating);
-        ExitCommand = new RelayCommand(Exit);
+        ExitCommand = new RelayCommand(Exit); 
         ResetFiltersCommand = new RelayCommand(ClearFilters);
         ApplySourceFilterCommand = new RelayCommand(ApplySourceFilter);
         ApplyLevelFilterCommand = new RelayCommand(ApplyLevelFilter);
@@ -384,7 +382,7 @@ public class MainViewModel : ObservableRecipient
         OpenSettingsCommand = new RelayCommand(OpenSettings);
         LaunchEventViewerCommand = new RelayCommand(() => ProcessHelper.LaunchEventViewer(SelectedLogSource));
         CopyMessageTextCommand = new RelayCommand(CopyMessageText);
-        ExportToCSVCommand = new RelayCommand(ExportToCSV);
+		ExportToCsvCommand = new RelayCommand(ExportToCsv);
         RunAsAdminCommand = new RelayCommand(RunAsAdmin);
     }
     #endregion
@@ -402,7 +400,7 @@ public class MainViewModel : ObservableRecipient
         else
         {
             // If the log source is a .evtx file, put the file's modified date instead of current time.
-            ToDateTime = (SelectedLogSource.PathType == PathType.FilePath)
+            ToDateTime = (SelectedLogSource.PathType == PathType.FilePath) 
                 ? SelectedLogSource.FileWriteTime
                 : DateTime.Now;
             if (!IsAppend)
@@ -414,9 +412,9 @@ public class MainViewModel : ObservableRecipient
         Cancel();
 
         // When appending events, request events logged after the current newest event's time, from older to newer.
-        await Update(DataService.ReadEvents(SelectedLogSource,
+        await Update(DataService.ReadEvents(SelectedLogSource, 
             IsAppend ? Events.First().TimeOfEvent : FromDateTime,
-            ToDateTime,
+            ToDateTime, 
             readFromNew: !IsAppend,
             progress));
     }
@@ -618,7 +616,7 @@ public class MainViewModel : ObservableRecipient
         string previousLogPath = SelectedLogSource?.Path;
 
         bool? ret = SettingsWindowService.ShowDialog(openSettingsVm);
-
+        
         if (ret != true)    // Cancel
             return;
 
@@ -652,11 +650,10 @@ public class MainViewModel : ObservableRecipient
             SelectedLogSource = LogSources.FirstOrDefault();
 
         SelectedRange = Ranges.FirstOrDefault(r => r.Text == newSettings.SelectedRange.Text);
-
+        
         readyToRefresh = true;
         Refresh(reset: true);
     }
-
     /// <summary>
     /// Copies Message text of the selected log to clipboard.
     /// </summary>
@@ -675,12 +672,13 @@ public class MainViewModel : ObservableRecipient
     /// <summary>
     /// Exports the current events to a CSV file.
     /// </summary>
-    private void ExportToCSV()
+	private void ExportToCsv()
     {
         try
         {
             var saveFileDialog = new SaveFileDialog
             {
+				Title = "Export to CSV",
                 Filter = "CSV files (*.csv)|*.csv|All files (*.*)|*.*",
                 FileName = $"ExportedEvents_{DateTime.Now.ToString("yyyyMMdd-HHmmss")}.csv"
             };
@@ -688,7 +686,7 @@ public class MainViewModel : ObservableRecipient
             if (saveFileDialog.ShowDialog() == true)
             {
                 var sb = new StringBuilder();
-                sb.AppendLine("Id,Time,Source,Level,EventId,Message");
+				sb.AppendLine("RecordId,Time,Provider,Level,EventId,Message");
 
                 // Ensure the CollectionViewSource is initialized and has a view
                 if (CVS?.View != null)
@@ -698,42 +696,30 @@ public class MainViewModel : ObservableRecipient
                         var eventRecord = eventItem.Record;
 
                         var line = string.Format("{0},{1},{2},{3},{4},{5}",
-                            EscapeCsvValue(eventRecord.RecordId.ToString()),
-                            EscapeCsvValue(eventRecord.TimeCreated.ToString()),
-                            EscapeCsvValue(eventRecord.ProviderName),
-                            EscapeCsvValue(eventRecord.Level.ToString()),
-                            EscapeCsvValue(eventRecord.Id.ToString()),
-                            EscapeCsvValue(eventItem.MessageOneLine));
+							TextHelper.EscapeCsvValue(eventRecord.RecordId.ToString()),
+							TextHelper.EscapeCsvValue(eventRecord.TimeCreated.ToString()),
+							TextHelper.EscapeCsvValue(eventRecord.ProviderName),
+							TextHelper.EscapeCsvValue(eventRecord.Level.ToString()),
+							TextHelper.EscapeCsvValue(eventRecord.Id.ToString()),
+							TextHelper.EscapeCsvValue(eventItem.MessageOneLine));
                         sb.AppendLine(line);
                     }
                 }
 
                 var filePath = saveFileDialog.FileName;
-                File.WriteAllText(filePath, sb.ToString());
+				File.WriteAllText(filePath, sb.ToString(), Encoding.UTF8);
 
-                MessageBox.Show($"Events exported.", "Export Complete", MessageBoxButton.OK, MessageBoxImage.Information);
+                var result = MessageBox.Show($"Events exported. Click OK to open file location.", "Export Complete", MessageBoxButton.OKCancel, MessageBoxImage.Information);
+                if (result == MessageBoxResult.OK)
+                {
+                    Process.Start("explorer.exe", $"/select,\"{filePath}\"");
+                }
             }
         }
         catch (Exception ex)
         {
             MessageBox.Show($"An error occurred while exporting: {ex.Message}", "Export to CSV", MessageBoxButton.OK, MessageBoxImage.Error);
         }
-    }
-
-    /// <summary>
-    /// Escapes special characters in a CSV value.
-    /// </summary>
-    private string EscapeCsvValue(string value)
-    {
-        if (value.Contains("\""))
-        {
-            value = value.Replace("\"", "\"\"");
-        }
-        if (value.Contains(",") || value.Contains("\n") || value.Contains("\r"))
-        {
-            value = $"\"{value}\"";
-        }
-        return value;
     }
 
     /// <summary>
@@ -753,9 +739,9 @@ public class MainViewModel : ObservableRecipient
 
             Process.Start(startInfo);
 
-            Application.Current.Shutdown();
+			Application.Current.MainWindow.Close();
         }
-        catch (Exception ex)
+		catch
         {
             MessageBox.Show("Failed to restart as administrator.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
