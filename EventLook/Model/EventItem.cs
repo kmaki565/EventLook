@@ -1,5 +1,7 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Text;
@@ -12,7 +14,7 @@ namespace EventLook.Model;
 /// Represents a event to display. 
 /// Could not inherit EventLogRecord as it doesn't have a public constructor.
 /// </summary>
-public class EventItem : IDisposable
+public class EventItem : ObservableObject, IDisposable
 {
     public EventItem(LogSource logSource, EventRecord eventRecord)
     {
@@ -62,10 +64,12 @@ public class EventItem : IDisposable
     /// Indicates the time when the event was loaded by the app.
     /// </summary>
     public DateTime TimeLoaded { get; set; }
+
     /// <summary>
     /// Indicates if the event is newly loaded.
     /// </summary>
-    public bool IsNewLoaded { get; set; }
+    private bool _isNewLoaded;
+    public bool IsNewLoaded { get => _isNewLoaded; set => SetProperty(ref _isNewLoaded, value); }
 
     public void Dispose()
     {

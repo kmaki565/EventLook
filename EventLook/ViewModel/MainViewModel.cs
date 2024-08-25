@@ -537,7 +537,7 @@ public class MainViewModel : ObservableRecipient
         Events.TakeWhile(e => e.IsNewLoaded)
             .Where(e => all || DateTime.Now - e.TimeLoaded >= newLoadedTimeThreshold)
             .ToList().ForEach(e => e.IsNewLoaded = false);
-        CVS.View.Refresh();
+
         return Events.Any(e => e.IsNewLoaded);
     }
 
