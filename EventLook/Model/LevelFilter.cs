@@ -56,6 +56,13 @@ public class LevelFilter : FilterBase
     {
         levelFilters.Clear();
     }
+    public override void Apply()
+    {
+        if (IsFilterSelectionsChanged())
+        {
+            base.Apply();
+        }
+    }
 
     protected override bool IsFilterMatched(EventItem evt)
     {
@@ -95,6 +102,22 @@ public class LevelFilter : FilterBase
                 filterItem.Selected = false;
         }
         return true;
+    }
+
+    private readonly List<LevelFilterItem> _prevFilters = new List<LevelFilterItem>();
+    private bool IsFilterSelectionsChanged()
+    {
+        bool changed = levelFilters.Count != _prevFilters.Count || levelFilters.Where((lf, i) => lf.Level != _prevFilters[i].Level || lf.Selected != _prevFilters[i].Selected).Any();
+
+        if (changed)
+        {
+            _prevFilters.Clear();
+            foreach (var lf in levelFilters)
+            {
+                _prevFilters.Add(new LevelFilterItem { Level = lf.Level, Selected = lf.Selected });
+            }
+        }
+        return changed;
     }
 }
 

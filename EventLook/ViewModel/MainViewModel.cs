@@ -277,15 +277,12 @@ public class MainViewModel : ObservableRecipient
     {
         filters.ForEach(f => f.Clear());
     }
-    private async void ApplySourceFilter()
+    private void ApplySourceFilter()
     {
-        // Delay is needed to ensure filter update in UI is propagated to the source.
-        await Task.Delay(10);
         sourceFilter.Apply();
     }
-    private async void ApplyLevelFilter()
+    private void ApplyLevelFilter()
     {
-        await Task.Delay(10);
         levelFilter.Apply();
     }
     private void OpenDetails()
@@ -537,7 +534,7 @@ public class MainViewModel : ObservableRecipient
         Events.TakeWhile(e => e.IsNewLoaded)
             .Where(e => all || DateTime.Now - e.TimeLoaded >= newLoadedTimeThreshold)
             .ToList().ForEach(e => e.IsNewLoaded = false);
-        CVS.View.Refresh();
+
         return Events.Any(e => e.IsNewLoaded);
     }
 
