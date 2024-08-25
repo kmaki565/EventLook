@@ -43,7 +43,7 @@ public abstract class FilterBase : Monitorable
     /// <summary>
     /// Applies filter when the user operates the filter UI.
     /// </summary>
-    public void Apply()
+    public virtual void Apply()
     {
         if (cvs != null)
         {

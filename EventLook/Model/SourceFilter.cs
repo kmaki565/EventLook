@@ -58,6 +58,16 @@ public class SourceFilter : FilterBase
     {
         sourceFilters.Clear();
     }
+    public override void Apply()
+    {
+        // When Select All is clicked, this will be called for the number of the checkboxes.
+        // As I observed, selections of all checkboxes are already set at the first call
+        // so we can ignore the rest of the calls.
+        if (IsFilterSelectionsChanged())
+        {
+            base.Apply();
+        }
+    }
 
     protected override bool IsFilterMatched(EventItem evt)
     {
@@ -99,6 +109,23 @@ public class SourceFilter : FilterBase
                 filterItem.Selected = false;
         }
         return true;
+    }
+
+    readonly List<SourceFilterItem> _prevFilters = new List<SourceFilterItem>();
+    private bool IsFilterSelectionsChanged()
+    {
+        bool changed = sourceFilters.Count != _prevFilters.Count || sourceFilters.Where((sf, i) => sf.Name != _prevFilters[i].Name || sf.Selected != _prevFilters[i].Selected).Any();
+
+        if (changed)
+        {
+            _prevFilters.Clear();
+            foreach (var sf in sourceFilters)
+            {
+                _prevFilters.Add(new SourceFilterItem { Name = sf.Name, Selected = sf.Selected });
+            }
+        }
+
+        return changed;
     }
 }
 
