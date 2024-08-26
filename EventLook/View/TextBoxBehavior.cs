@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Xml;
 using System.Xml.Linq;
 
 namespace EventLook.View;
@@ -64,6 +65,22 @@ public class TextBoxBehavior
         );
 
     /// <summary>
+    /// Validate string is proper XML format
+    /// </summary>
+    private static bool IsValidXml(string xml)
+    {
+        try
+        {
+            XElement.Parse(xml);
+            return true;
+        }
+        catch (XmlException)
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
     /// Sets the HighlightedXml property on a DependencyObject.
     /// </summary>
     public static void SetHighlightedXml(DependencyObject element, string value)
@@ -86,7 +103,15 @@ public class TextBoxBehavior
     {
         if (d is RichTextBox richTextBox && e.NewValue is string xml)
         {
-            // Highlight XML content in RichTextBox
+            // If invalid XML, skip highlight and display string.
+            if (!IsValidXml(xml))
+            {
+                richTextBox.Document.Blocks.Clear();
+                richTextBox.AppendText(xml);
+                return;
+            }
+
+            // If valid XML, proceed to highlight it
             HighlightXml(richTextBox, xml);
         }
     }
