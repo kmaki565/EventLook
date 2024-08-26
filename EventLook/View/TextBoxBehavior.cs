@@ -140,6 +140,11 @@ public class TextBoxBehavior
 
         // Add XML elements to paragraph
         AddElementToParagraph(paragraph, xmlDoc.Root, 0);
+
+        // Remove the extra line break at the end
+        if (paragraph.Inlines.LastInline is LineBreak)
+            paragraph.Inlines.Remove(paragraph.Inlines.LastInline);
+
         doc.Blocks.Add(paragraph);
     }
 
