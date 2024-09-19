@@ -593,7 +593,12 @@ public class MainViewModel : ObservableRecipient
         bool? ret = LogPickerWindowService.ShowDialog(openLogVm);
         if (ret == true && !string.IsNullOrEmpty(openLogVm.SelectedChannel?.Path))
         {
-            SelectedLogSource = logSourceMgr.AddLogSource(openLogVm.SelectedChannel.Path, PathType.LogName);
+            // If the chosen source is already in the list, just select it.
+            SelectedLogSource = LogSources.FirstOrDefault(x => x.Path == openLogVm.SelectedChannel.Path) ??
+                logSourceMgr.AddLogSource(openLogVm.SelectedChannel.Path, PathType.LogName, addToBottom: true);
+
+            Properties.Settings.Default.StartupLogNames = LogSources.Where(x => x.PathType == PathType.LogName).Select(x => x.Path).ToList();
+            Properties.Settings.Default.Save();
         }
     }
     /// <summary>
