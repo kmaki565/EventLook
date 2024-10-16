@@ -3,9 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.Eventing.Reader;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace EventLook.Model;
@@ -25,10 +27,11 @@ public class EventItem : ObservableObject, IDisposable
         {
             Message = eventRecord.FormatDescription();
 
-            // Formatting event message failed. Try to display information in EventData.
+            // Formatting event message failed, most likely because EventID was 0 or unknown.
+            // Display information in EventData instead.
             if (Message == null) 
             {
-                var sb = new StringBuilder("(EventLook - dump of EventData)\r\n");
+                var sb = new StringBuilder("EventData:\r\n");
                 for (int i = 0; i < eventRecord.Properties.Count; i++)
                 {
                     if (i > 0) sb.Append("\r\n");
