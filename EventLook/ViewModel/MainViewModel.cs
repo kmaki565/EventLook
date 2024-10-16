@@ -574,10 +574,14 @@ public class MainViewModel : ObservableRecipient
 
     private void OpenFile()
     {
+        //The Windows XML EventLog (EVTX) format is currently used by Microsoft Windows to store system log information.
+        //
+        //The Windows Event Log (EVT) format was deprecated in Windows Vista in favor of EVTX.
+        //It is not officially supported anymore, but System.Diagnostics.Eventing seems to work perfectly fine with it.
         OpenFileDialog openFileDialog = new()
         {
-            Filter = "Event Log files (*.evtx)|*.evtx",
-            Title = "Open .evtx file"
+            Filter = "Windows Event Log (*.evtx;*.evt)|*.evtx;*.evt",
+            Title = "Open Event Log File"
         };
         if (openFileDialog.ShowDialog() == true)
         {

@@ -64,7 +64,7 @@
         <Menu DockPanel.Dock="Top" Background="White">
             <MenuItem Header="_File">
                 <MenuItem Header="Open Event _Log on local computer" InputGestureText="Ctrl+L" Command="{Binding OpenLogPickerCommand}"/>
-                <MenuItem Header="_Open .evtx File" InputGestureText="Ctrl+O" Command="{Binding OpenFileCommand}"/>
+                <MenuItem Header="_Open Event Log File" InputGestureText="Ctrl+O" Command="{Binding OpenFileCommand}"/>
                 <MenuItem Header="Export to C_SV file" InputGestureText="Ctrl+S" Command="{Binding ExportToCsvCommand}"/>
                 <Separator />
                 <MenuItem Header="Launch Windows _Event Viewer" Command="{Binding LaunchEventViewerCommand}"/>
