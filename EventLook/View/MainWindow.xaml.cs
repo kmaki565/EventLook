@@ -62,7 +62,7 @@ public partial class MainWindow : Window
             var fileName = args[1];
             if (File.Exists(fileName))
             {
-                var extension = System.IO.Path.GetExtension(fileName);
+                var extension = System.IO.Path.GetExtension(fileName)?.ToLowerInvariant();
                 if (extension == ".evtx")
                 {
                     WeakReferenceMessenger.Default.Send(new FileToBeProcessedMessageToken() { FilePath = fileName });
