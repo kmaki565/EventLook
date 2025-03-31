@@ -6,12 +6,13 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using EventLook.View;
 
 namespace EventLook.Model;
 
 public interface IDataService
 {
-    Task<int> ReadEvents(LogSource source, DateTime fromTime, DateTime toTime, bool readFromNew, IProgress<ProgressInfo> progress);
+    Task<int> ReadEvents(LogSource source, Range selectedRange, DateTime fromTime, DateTime toTime, bool readFromNew, IProgress<ProgressInfo> progress);
     void Cancel();
     /// <summary>
     /// Subscribes to events in an event log channel. The caller will be reported whenever a new event comes in.
@@ -27,7 +28,7 @@ public class DataService : IDataService
     private LogSource logSource;
     private CancellationTokenSource cts;
     const int WIN32ERROR_RPC_S_INVALID_BOUND = unchecked((int)0x800706C6);
-    public async Task<int> ReadEvents(LogSource source, DateTime fromTime, DateTime toTime, bool readFromNew, IProgress<ProgressInfo> progress)
+    public async Task<int> ReadEvents(LogSource source, Range selectedRange, DateTime fromTime, DateTime toTime, bool readFromNew, IProgress<ProgressInfo> progress)
     {
         logSource = source;
         using (cts = new CancellationTokenSource())
@@ -40,6 +41,13 @@ public class DataService : IDataService
             int count = 0;
             int totalCount = 0;
             bool isFirst = true;
+
+            if (selectedRange.IsCustom)
+            {
+                fromTime = new DateTime(fromTime.Year, fromTime.Month, fromTime.Day, fromTime.Hour, fromTime.Minute, 0, 0, 0, DateTimeKind.Local);
+                toTime = toTime.AddSeconds(59 - toTime.Second);
+                toTime = toTime.AddTicks(9999999 - toTime.Ticks % 10000000);
+            }
             try
             {
                 string sQuery = string.Format(" *[System[TimeCreated[@SystemTime > '{0}' and @SystemTime <= '{1}']]]",

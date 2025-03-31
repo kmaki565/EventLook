@@ -407,9 +407,9 @@ public class MainViewModel : ObservableRecipient
     private async Task LoadEvents()
     {
         Cancel();
-
+        
         // When appending events, request events logged after the current newest event's time, from older to newer.
-        await Update(DataService.ReadEvents(SelectedLogSource, 
+        await Update(DataService.ReadEvents(SelectedLogSource, SelectedRange,
             IsAppend ? Events.First().TimeOfEvent : FromDateTime,
             ToDateTime, 
             readFromNew: !IsAppend,
