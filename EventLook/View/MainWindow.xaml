@@ -48,10 +48,13 @@
         <v:StatusTextConverter x:Key="StatusTextConverter"/>
         <v:FilterInfoTextConverter x:Key="FilterInfoTextConverter"/>
         <v:SelectedEventsTextConverter x:Key="SelectedEventsTextConverter"/>
-        <v:NullableToInverseBooleanConverter x:Key="NullableToInverseBooleanConverter"/>
+        <v:NullableToVisibilityConverter x:Key="NullableToVisibilityConverter"/>
         <!-- This next line instantiates a CollectionViewSource with the collection of Events as its collection of objects-->
         <CollectionViewSource Source="{Binding Events}" x:Key="X_CVS"/>
         <DataGridTextColumn x:Key="RecordIdColumn" Header="Record ID" Binding="{Binding Record.RecordId}" Visibility="{Binding DataContext.ShowsRecordId, Source={x:Reference _window}, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+        <Style x:Key="IdFilterMenuStyle" TargetType="Control">
+            <Setter Property="Visibility" Value="{Binding DataContext.IdFilter.IdFilterNum, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}, Converter={StaticResource NullableToVisibilityConverter}}"/>
+        </Style>
     </Window.Resources>
     <Window.InputBindings>
         <KeyBinding Key="F5" Command="{Binding RefreshCommand}"/>
@@ -213,9 +216,12 @@
                                       Command="{Binding DataContext.ExcludeSelectedLevelCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"/>
                             <Separator/>
                             <MenuItem Header="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.DataContext.Record.Id}" HeaderStringFormat="Filter to ID {0}"
-                                      IsEnabled="{Binding DataContext.IdFilter.IdFilterNum, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}, Converter={StaticResource NullableToInverseBooleanConverter}}"
-                                      Command="{Binding DataContext.FilterToSelectedIdCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"/>
-                            <Separator/>
+                                      Command="{Binding DataContext.FilterToSelectedIdCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"
+                                      Style="{StaticResource IdFilterMenuStyle}"/>
+                            <MenuItem Header="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.DataContext.Record.Id}" HeaderStringFormat="Exclude ID {0}"
+                                      Command="{Binding DataContext.ExcludeSelectedIdCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"
+                                      Style="{StaticResource IdFilterMenuStyle}"/>
+                            <Separator Style="{StaticResource IdFilterMenuStyle}"/>
                             <MenuItem Header="Reset filters" Command="{Binding DataContext.ResetFiltersCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"/>
                             <Separator/>
                             <MenuItem Header="Copy Message text" Command="{Binding DataContext.CopyMessageTextCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"/>

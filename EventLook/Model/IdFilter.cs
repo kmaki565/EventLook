@@ -45,7 +45,7 @@ public class IdFilter : FilterBase
     protected override bool IsFilterMatched(EventItem evt)
     {
         if (idFilterNum.HasValue)
-            return evt.Record.Id == IdFilterNum.Value;
+            return IdFilterNum.Value < 0 ? evt.Record.Id != IdFilterNum.Value * -1 : evt.Record.Id == IdFilterNum.Value;
         else
             return true;    // No filter specified.
     }

@@ -325,11 +325,11 @@ public class MainViewModel : ObservableRecipient
                 levelFilter.Apply();
         }
     }
-    private void FilterToSelectedId()
+    private void FilterToSelectedId(bool isExclude)
     {
         if (SelectedEventItem != null)
         {
-            IdFilter.IdFilterNum = SelectedEventItem.Record.Id;
+            IdFilter.IdFilterNum = isExclude ? SelectedEventItem.Record.Id * -1 : SelectedEventItem.Record.Id;
             IdFilter.Apply();
         }
     }
@@ -352,6 +352,7 @@ public class MainViewModel : ObservableRecipient
     public ICommand FilterToSelectedLevelCommand { get; private set; }
     public ICommand ExcludeSelectedLevelCommand { get; private set; }
     public ICommand FilterToSelectedIdCommand { get; private set; }
+    public ICommand ExcludeSelectedIdCommand { get; private set; }
     public ICommand OpenFileCommand { get; private set; }
     public ICommand OpenLogPickerCommand { get; private set; }
     public ICommand OpenSettingsCommand { get; private set; }
@@ -373,7 +374,8 @@ public class MainViewModel : ObservableRecipient
         ExcludeSelectedSourceCommand = new RelayCommand(ExcludeSelectedSource);
         FilterToSelectedLevelCommand = new RelayCommand(FilterToSelectedLevel);
         ExcludeSelectedLevelCommand = new RelayCommand(ExcludeSelectedLevel);
-        FilterToSelectedIdCommand = new RelayCommand(FilterToSelectedId);
+        FilterToSelectedIdCommand = new RelayCommand(() => FilterToSelectedId(isExclude: false));
+        ExcludeSelectedIdCommand = new RelayCommand(() => FilterToSelectedId(isExclude: true));
         OpenFileCommand = new RelayCommand(OpenFile);
         OpenLogPickerCommand = new RelayCommand(OpenLogPicker);
         OpenSettingsCommand = new RelayCommand(OpenSettings);

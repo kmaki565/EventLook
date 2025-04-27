@@ -249,14 +249,17 @@ public class SelectedEventsTextConverter : IValueConverter
     }
 }
 
-public class NullableToInverseBooleanConverter : IValueConverter
+/// <summary>
+/// Converts a nullable value to Visibility. If the value has a value, it will hide the element.
+/// </summary>
+public class NullableToVisibilityConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         if (value is null)
-            return true;
+            return Visibility.Visible;
         else
-            return false;
+            return Visibility.Collapsed;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
