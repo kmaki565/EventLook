@@ -387,9 +387,12 @@ public class MainViewModel : ObservableRecipient
     private void UpdateDateTimeInUi()
     {
         if (SelectedRange.IsCustom)
-            return;
-
-        if (SelectedRange.DaysFromNow == 0) // All time
+        {
+            // Cut off seconds from the time pickers since we only display up to minutes.
+            FromDateTime = new DateTime(FromDateTime.Year, FromDateTime.Month, FromDateTime.Day, FromDateTime.Hour, FromDateTime.Minute, 0);
+            ToDateTime = new DateTime(ToDateTime.Year, ToDateTime.Month, ToDateTime.Day, ToDateTime.Hour, ToDateTime.Minute, 0);
+        }
+        else if (SelectedRange.DaysFromNow == 0) // All time
         {
             FromDateTime = new DateTime(1970, 1, 1, 0, 0, 0);
             ToDateTime = new DateTime(2030, 12, 31, 0, 0, 0);
