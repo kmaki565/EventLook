@@ -248,22 +248,3 @@ public class SelectedEventsTextConverter : IValueConverter
         throw new NotImplementedException();
     }
 }
-
-/// <summary>
-/// Converts a nullable value to Visibility. If the value has a value, it will hide the element.
-/// </summary>
-public class NullableToVisibilityConverter : IValueConverter
-{
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        if (value is null)
-            return Visibility.Visible;
-        else
-            return Visibility.Collapsed;
-    }
-
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        throw new NotImplementedException();
-    }
-}

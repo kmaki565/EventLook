@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -10,26 +11,42 @@ namespace EventLook.Model;
 
 public class IdFilter : FilterBase
 {
+    private ObservableCollection<int> _filterIds;
     public IdFilter()
     {
-        IdFilterNum = null;
+        _filterIds = [];
+        _filterIds.CollectionChanged += (s, e) =>
+        {
+            Apply();
+        };
     }
 
-    //TODO: May want to support comma-separated multiple IDs in the input
-    private int? idFilterNum;
-    public int? IdFilterNum
+    private string _filterText = "";
+    public string FilterText
     {
-        get { return idFilterNum; }
+        get { return _filterText; }
         set
         {
-            if (value == idFilterNum)
-                return;
-
-            idFilterNum = value;
-            NotifyPropertyChanged();
-
-            Apply();
+            if (value != _filterText)
+            {
+                _filterText = value;
+                UpdateFilterIds(_filterText);
+                NotifyPropertyChanged();
+            }
         }
+    }
+
+    /// <summary>
+    /// Updates the filter text with the given ID. 
+    /// The filter ID list will be updated accordingly.
+    /// </summary>
+    /// <param name="id"></param>
+    public void AddFilterId(int id)
+    {
+        if (_filterIds.Contains(id))
+            return;
+
+        FilterText = (_filterIds.Count == 0) ? id.ToString() : FilterText + "," + id.ToString();
     }
 
     public override void Refresh(IEnumerable<EventItem> events, bool reset)
@@ -39,14 +56,38 @@ public class IdFilter : FilterBase
     }
     public override void Clear()
     {
-        IdFilterNum = null;
+        FilterText = "";
     }
 
     protected override bool IsFilterMatched(EventItem evt)
     {
-        if (idFilterNum.HasValue)
-            return IdFilterNum.Value < 0 ? evt.Record.Id != IdFilterNum.Value * -1 : evt.Record.Id == IdFilterNum.Value;
-        else
-            return true;    // No filter specified.
+        if (_filterIds.Count == 0)
+            return true;
+
+        IEnumerable<int> excludeIds = _filterIds.Where(fi => fi < 0).Select(fi => fi * -1);
+        if (excludeIds.Any(fi => evt.Record.Id == fi))
+            return false;
+
+        IEnumerable<int> includeIds = _filterIds.Where(fi => fi > 0);
+        if (includeIds.Count() == 0)
+            return true;
+
+        return includeIds.Any(fi => evt.Record.Id == fi);
+    }
+
+    private void UpdateFilterIds(string filterText)
+    {
+        if (filterText is null)
+            throw new Exception("Filter text cannot be null.");
+
+        _filterIds.Clear();
+
+        string[] filterParts = filterText.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+        foreach (string part in filterParts)
+        {
+            // Exception to be handled in the view.
+            // This will cause Apply() to be called multiple times, but should be ok.
+            _filterIds.Add(int.Parse(part.Trim()));
+        }
     }
 }
