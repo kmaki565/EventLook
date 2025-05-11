@@ -11,14 +11,10 @@ namespace EventLook.Model;
 
 public class IdFilter : FilterBase
 {
-    private ObservableCollection<int> _filterIds;
+    private List<int> _filterIds;
     public IdFilter()
     {
         _filterIds = [];
-        _filterIds.CollectionChanged += (s, e) =>
-        {
-            Apply();
-        };
     }
 
     private string _filterText = "";
@@ -68,7 +64,7 @@ public class IdFilter : FilterBase
         if (excludeIds.Any(fi => evt.Record.Id == fi))
             return false;
 
-        IEnumerable<int> includeIds = _filterIds.Where(fi => fi > 0);
+        IEnumerable<int> includeIds = _filterIds.Where(fi => fi >= 0);
         if (includeIds.Count() == 0)
             return true;
 
@@ -86,8 +82,8 @@ public class IdFilter : FilterBase
         foreach (string part in filterParts)
         {
             // Exception to be handled in the view.
-            // This will cause Apply() to be called multiple times, but should be ok.
             _filterIds.Add(int.Parse(part.Trim()));
         }
+        Apply();
     }
 }
