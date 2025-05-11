@@ -11,10 +11,13 @@ namespace EventLook.Model;
 
 public class IdFilter : FilterBase
 {
-    private List<int> _filterIds;
+    // Assume Event IDs are always positive.
+    private readonly List<uint> _filterIds;
+    private readonly List<uint> _excludeIds;
     public IdFilter()
     {
         _filterIds = [];
+        _excludeIds = [];
     }
 
     private string _filterText = "";
@@ -37,12 +40,10 @@ public class IdFilter : FilterBase
     /// The filter ID list will be updated accordingly.
     /// </summary>
     /// <param name="id"></param>
-    public void AddFilterId(int id)
+    public void AddFilterId(int id, bool isExclude)
     {
-        if (_filterIds.Contains(id))
-            return;
-
-        FilterText = (_filterIds.Count == 0) ? id.ToString() : FilterText + "," + id.ToString();
+        FilterText += ((_filterIds.Count + _excludeIds.Count > 0) ? "," : "")
+            + (isExclude ? $"-{id}" : $"{id}");
     }
 
     public override void Refresh(IEnumerable<EventItem> events, bool reset)
@@ -57,18 +58,16 @@ public class IdFilter : FilterBase
 
     protected override bool IsFilterMatched(EventItem evt)
     {
+        if (_filterIds.Count + _excludeIds.Count == 0)
+            return true;
+
+        if (_excludeIds.Any(fi => evt.Record.Id == fi))
+            return false;
+
         if (_filterIds.Count == 0)
             return true;
 
-        IEnumerable<int> excludeIds = _filterIds.Where(fi => fi < 0).Select(fi => fi * -1);
-        if (excludeIds.Any(fi => evt.Record.Id == fi))
-            return false;
-
-        IEnumerable<int> includeIds = _filterIds.Where(fi => fi >= 0);
-        if (includeIds.Count() == 0)
-            return true;
-
-        return includeIds.Any(fi => evt.Record.Id == fi);
+        return _filterIds.Any(fi => evt.Record.Id == fi);
     }
 
     private void UpdateFilterIds(string filterText)
@@ -77,12 +76,24 @@ public class IdFilter : FilterBase
             throw new Exception("Filter text cannot be null.");
 
         _filterIds.Clear();
+        _excludeIds.Clear();
 
         string[] filterParts = filterText.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
         foreach (string part in filterParts)
         {
+            if (part.Trim() == "-0")
+            {
+                _excludeIds.Add(0);
+                continue;
+            }
+
             // Exception to be handled in the view.
-            _filterIds.Add(int.Parse(part.Trim()));
+            int id = int.Parse(part.Trim());
+
+            if (id < 0)
+                _excludeIds.Add((uint)(-1 * id));
+            else
+                _filterIds.Add((uint)id);
         }
         Apply();
     }

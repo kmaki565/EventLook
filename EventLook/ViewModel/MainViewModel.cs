@@ -329,7 +329,7 @@ public class MainViewModel : ObservableRecipient
     {
         if (SelectedEventItem != null)
         {
-            IdFilter.AddFilterId(isExclude ? SelectedEventItem.Record.Id * -1 : SelectedEventItem.Record.Id);
+            IdFilter.AddFilterId(SelectedEventItem.Record.Id, isExclude);
         }
     }
     private void OnFilterUpdated(object sender, EventArgs e)
