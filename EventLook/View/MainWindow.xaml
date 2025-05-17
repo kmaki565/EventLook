@@ -182,9 +182,9 @@
                             ItemsSource="{Binding LevelFilters}" SelectedMemberPath="Selected"
                             Command="{Binding ApplyLevelFilterCommand}"/>
                     <TextBlock Text="Event ID: " Margin="10,0,0,0" VerticalAlignment="Center"/>
-                    <TextBox Text="{Binding IdFilter.IdFilterNum, TargetNullValue='', Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=300}"
+                    <TextBox Text="{Binding IdFilter.FilterText, Mode=TwoWay, ValidatesOnExceptions=True, UpdateSourceTrigger=PropertyChanged, Delay=300}"
                              v:TextBoxBehavior.EscapeClearsText="True"
-                             Width="50" VerticalContentAlignment="Center" />
+                             MinWidth="50" MaxWidth="150" VerticalContentAlignment="Center" />
                     <TextBlock Text="Message contains: " Margin="10,0,0,0" VerticalAlignment="Center"/>
                     <TextBox x:Name="textBoxMsgFilter" Text="{Binding MsgFilter.MessageFilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=300}"
                              v:TextBoxBehavior.EscapeClearsText="True"
@@ -213,6 +213,8 @@
                             <Separator/>
                             <MenuItem Header="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.DataContext.Record.Id}" HeaderStringFormat="Filter to ID {0}"
                                       Command="{Binding DataContext.FilterToSelectedIdCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"/>
+                            <MenuItem Header="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.DataContext.Record.Id}" HeaderStringFormat="Exclude ID {0}"
+                                      Command="{Binding DataContext.ExcludeSelectedIdCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"/>
                             <Separator/>
                             <MenuItem Header="Reset filters" Command="{Binding DataContext.ResetFiltersCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"/>
                             <Separator/>
