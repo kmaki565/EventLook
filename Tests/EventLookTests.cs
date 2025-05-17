@@ -1,4 +1,5 @@
 using EventLook.Model;
+using System.Linq;
 
 namespace Tests;
 
@@ -89,5 +90,36 @@ public class IsTextMatched_Tests
         Assert.IsFalse(TextHelper.IsTextMatched(samplelogs[2], andSearch));
         Assert.IsFalse(TextHelper.IsTextMatched(samplelogs[3], andSearch));
         Assert.IsTrue(TextHelper.IsTextMatched(samplelogs[4], andSearch));
+    }
+}
+
+[TestClass]
+public class IdFilter_Tests
+{
+    [TestMethod]
+    public void Test1()
+    {
+        IdFilter idFilter = new IdFilter();
+        idFilter.FilterText = "1,-0,-3";
+        idFilter.AddFilterId(4, isExclude: false);
+        Assert.AreEqual("1,-0,-3,4", idFilter.FilterText);
+        CollectionAssert.AreEquivalent(new uint[] { 1, 4 }, idFilter.FilterIds.ToArray());
+        CollectionAssert.AreEquivalent(new uint[] { 0, 3 }, idFilter.ExcludeIds.ToArray());
+    }
+    [TestMethod]
+    public void Test2()
+    {
+        IdFilter idFilter = new IdFilter();
+        idFilter.FilterText = "5, 0, -2";
+        idFilter.AddFilterId(6, isExclude: true);
+        Assert.AreEqual("5, 0, -2,-6", idFilter.FilterText);
+        CollectionAssert.AreEquivalent(new uint[] { 5, 0 }, idFilter.FilterIds.ToArray());
+        CollectionAssert.AreEquivalent(new uint[] { 2, 6 }, idFilter.ExcludeIds.ToArray());
+    }
+    [TestMethod]
+    public void Test3()
+    {
+        IdFilter idFilter = new IdFilter();
+        Assert.ThrowsException<FormatException>(() => idFilter.FilterText = "abc");
     }
 }

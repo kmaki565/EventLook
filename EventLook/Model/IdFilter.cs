@@ -11,7 +11,7 @@ namespace EventLook.Model;
 
 public class IdFilter : FilterBase
 {
-    // Assume Event IDs are always positive.
+    // Assume Event IDs are always positive (can be 0).
     private readonly List<uint> _filterIds;
     private readonly List<uint> _excludeIds;
     public IdFilter()
@@ -19,6 +19,10 @@ public class IdFilter : FilterBase
         _filterIds = [];
         _excludeIds = [];
     }
+
+    // For testing purpose.
+    public IReadOnlyList<uint> FilterIds => _filterIds.AsReadOnly();
+    public IReadOnlyList<uint> ExcludeIds => _excludeIds.AsReadOnly();
 
     private string _filterText = "";
     public string FilterText
@@ -30,6 +34,7 @@ public class IdFilter : FilterBase
             {
                 _filterText = value;
                 UpdateFilterIds(_filterText);
+                Apply();
                 NotifyPropertyChanged();
             }
         }
@@ -72,9 +77,6 @@ public class IdFilter : FilterBase
 
     private void UpdateFilterIds(string filterText)
     {
-        if (filterText is null)
-            throw new Exception("Filter text cannot be null.");
-
         _filterIds.Clear();
         _excludeIds.Clear();
 
@@ -87,7 +89,7 @@ public class IdFilter : FilterBase
                 continue;
             }
 
-            // Exception to be handled in the view.
+            // Exception to be handled by the view.
             int id = int.Parse(part.Trim());
 
             if (id < 0)
@@ -95,6 +97,5 @@ public class IdFilter : FilterBase
             else
                 _filterIds.Add((uint)id);
         }
-        Apply();
     }
 }
