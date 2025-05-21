@@ -257,7 +257,7 @@ public class MainViewModel : ObservableRecipient
         // If the log source selection is changed before completing loading events, we don't want to enumerate
         // the source filter items with the previous log source.
         if (!IsUpdating)
-            filters.ForEach(f => f.Refresh(Events, reset));
+            filters.ForEach(f => f.Populate(Events, reset));
 
         Refreshed?.Invoke();
     }
@@ -483,7 +483,7 @@ public class MainViewModel : ObservableRecipient
         {
             InsertEvents(progressInfo.LoadedEvents);    // Single event should be loaded at a time.
             LoadedEventCount = Events.Count;
-            filters.ForEach(f => f.Refresh(Events, reset: false));
+            filters.ForEach(f => f.Populate(Events, reset: false));
             // If the range is like "Last x days", just adjust appearance of the date time picker.
             if (!SelectedRange.IsCustom && SelectedRange.DaysFromNow != 0)
                 ToDateTime = DateTime.Now;
