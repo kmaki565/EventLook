@@ -51,6 +51,12 @@
         <!-- This next line instantiates a CollectionViewSource with the collection of Events as its collection of objects-->
         <CollectionViewSource Source="{Binding Events}" x:Key="X_CVS"/>
         <DataGridTextColumn x:Key="RecordIdColumn" Header="Record ID" Binding="{Binding Record.RecordId}" Visibility="{Binding DataContext.ShowsRecordId, Source={x:Reference _window}, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+        <DataTemplate x:Key="SourceFilterWatermarkTemplate">
+            <TextBlock Text="Select provider(s)" FontStyle="Italic" Margin="3,0,0,0"/>
+        </DataTemplate>
+        <DataTemplate x:Key="LevelFilterWatermarkTemplate">
+            <TextBlock Text="Select level(s)" FontStyle="Italic" Margin="3,0,0,0"/>
+        </DataTemplate>
     </Window.Resources>
     <Window.InputBindings>
         <KeyBinding Key="F5" Command="{Binding RefreshCommand}"/>
@@ -172,13 +178,13 @@
                     <TextBlock Text="Provider: " Margin="5,0,0,0" VerticalAlignment="Center"/>
                     <xctk:CheckComboBox Width="250" 
                             IsSelectAllActive="True" IsAllItemsSelectedContentActive="True"
-                            Delimiter=", "
+                            Delimiter=", " WatermarkTemplate="{StaticResource SourceFilterWatermarkTemplate}"
                             ItemsSource="{Binding SourceFilters}" DisplayMemberPath="Name" SelectedMemberPath="Selected"
                             Command="{Binding ApplySourceFilterCommand}"/>
                     <TextBlock Text="Level: " Margin="10,0,0,0" VerticalAlignment="Center"/>
                     <xctk:CheckComboBox Width="120" 
                             IsSelectAllActive="True" IsAllItemsSelectedContentActive="True"
-                            Delimiter=", "
+                            Delimiter=", " WatermarkTemplate="{StaticResource LevelFilterWatermarkTemplate}"
                             ItemsSource="{Binding LevelFilters}" SelectedMemberPath="Selected"
                             Command="{Binding ApplyLevelFilterCommand}"/>
                     <TextBlock Text="Event ID: " Margin="10,0,0,0" VerticalAlignment="Center"/>
