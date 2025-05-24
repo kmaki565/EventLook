@@ -202,14 +202,18 @@
                     <ContextMenu x:Key="dataGridContextMenu">
                         <ContextMenu.Items>
                             <MenuItem Header="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.DataContext.Record.ProviderName}" HeaderStringFormat="Filter to &quot;{0}&quot;"
-                                      Command="{Binding DataContext.FilterToSelectedSourceCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"/>
+                                      Command="{Binding DataContext.FilterToSelectedSourceCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"
+                                      IsEnabled="{Binding DataContext.IsUpdating, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}, Converter={StaticResource InverseBooleanConverter}}"/>
                             <MenuItem Header="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.DataContext.Record.ProviderName}" HeaderStringFormat="Exclude &quot;{0}&quot;" 
-                                      Command="{Binding DataContext.ExcludeSelectedSourceCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"/>
+                                      Command="{Binding DataContext.ExcludeSelectedSourceCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"
+                                      IsEnabled="{Binding DataContext.IsUpdating, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}, Converter={StaticResource InverseBooleanConverter}}"/>
                             <Separator/>
                             <MenuItem Header="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.DataContext.Record.Level, Converter={StaticResource EventLevelToDisplayTextConverter}}" HeaderStringFormat="Filter to {0}"
-                                      Command="{Binding DataContext.FilterToSelectedLevelCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"/>
+                                      Command="{Binding DataContext.FilterToSelectedLevelCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"
+                                      IsEnabled="{Binding DataContext.IsUpdating, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}, Converter={StaticResource InverseBooleanConverter}}"/>
                             <MenuItem Header="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.DataContext.Record.Level, Converter={StaticResource EventLevelToDisplayTextConverter}}" HeaderStringFormat="Exclude {0}"
-                                      Command="{Binding DataContext.ExcludeSelectedLevelCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"/>
+                                      Command="{Binding DataContext.ExcludeSelectedLevelCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"
+                                      IsEnabled="{Binding DataContext.IsUpdating, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}, Converter={StaticResource InverseBooleanConverter}}"/>
                             <Separator/>
                             <MenuItem Header="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.DataContext.Record.Id}" HeaderStringFormat="Filter to ID {0}"
                                       Command="{Binding DataContext.FilterToSelectedIdCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}}"/>
