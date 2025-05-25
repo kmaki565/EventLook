@@ -82,8 +82,13 @@
                 <MenuItem Header="_Auto Refresh" IsCheckable="True" IsChecked="{Binding IsAutoRefreshEnabled}"/>
                 <Separator />
                 <MenuItem Header="_Settings..." Command="{Binding OpenSettingsCommand}" />
-            </MenuItem> 
-            <MenuItem Header="_About" Click="MenuItem_About_Click"/>
+            </MenuItem>
+            <MenuItem Header="_Help">
+                <MenuItem Header="View in _Microsoft Store" Command="{Binding OpenStoreCommand}"/>
+                <MenuItem Header="Visit _GitHub repo" Command="{Binding OpenGitHubCommand}"/>
+                <Separator />
+                <MenuItem Header="_About EventLook" Click="MenuItem_About_Click"/>
+            </MenuItem>
         </Menu>
         <StatusBar DockPanel.Dock="Bottom" Background="WhiteSmoke">
             <StatusBarItem>

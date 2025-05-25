@@ -359,6 +359,8 @@ public class MainViewModel : ObservableRecipient
     public ICommand CopyMessageTextCommand { get; private set; }
 	public ICommand ExportToCsvCommand { get; private set; }
     public ICommand RunAsAdminCommand { get; private set; }
+    public ICommand OpenStoreCommand { get; private set; }
+    public ICommand OpenGitHubCommand { get; private set; }
 
     private void InitializeCommands()
     {
@@ -382,6 +384,8 @@ public class MainViewModel : ObservableRecipient
         CopyMessageTextCommand = new RelayCommand(CopyMessageText);
 		ExportToCsvCommand = new RelayCommand(ExportToCsv);
         RunAsAdminCommand = new RelayCommand(RunAsAdmin);
+        OpenStoreCommand = new RelayCommand(OpenStore);
+        OpenGitHubCommand = new RelayCommand(OpenGitHub);
     }
     #endregion
 
@@ -751,5 +755,13 @@ public class MainViewModel : ObservableRecipient
         {
             MessageBox.Show("Failed to restart as administrator.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
+    }
+    private void OpenStore()
+    {
+        ProcessHelper.OpenUri("ms-windows-store://pdp/?productid=9NJV5FQ089Z0");
+    }
+    private void OpenGitHub()
+    {
+        ProcessHelper.OpenUri("https://github.com/kmaki565/EventLook");
     }
 }
