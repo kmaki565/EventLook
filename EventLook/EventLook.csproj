@@ -9,7 +9,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyTitle>A fast &amp; handy Event Viewer</AssemblyTitle>
-    <AssemblyVersion>1.6.3.0</AssemblyVersion>
+    <AssemblyVersion>1.6.4.0</AssemblyVersion>
     <Description>$(AssemblyTitle)</Description>
     <Copyright>Copyright (C) K. Maki</Copyright>
     <Product>EventLook</Product>
