@@ -40,11 +40,6 @@ public class MessageFilter : FilterBase
         }
     }
 
-    public override void Refresh(IEnumerable<EventItem> events, bool reset)
-    {
-        if (reset)
-            Clear();
-    }
     public override void Clear()
     {
         MessageFilterText = "";

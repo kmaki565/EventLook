@@ -36,4 +36,18 @@ public static class ProcessHelper
             Arguments = arg,
         });
     }
+
+    /// <summary>
+    /// Launches the associated app with shell for the supplied URI .
+    /// </summary>
+    /// <param name="uri"></param>
+    public static void OpenUri(string uri)
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo(uri) { UseShellExecute = true });
+        }
+        catch (Exception)
+        { }
+    }
 }

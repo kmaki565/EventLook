@@ -51,11 +51,6 @@ public class IdFilter : FilterBase
             + (isExclude ? $"-{id}" : $"{id}");
     }
 
-    public override void Refresh(IEnumerable<EventItem> events, bool reset)
-    {
-        if (reset)
-            Clear();
-    }
     public override void Clear()
     {
         FilterText = "";

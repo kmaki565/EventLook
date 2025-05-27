@@ -20,12 +20,13 @@ public abstract class FilterBase : Monitorable
         this.cvs.Filter += DoFilter;
     }
     /// <summary>
-    /// Refreshes filter UI (e.g. populate filter items in a drop down) by loaded events,
+    /// For filters with checkboxes, populates the list of checkboxes by the loaded events.
+    /// This will do nothing for text-based filters.
     /// If reset is true, all filters will be cancelled (e.g. checkboxes all checked).
     /// Otherwise, it'll try to carry over filters user specified (except newly populated checkboxes).
     /// </summary>
     /// <param name="events">Loaded event items</param>
-    public virtual void Refresh(IEnumerable<EventItem> events, bool reset) { }
+    public virtual void Populate(IEnumerable<EventItem> events, bool reset) { }
 
     /// <summary>
     /// Removes filter, but keeps the filter items in the dropdown (if available).

@@ -25,7 +25,7 @@ public class LevelFilter : FilterBase
         private set;
     }
 
-    public override void Refresh(IEnumerable<EventItem> events, bool reset)
+    public override void Populate(IEnumerable<EventItem> events, bool reset)
     {
         // Remember filters and their selections before clearing (needs ToList)
         var prevFilters = reset ? null : levelFilters.Select(f => new { f.Level, f.Selected }).ToList();
