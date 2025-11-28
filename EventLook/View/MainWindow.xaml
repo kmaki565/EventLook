@@ -8,6 +8,7 @@
         xmlns:v="clr-namespace:EventLook.View"
         xmlns:viewmodel="clr-namespace:EventLook.ViewModel"
         xmlns:properties="clr-namespace:EventLook.Properties"
+        xmlns:local="clr-namespace:EventLook.View"
         d:DataContext="{d:DesignInstance Type=viewmodel:MainViewModel}"
         mc:Ignorable="d"
         ResizeMode="CanResizeWithGrip"
@@ -19,7 +20,7 @@
         WindowStartupLocation="CenterScreen"
         Closing="Window_Closing">
     <Window.Style>
-        <Style TargetType="Window">
+        <Style TargetType="Window" BasedOn="{StaticResource {x:Type Window}}">
             <Style.Triggers>
                 <DataTrigger Binding="{Binding IsRunAsAdmin}" Value="False">
                     <Setter Property="Title" Value="{Binding SelectedLogSource.Path, StringFormat={}{0} - EventLook}"/>
@@ -61,13 +62,13 @@
     <Window.InputBindings>
         <KeyBinding Key="F5" Command="{Binding RefreshCommand}"/>
         <KeyBinding Key="F5" Modifiers="Shift" Command="{Binding CancelCommand}"/>
-        <KeyBinding Key="L" Modifiers="Ctrl" Command="{Binding OpenLogPickerCommand}"/>
-        <KeyBinding Key="O" Modifiers="Ctrl" Command="{Binding OpenFileCommand}"/>
-        <KeyBinding Key="S" Modifiers="Ctrl" Command="{Binding ExportToCsvCommand}"/>
+        <KeyBinding Key="L" Modifiers="Control" Command="{Binding OpenLogPickerCommand}"/>
+        <KeyBinding Key="O" Modifiers="Control" Command="{Binding OpenFileCommand}"/>
+        <KeyBinding Key="S" Modifiers="Control" Command="{Binding ExportToCsvCommand}"/>
     </Window.InputBindings>
     
     <DockPanel>
-        <Menu DockPanel.Dock="Top" Background="White">
+        <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
                 <MenuItem Header="Open Event _Log on local computer" InputGestureText="Ctrl+L" Command="{Binding OpenLogPickerCommand}"/>
                 <MenuItem Header="_Open .evtx File" InputGestureText="Ctrl+O" Command="{Binding OpenFileCommand}"/>
@@ -90,7 +91,7 @@
                 <MenuItem Header="_About EventLook" Click="MenuItem_About_Click"/>
             </MenuItem>
         </Menu>
-        <StatusBar DockPanel.Dock="Bottom" Background="WhiteSmoke">
+        <StatusBar DockPanel.Dock="Bottom" Padding="0">
             <StatusBarItem>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock>
@@ -125,8 +126,8 @@
 
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="35"/>
-                <RowDefinition Height="{Binding ElementName=Ex1, Path=IsExpanded, Converter={StaticResource ExpandedToGridLengthConverter}, ConverterParameter=25}" />
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="{Binding ElementName=Ex1, Path=IsExpanded, Converter={StaticResource ExpandedToGridLengthConverter}, ConverterParameter=50}" />
                 <RowDefinition/>
             </Grid.RowDefinitions>
 
@@ -134,30 +135,26 @@
                 <ComboBox  
                   x:Name="ComboBox_Source" ItemsSource="{Binding LogSources}" SelectedItem="{Binding SelectedLogSource}"
                   DisplayMemberPath="DisplayName" SelectedValuePath="Path" 
-                  HorizontalAlignment="Left" Margin="10,0,0,0" MinWidth="250" />
+                  HorizontalAlignment="Left" Margin="10,0,0,0" MinWidth="200" />
                 <ComboBox  
                       ItemsSource="{Binding Ranges}" SelectedItem="{Binding SelectedRange}"
                       DisplayMemberPath="Text" SelectedValuePath="Text"
                       HorizontalAlignment="Left" Margin="10,0,0,0" MinWidth="100" />
                 <TextBlock Text="From:" Margin="10,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-                <xctk:DateTimePicker Margin="8,0,0,0" MinWidth="160" 
-                                 AutoCloseCalendar="True" 
+                <local:DateTimePickerCustom Margin="8,0,0,0"
                                  IsReadOnly="{Binding SelectedRange.IsCustom, Converter={StaticResource InverseBooleanConverter}}"
-                                 Value="{Binding FromDateTime, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" 
-                                 Format="Custom" FormatString="yyyy-MM-dd HH:mm (z)"/>
+                                 Value="{Binding FromDateTime, Mode=TwoWay}" />
                 <TextBlock Text="To:" Margin="8,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-                <xctk:DateTimePicker Margin="8,0,0,0" MinWidth="160"
-                                 AutoCloseCalendar="True"
+                <local:DateTimePickerCustom Margin="8,0,0,0"
                                  IsReadOnly="{Binding SelectedRange.IsCustom, Converter={StaticResource InverseBooleanConverter}}"
-                                 Value="{Binding ToDateTime, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" 
-                                 Format="Custom" FormatString="yyyy-MM-dd HH:mm (z)"/>
+                                 Value="{Binding ToDateTime, Mode=TwoWay}" />
                 <ComboBox
                     ItemsSource="{Binding TimeZones}" SelectedItem="{Binding SelectedTimeZone}"
                     DisplayMemberPath="DisplayName"
-                    Margin="10,0,0,0" Width="93"/>
-                <Button x:Name="refreshButton" Margin="15,0,0,0" Width="25" Height="25">
+                    Margin="10,0,0,0" Width="125"/>
+                <Button x:Name="refreshButton" Margin="15,0,0,0" Padding="0" Width="30" Height="30">
                     <Button.Style>
-                        <Style TargetType="Button">
+                        <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsUpdating}" Value="False">
                                     <Setter Property="Command" Value="{Binding RefreshCommand, Mode=OneWay}"/>
@@ -200,7 +197,7 @@
                     <TextBox x:Name="textBoxMsgFilter" Text="{Binding MsgFilter.MessageFilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=300}"
                              v:TextBoxBehavior.EscapeClearsText="True"
                              MinWidth="200" VerticalContentAlignment="Center" />
-                    <Button Content="Reset filters" Height="25" Width="70" Margin="15,0,0,0" Command="{Binding ResetFiltersCommand, Mode=OneWay}"/>
+                    <Button Content="Reset filters" Margin="15,0,0,0" Command="{Binding ResetFiltersCommand, Mode=OneWay}"/>
                 </StackPanel>
             </Expander>
 
@@ -239,16 +236,25 @@
                 </DataGrid.Resources>
                 <DataGrid.CellStyle>
                     <Style TargetType="DataGridCell">
-                        <Setter Property="BorderThickness" Value="0"/>
-                        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="{DynamicResource AccentFillColorTertiaryBrush}"/>
+                                <Setter Property="BorderThickness" Value="0"/>
+                                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                            </Trigger>
+                        </Style.Triggers>
                     </Style>
                 </DataGrid.CellStyle>
                 <DataGrid.RowStyle>
-                    <Style TargetType="DataGridRow">
+                    <Style TargetType="DataGridRow" BasedOn="{StaticResource {x:Type DataGridRow}}">
                         <Setter Property="ContextMenu" Value="{StaticResource dataGridContextMenu}" />
+                        <Setter Property="Height" Value="20" />
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding IsNewLoaded}" Value="True">
-                                <Setter Property="Background" Value="Yellow"/>
+                                <Setter Property="Background" Value="{DynamicResource AccentFillColorDefaultBrush}"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsNewLoaded}" Value="False">
+                                <Setter Property="Background" Value="{x:Null}"/>
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
@@ -275,7 +281,7 @@
                     </DataGridTextColumn>
                     <DataGridTextColumn Header="Provider" Binding="{Binding Record.ProviderName}" Width="200">
                         <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock">
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding IsChecked, Source={x:Reference CheckTruncate}}" Value="False">
                                         <Setter Property="TextWrapping" Value="Wrap" />
@@ -302,14 +308,14 @@
                     <DataGridTextColumn Header="Event ID" Binding="{Binding Record.Id}"/>
                     <DataGridTextColumn Header="Message" Binding="{Binding Message}" Width="*" Visibility="{Binding IsChecked, Source={x:Reference CheckTruncate}, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
                         <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock">
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
                                 <Setter Property="TextWrapping" Value="Wrap" />
                             </Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
                     <DataGridTextColumn Header="Message" Binding="{Binding MessageOneLine}" Width="*" Visibility="{Binding IsChecked, Source={x:Reference CheckTruncate}, Converter={StaticResource BooleanToVisibilityConverter}}">
                         <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock">
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
                                 <Setter Property="TextTrimming" Value="CharacterEllipsis" />
                             </Style>
                         </DataGridTextColumn.ElementStyle>
