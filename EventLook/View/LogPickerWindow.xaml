@@ -24,7 +24,7 @@
             </DockPanel>
             <CheckBox Margin="8" IsChecked="{Binding HidesEmptyLogs}">
                 <CheckBox.Style>
-                    <Style TargetType="CheckBox">
+                    <Style TargetType="CheckBox" BasedOn="{StaticResource {x:Type CheckBox}}">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding IsRunAsAdmin}" Value="False">
                                 <Setter Property="Content" Value="Hide empty logs (try run as admin to view logs with blank record count)"/>
@@ -43,12 +43,12 @@
                       IsReadOnly="True"
                       PreviewKeyDown="dataGrid1_PreviewKeyDown">
             <DataGrid.Resources>
-                <Style TargetType="DataGridRow">
+                <Style TargetType="DataGridRow" BasedOn="{StaticResource {x:Type DataGridRow}}">
                     <EventSetter Event="MouseDoubleClick" Handler="DataGridRow_MouseDoubleClick" />
                 </Style>
             </DataGrid.Resources>
             <DataGrid.CellStyle>
-                <Style TargetType="DataGridCell">
+                <Style TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}">
                     <Setter Property="BorderThickness" Value="0"/>
                     <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
                 </Style>

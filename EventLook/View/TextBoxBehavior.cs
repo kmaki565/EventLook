@@ -134,7 +134,8 @@ public class TextBoxBehavior
         var declaration = xmlDoc.Declaration;
         if (declaration != null)
         {
-            paragraph.Inlines.Add(new Run($"<?xml version=\"{declaration.Version}\" encoding=\"{declaration.Encoding}\"?>") { Foreground = Brushes.SlateGray });
+            var brush = GetBrush("AccentTextFillColorDisabledBrush");
+            paragraph.Inlines.Add(new Run($"<?xml version=\"{declaration.Version}\" encoding=\"{declaration.Encoding}\"?>") { Foreground = brush });
             paragraph.Inlines.Add(new LineBreak());
         }
 
@@ -153,30 +154,36 @@ public class TextBoxBehavior
     /// </summary>
     private static void AddElementToParagraph(Paragraph paragraph, XElement element, int indentLevel)
     {
+        var tagBrush = GetBrush("AccentTextFillColorPrimaryBrush");
+        var attrBrush = GetBrush("TextFillColorSecondaryBrush");
+        var valueBrush = GetBrush("AccentTextFillColorTertiaryBrush");
+        var punctuationBrush = GetBrush("TextFillColorTertiaryBrush");
+        var textBrush = GetBrush("TextFillColorPrimaryBrush");
+
         var indent = new string(' ', indentLevel * 2);
         paragraph.Inlines.Add(new Run(indent));
 
         var prefix = element.GetPrefixOfNamespace(element.Name.Namespace);
         var elementName = !string.IsNullOrEmpty(prefix) ? $"{prefix}:{element.Name.LocalName}" : element.Name.LocalName;
-        paragraph.Inlines.Add(new Run($"<{elementName}") { Foreground = Brushes.MediumBlue });
+        paragraph.Inlines.Add(new Run($"<{elementName}") { Foreground = tagBrush });
 
         // Add attributes
         foreach (var attribute in element.Attributes())
         {
-            paragraph.Inlines.Add(new Run($" {attribute.Name}") { Foreground = Brushes.Firebrick });
-            paragraph.Inlines.Add(new Run("=") { Foreground = Brushes.SlateGray });
-            paragraph.Inlines.Add(new Run($"\"{attribute.Value}\"") { Foreground = Brushes.ForestGreen });
+            paragraph.Inlines.Add(new Run($" {attribute.Name}") { Foreground = attrBrush });
+            paragraph.Inlines.Add(new Run("=") { Foreground = punctuationBrush });
+            paragraph.Inlines.Add(new Run($"\"{attribute.Value}\"") { Foreground = valueBrush });
         }
 
         if (element.IsEmpty || string.IsNullOrWhiteSpace(element.Value))
         {
             // Self-closing tag
-            paragraph.Inlines.Add(new Run(" />") { Foreground = Brushes.MediumBlue });
+            paragraph.Inlines.Add(new Run(" />") { Foreground = tagBrush });
             paragraph.Inlines.Add(new LineBreak());
         }
         else
         {
-            paragraph.Inlines.Add(new Run(">") { Foreground = Brushes.MediumBlue });
+            paragraph.Inlines.Add(new Run(">") { Foreground = tagBrush });
 
             if (!string.IsNullOrWhiteSpace(element.Value) && !element.HasElements)
             {
@@ -184,15 +191,15 @@ public class TextBoxBehavior
                 if (element.Value.Contains("\n"))
                 {
                     paragraph.Inlines.Add(new LineBreak());
-                    paragraph.Inlines.Add(new Run($"{new string(' ', (indentLevel + 1) * 2)}{element.Value}") { Foreground = Brushes.Black });
+                    paragraph.Inlines.Add(new Run($"{new string(' ', (indentLevel + 1) * 2)}{element.Value}") { Foreground = textBrush });
                     paragraph.Inlines.Add(new LineBreak());
-                    paragraph.Inlines.Add(new Run($"{indent}</{elementName}>") { Foreground = Brushes.MediumBlue });
+                    paragraph.Inlines.Add(new Run($"{indent}</{elementName}>") { Foreground = tagBrush });
                     paragraph.Inlines.Add(new LineBreak());
                 }
                 else
                 {
-                    paragraph.Inlines.Add(new Run(element.Value) { Foreground = Brushes.Black });
-                    paragraph.Inlines.Add(new Run($"</{elementName}>") { Foreground = Brushes.MediumBlue });
+                    paragraph.Inlines.Add(new Run(element.Value) { Foreground = textBrush });
+                    paragraph.Inlines.Add(new Run($"</{elementName}>") { Foreground = tagBrush });
                     paragraph.Inlines.Add(new LineBreak());
                 }
             }
@@ -204,7 +211,7 @@ public class TextBoxBehavior
                 {
                     AddElementToParagraph(paragraph, childElement, indentLevel + 1);
                 }
-                paragraph.Inlines.Add(new Run($"{indent}</{elementName}>") { Foreground = Brushes.MediumBlue });
+                paragraph.Inlines.Add(new Run($"{indent}</{elementName}>") { Foreground = tagBrush });
                 paragraph.Inlines.Add(new LineBreak());
             }
         }
@@ -231,6 +238,8 @@ public class TextBoxBehavior
         return stringBuilder.ToString();
     }
 
+    private static Brush GetBrush(string key) =>
+        (Brush)Application.Current.Resources[key] ?? Brushes.Black;
 
     #endregion Attached Property HighlightedXml
 }

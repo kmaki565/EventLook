@@ -7,7 +7,7 @@
         xmlns:viewmodel="clr-namespace:EventLook.ViewModel"
         d:DataContext="{d:DesignInstance Type=viewmodel:SettingsViewModel}"
         mc:Ignorable="d"
-        Title="Settings" Height="360" Width="450" Background="WhiteSmoke">
+        Title="Settings" Height="375" Width="485">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition />
@@ -24,11 +24,11 @@
                              ItemsSource="{Binding LogSources}" SelectedItem="{Binding SelectedLogSource}"
                              DisplayMemberPath="Path" SelectedValuePath="Path" />
                     <StackPanel Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Center" Margin="10,10,12,10">
-                        <Button Content="Add" Command="{Binding AddCommand}" Width="90" Margin="0,5"/>
-                        <Button Content="Remove" Command="{Binding RemoveCommand}" Width="90" Margin="0,5"/>
-                        <Button Content="Move Up" Command="{Binding UpCommand}" Width="90" Margin="0,5"/>
-                        <Button Content="Move Down" Command="{Binding DownCommand}" Width="90" Margin="0,5"/>
-                        <Button Content="Restore Default" Command="{Binding RestoreDefaultCommand}" Width="90" Margin="0,25"/>
+                        <Button Content="Add" Command="{Binding AddCommand}" Width="120" Margin="0,5"/>
+                        <Button Content="Remove" Command="{Binding RemoveCommand}" Width="120" Margin="0,5"/>
+                        <Button Content="Move Up" Command="{Binding UpCommand}" Width="120" Margin="0,5"/>
+                        <Button Content="Move Down" Command="{Binding DownCommand}" Width="120" Margin="0,5"/>
+                        <Button Content="Restore Default" Command="{Binding RestoreDefaultCommand}" Width="120" Margin="0,25"/>
                     </StackPanel>
                 </Grid>
             </TabItem>
