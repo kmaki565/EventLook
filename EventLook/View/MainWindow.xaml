@@ -65,7 +65,7 @@
         <KeyBinding Key="O" Modifiers="Control" Command="{Binding OpenFileCommand}"/>
         <KeyBinding Key="S" Modifiers="Control" Command="{Binding ExportToCsvCommand}"/>
     </Window.InputBindings>
-    
+
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
@@ -173,31 +173,31 @@
                 </Button>
                 <CheckBox Content="_Truncate long text" Margin="20,0,0,0" VerticalAlignment="Center" x:Name="CheckTruncate" IsChecked="True" Click="CheckTruncate_Click"/>
             </StackPanel>
-            
-                <StackPanel Grid.Row="1" Orientation="Horizontal">
-                    <TextBlock Text="Provider: " Margin="5,0,0,0" VerticalAlignment="Center"/>
-                    <xctk:CheckComboBox Width="250" 
+
+            <StackPanel Grid.Row="1" Orientation="Horizontal">
+                <TextBlock Text="Provider: " Margin="5,0,0,0" VerticalAlignment="Center"/>
+                <xctk:CheckComboBox Width="250" 
                             IsSelectAllActive="True" IsAllItemsSelectedContentActive="True"
                             Delimiter=", " WatermarkTemplate="{StaticResource SourceFilterWatermarkTemplate}"
                             ItemsSource="{Binding SourceFilters}" DisplayMemberPath="Name" SelectedMemberPath="Selected"
                             Command="{Binding ApplySourceFilterCommand}"/>
-                    <TextBlock Text="Level: " Margin="10,0,0,0" VerticalAlignment="Center"/>
-                    <xctk:CheckComboBox Width="120" 
+                <TextBlock Text="Level: " Margin="10,0,0,0" VerticalAlignment="Center"/>
+                <xctk:CheckComboBox Width="120" 
                             IsSelectAllActive="True" IsAllItemsSelectedContentActive="True"
                             Delimiter=", " WatermarkTemplate="{StaticResource LevelFilterWatermarkTemplate}"
                             ItemsSource="{Binding LevelFilters}" SelectedMemberPath="Selected"
                             Command="{Binding ApplyLevelFilterCommand}"/>
-                    <TextBlock Text="Event ID: " Margin="10,0,0,0" VerticalAlignment="Center"/>
-                    <TextBox Text="{Binding IdFilter.FilterText, Mode=TwoWay, ValidatesOnExceptions=True, UpdateSourceTrigger=PropertyChanged, Delay=300}"
+                <TextBlock Text="Event ID: " Margin="10,0,0,0" VerticalAlignment="Center"/>
+                <TextBox Text="{Binding IdFilter.FilterText, Mode=TwoWay, ValidatesOnExceptions=True, UpdateSourceTrigger=PropertyChanged, Delay=300}"
                              v:TextBoxBehavior.EscapeClearsText="True"
                              MinWidth="50" MaxWidth="150" VerticalContentAlignment="Center" />
-                    <TextBlock Text="Message contains: " Margin="10,0,0,0" VerticalAlignment="Center"/>
-                    <TextBox x:Name="textBoxMsgFilter" Text="{Binding MsgFilter.MessageFilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=300}"
+                <TextBlock Text="Message contains: " Margin="10,0,0,0" VerticalAlignment="Center"/>
+                <TextBox x:Name="textBoxMsgFilter" Text="{Binding MsgFilter.MessageFilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=300}"
                              v:TextBoxBehavior.EscapeClearsText="True"
                              MinWidth="200" VerticalContentAlignment="Center" />
-                    <Button Content="Reset filters" Margin="15,0,0,0" Command="{Binding ResetFiltersCommand, Mode=OneWay}"/>
-                </StackPanel>
-            
+                <Button Content="Reset filters" Margin="15,0,0,0" Command="{Binding ResetFiltersCommand, Mode=OneWay}"/>
+            </StackPanel>
+
             <!-- *** The ItemsSource of the data grid is bound to the CollectionViewSource object that was instantiated above -->
             <DataGrid x:Name="dataGrid1" ItemsSource="{Binding Source={StaticResource X_CVS}}" 
                       SelectedItem="{Binding SelectedEventItem}" SelectedCellsChanged="DataGrid_SelectedCellsChanged"
@@ -260,7 +260,8 @@
                     <KeyBinding Key="Enter" Command="{Binding OpenDetailsCommand}" />
                 </DataGrid.InputBindings>
                 <DataGrid.Columns>
-                    <StaticResource ResourceKey="RecordIdColumn"/> <!-- TODO: Resolve XAML warning -->
+                    <!-- TODO: Resolve XAML warning -->
+                    <StaticResource ResourceKey="RecordIdColumn"/>
                     <DataGridTextColumn SortMemberPath="TimeOfEvent">
                         <DataGridTextColumn.Binding>
                             <MultiBinding Converter="{StaticResource UtcToAnotherTimeZoneStringConverter}">
