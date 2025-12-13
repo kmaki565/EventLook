@@ -1,0 +1,31 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="ARM" />
+    <Platform Name="ARM64" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="AboutBoxWpf/AboutBoxWpf.csproj">
+    <Platform Solution="*|ARM64" Project="ARM64" />
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|x86" Project="x86" />
+  </Project>
+  <Project Path="EventLook/EventLook.csproj">
+    <Platform Solution="*|ARM64" Project="ARM64" />
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|x86" Project="x86" />
+    <Platform Solution="Release|ARM" Project="ARM32" />
+  </Project>
+  <Project Path="EventLookPackage/EventLookPackage.wapproj" Type="c7167f0d-bc9f-4e6e-afe1-012c56b48db5">
+    <Build Solution="Debug|Any CPU" Project="false" />
+    <Deploy Solution="*|ARM" />
+    <Deploy Solution="*|ARM64" />
+    <Deploy Solution="*|x64" />
+    <Deploy Solution="*|x86" />
+    <Deploy Solution="Release|Any CPU" />
+  </Project>
+  <Project Path="Tests/Tests.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+  </Project>
+</Solution>
