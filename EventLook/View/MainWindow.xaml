@@ -42,7 +42,6 @@
                                      InformationIconPath="/Asset/StatusInformationOutline_16x.png"
                                      VerboseIconPath="/Asset/StatusInformation_16x.png"
                                      UnknownIconPath="/Asset/StatusHidden_16x.png"/>
-        <v:ExpandedToGridLengthConverter x:Key="ExpandedToGridLengthConverter"/>
         <v:InverseBooleanConverter x:Key="InverseBooleanConverter" />
         <v:UtcToAnotherTimeZoneStringConverter x:Key="UtcToAnotherTimeZoneStringConverter"/>
         <v:TimeZoneToOffsetTextConverter x:Key="TimeZoneToOffsetTextConverter"/>
@@ -127,7 +126,7 @@
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="40"/>
-                <RowDefinition Height="{Binding ElementName=Ex1, Path=IsExpanded, Converter={StaticResource ExpandedToGridLengthConverter}, ConverterParameter=50}" />
+                <RowDefinition Height="30" />
                 <RowDefinition/>
             </Grid.RowDefinitions>
 
@@ -174,9 +173,8 @@
                 </Button>
                 <CheckBox Content="_Truncate long text" Margin="20,0,0,0" VerticalAlignment="Center" x:Name="CheckTruncate" IsChecked="True" Click="CheckTruncate_Click"/>
             </StackPanel>
-
-            <Expander x:Name="Ex1" Header="F_ilters" Grid.Row="1" Margin="10,0,0,0" ExpandDirection="Down">
-                <StackPanel Orientation="Horizontal">
+            
+                <StackPanel Grid.Row="1" Orientation="Horizontal">
                     <TextBlock Text="Provider: " Margin="5,0,0,0" VerticalAlignment="Center"/>
                     <xctk:CheckComboBox Width="250" 
                             IsSelectAllActive="True" IsAllItemsSelectedContentActive="True"
@@ -199,8 +197,7 @@
                              MinWidth="200" VerticalContentAlignment="Center" />
                     <Button Content="Reset filters" Margin="15,0,0,0" Command="{Binding ResetFiltersCommand, Mode=OneWay}"/>
                 </StackPanel>
-            </Expander>
-
+            
             <!-- *** The ItemsSource of the data grid is bound to the CollectionViewSource object that was instantiated above -->
             <DataGrid x:Name="dataGrid1" ItemsSource="{Binding Source={StaticResource X_CVS}}" 
                       SelectedItem="{Binding SelectedEventItem}" SelectedCellsChanged="DataGrid_SelectedCellsChanged"
@@ -248,7 +245,6 @@
                 <DataGrid.RowStyle>
                     <Style TargetType="DataGridRow" BasedOn="{StaticResource {x:Type DataGridRow}}">
                         <Setter Property="ContextMenu" Value="{StaticResource dataGridContextMenu}" />
-                        <Setter Property="Height" Value="20" />
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding IsNewLoaded}" Value="True">
                                 <Setter Property="Background" Value="{DynamicResource AccentFillColorDefaultBrush}"/>
@@ -264,7 +260,7 @@
                     <KeyBinding Key="Enter" Command="{Binding OpenDetailsCommand}" />
                 </DataGrid.InputBindings>
                 <DataGrid.Columns>
-                    <StaticResource ResourceKey="RecordIdColumn"/>
+                    <StaticResource ResourceKey="RecordIdColumn"/> <!-- TODO: Resolve XAML warning -->
                     <DataGridTextColumn SortMemberPath="TimeOfEvent">
                         <DataGridTextColumn.Binding>
                             <MultiBinding Converter="{StaticResource UtcToAnotherTimeZoneStringConverter}">

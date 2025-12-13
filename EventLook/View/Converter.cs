@@ -106,33 +106,6 @@ public class InverseBooleanToVisibilityConverter : IValueConverter
     }
 }
 
-/// <summary>
-/// Doubles the parameter (as original grid length) according to the boolean value.
-/// </summary>
-public class ExpandedToGridLengthConverter : IValueConverter
-{
-    public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-    {
-        if (!(value is bool))
-            throw new ArgumentException("The source must be a boolean");
-
-        try
-        {
-            int origLength = System.Convert.ToInt32(parameter as string);
-            return new GridLength((bool)value ? origLength * 2 : origLength);
-        }
-        catch (Exception)
-        {
-            throw new ArgumentException("Exception occurred while interpreting parameter.");
-        }
-    }
-
-    public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-    {
-        throw new NotImplementedException();
-    }
-}
-
 public class UtcToAnotherTimeZoneStringConverter : IMultiValueConverter
 {
     public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
