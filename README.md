@@ -1,11 +1,11 @@
 <img align="left" width="80" height="80" src="https://user-images.githubusercontent.com/16055659/169651886-f53360a0-ccad-49f0-8c68-d8f0d5306ecc.png" alt="app_icon">
 
 # EventLook
+<br/>
 
-| :point_up: EventLook is now available in [Microsoft Store](https://www.microsoft.com/store/apps/9NJV5FQ089Z0)! |
-|-----|
-
-A fast & handy alternative to Windows Event Viewer
+> [!NOTE]
+> **EventLook on Microsoft Store has been reimagined with Pro features added — [see below for details](#microsoft-store-version).**
+<br/>
 
 ![screenshot](/Screenshot-1.png)
 
@@ -24,10 +24,6 @@ The inbox Windows Event Viewer is a great app that provides comprehensive functi
 - Right click to quickly filter events
 - Adjust time of events by time zone (Useful when you investigate .evtx file from different time zone)
 
-# Install
-Install from [Microsoft Store](https://www.microsoft.com/store/apps/9NJV5FQ089Z0).
-Alternatively, you could download the latest artifact from [Actions](https://github.com/kmaki565/EventLook/actions), unzip it, and run EventLook.exe. Settings will be saved in `user.config` under `%LOCALAPPDATA%\EventLook`. No registry is used.
-
 # Technologies
 - WPF on .NET 8
 - The basic structure for DataGrid with filters is based on an article in CodeProject: [Multi-filtered WPF DataGrid with MVVM](https://www.codeproject.com/Articles/442498/Multi-filtered-WPF-DataGrid-with-MVVM)
@@ -35,12 +31,19 @@ Alternatively, you could download the latest artifact from [Actions](https://git
 - [Extended WPF Toolkit](https://github.com/xceedsoftware/wpftoolkit)
 - Reading event logs are done by APIs in [System.Diagnostics.Eventing.Reader](https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.eventing.reader?view=netframework-4.8) namespace. The API provides a unified access to logs both from the legacy [Event Logging](https://docs.microsoft.com/en-us/windows/win32/eventlog/event-logging) and the modern [Windows Event Log](https://docs.microsoft.com/en-us/windows/win32/wes/windows-event-log) infrastructure.
 
-# Contribute
-We welcome your code! A standard contribution procedure is as follows:
-1. Fork it to your account
-1. Create your feature branch (git checkout -b my-new-feature)
-1. Commit your changes (git commit -am 'Add some feature')
-1. Push to the branch (git push origin my-new-feature)
-1. Create a new Pull Request
+---
 
-If you have a desired feature, please let me know by opening a new issue :wink:
+# Microsoft Store Version
+
+Going independent as a developer gave me the opportunity to rebuild EventLook on top of this codebase (the OSS version). The Store version includes the following additions and many other improvements. All features from the OSS version remain freely available; select features are offered as a one-time **Pro** upgrade.
+
+- UI Redesign
+  - A modern, clean look with support for multiple languages and dark mode.
+- Activity Chart (Pro)
+  - Visualize event patterns with an intuitive chart. Double-click to jump to an event, or drag to zoom.
+- AI Assistant (Pro)
+  - Get expert AI-powered analysis of event logs.
+
+👉 [**Try it on the Microsoft Store**](https://www.microsoft.com/store/apps/9NJV5FQ089Z0)
+
+Feedback is always welcome via [Issues](https://github.com/kmaki565/EventLook/issues) and [Discussions](https://github.com/kmaki565/EventLook/discussions) here :wink:
