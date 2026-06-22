@@ -1,6 +1,7 @@
 <img align="left" width="80" height="80" src="https://user-images.githubusercontent.com/16055659/169651886-f53360a0-ccad-49f0-8c68-d8f0d5306ecc.png" alt="app_icon">
 
 # EventLook
+<br/>
 
 | 📢 **Notice:** EventLook on Microsoft Store has been reimagined with Pro features added — [see below for details](#microsoft-store-version). |
 |-----|
