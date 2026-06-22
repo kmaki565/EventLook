@@ -4,7 +4,7 @@
 <br/>
 
 > [!NOTE]
-> EventLook on Microsoft Store has been reimagined with Pro features added — [see below for details](#microsoft-store-version).
+> **EventLook on Microsoft Store has been reimagined with Pro features added — [see below for details](#microsoft-store-version).**
 <br/>
 
 ![screenshot](/Screenshot-1.png)
